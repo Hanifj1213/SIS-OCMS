@@ -14,6 +14,7 @@ class Component extends Model
     protected $fillable = [
         'serial_number',
         'model_type',
+        'major_category',
         'current_stage',
         'qr_code_path',
         'status',
@@ -42,5 +43,10 @@ class Component extends Model
     public function partRequests()
     {
         return $this->hasMany(PartRequest::class, 'comp_id', 'comp_id');
+    }
+
+    public function checksheets()
+    {
+        return $this->hasMany(ComponentChecksheet::class, 'comp_id', 'comp_id');
     }
 }

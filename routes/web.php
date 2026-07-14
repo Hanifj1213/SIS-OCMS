@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ChecksheetController;
 use App\Http\Controllers\ComponentController;
 use App\Http\Controllers\PartRequestController;
 use App\Http\Controllers\ProfileController;
@@ -40,7 +41,7 @@ Route::get('/dashboard', function () {
 
     // Data per-stage untuk chart
     $stageDistribution = [];
-    for ($i = 1; $i <= 8; $i++) {
+    for ($i = 1; $i <= 9; $i++) {
         $stageDistribution[$i] = \App\Models\Component::where('current_stage', $i)
             ->where('status', 'On Progress')
             ->count();
@@ -58,6 +59,16 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/scan', function () {
         return view('overhauls.scan');
     })->name('scan');
+
+    // Checksheet routes (Typeform-style)
+    Route::get('components/{component}/checksheet/{stage}', [ChecksheetController::class, 'show'])
+        ->name('checksheet.show');
+    Route::post('components/{component}/checksheet/{stage}/answer', [ChecksheetController::class, 'saveAnswer'])
+        ->name('checksheet.saveAnswer');
+    Route::post('components/{component}/checksheet/{stage}/add-item', [ChecksheetController::class, 'addItem'])
+        ->name('checksheet.addItem');
+    Route::delete('components/{component}/checksheet/{stage}/remove-item', [ChecksheetController::class, 'removeItem'])
+        ->name('checksheet.removeItem');
 
     // Custom component routes (HARUS didefinisikan SEBELUM resource route)
     Route::get('components/{component}/print-pdf', [ComponentController::class, 'printPdf'])

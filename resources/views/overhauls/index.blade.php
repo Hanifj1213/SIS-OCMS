@@ -38,7 +38,7 @@
                     <td class="mono">{{ $comp->serial_number }}</td>
                     <td>{{ $comp->model_type }}</td>
                     <td>
-                        <span class="badge badge-cyan">{{ $comp->current_stage }}/8</span>
+                        <span class="badge badge-cyan">{{ $comp->current_stage }}/9</span>
                     </td>
                     <td>
                         @if($comp->status == 'On Progress')

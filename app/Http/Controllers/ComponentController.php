@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ChecksheetTemplate;
 use App\Models\Component;
+use App\Models\ComponentChecksheet;
 use App\Models\PartRequest;
 use Illuminate\Http\Request;
 use Endroid\QrCode\QrCode;
@@ -14,14 +16,15 @@ class ComponentController extends Controller
      * Nama deskriptif untuk setiap tahapan overhaul.
      */
     public const STAGE_NAMES = [
-        1 => 'Receiving (Penerimaan)',
-        2 => 'Disassembly (Pembongkaran)',
-        3 => 'Measuring & Inspection (Pengukuran)',
-        4 => 'Repair / Machining (Perbaikan)',
-        5 => 'Assembly (Perakitan)',
-        6 => 'Test Bench (Uji Fungsi)',
-        7 => 'Painting & Finishing',
-        8 => 'Delivery (Ready for Use)',
+        1 => 'Receiving (Penerimaan DC)',
+        2 => 'Disassembling (Pembongkaran)',
+        3 => 'Washing (Pencucian)',
+        4 => 'Measurement & Inspection (Pengukuran)',
+        5 => 'Machining & Fabrication (Perbaikan)',
+        6 => 'Assembly (Perakitan)',
+        7 => 'Test Performance (Uji Fungsi)',
+        8 => 'Painting (Pengecatan)',
+        9 => 'Final Inspection (Inspeksi Akhir)',
     ];
 
     /**
@@ -46,16 +49,24 @@ class ComponentController extends Controller
      */
     public function store(Request $request)
     {
+        $validCategories = [
+            'Engine', 'TC/Transmission', 'Differential', 'Final Drive', 'PTO',
+            'Control Valve', 'Hydraulic Pump', 'Travel Motor', 'Swing Motor',
+            'Swing Machinery', 'Hydraulic Cylinder',
+        ];
+
         $request->validate([
-            'serial_number' => 'required|string|max:100|unique:components,serial_number',
-            'model_type'    => 'required|string|max:255',
+            'serial_number'  => 'required|string|max:100|unique:components,serial_number',
+            'model_type'     => 'required|string|max:255',
+            'major_category' => 'required|string|in:' . implode(',', $validCategories),
         ]);
 
         $component = Component::create([
-            'serial_number' => strtoupper(trim($request->serial_number)),
-            'model_type'    => trim($request->model_type),
-            'current_stage' => 1,
-            'status'        => 'On Progress',
+            'serial_number'  => strtoupper(trim($request->serial_number)),
+            'model_type'     => trim($request->model_type),
+            'major_category' => $request->major_category,
+            'current_stage'  => 1,
+            'status'         => 'On Progress',
         ]);
 
         // Generate QR Code
@@ -81,6 +92,20 @@ class ComponentController extends Controller
             'notes'        => 'Komponen diterima di PRC (Receiving)',
         ]);
 
+        // Auto-generate checksheet from template for Stage 1
+        $template = ChecksheetTemplate::where('major_category', $request->major_category)
+            ->where('stage_number', 1)
+            ->first();
+
+        if ($template) {
+            ComponentChecksheet::create([
+                'comp_id'      => $component->comp_id,
+                'stage_number' => 1,
+                'items'        => $template->items,
+                'answers'      => [],
+            ]);
+        }
+
         return redirect()->route('components.show', $component->comp_id)
             ->with('success', 'Komponen "' . $component->serial_number . '" berhasil didaftarkan dan QR Code telah di-generate.');
     }
@@ -91,7 +116,7 @@ class ComponentController extends Controller
     public function show(Component $component)
     {
         // Eager load semua relasi untuk menghindari N+1 query
-        $component->load(['overhaulLogs.mechanic', 'inspectionDetails', 'partRequests']);
+        $component->load(['overhaulLogs.mechanic', 'inspectionDetails', 'partRequests', 'checksheets']);
 
         $stageNames = self::STAGE_NAMES;
 
@@ -103,17 +128,28 @@ class ComponentController extends Controller
      */
     public function updateStage(Request $request, Component $component)
     {
+        // RBAC: hanya Mechanic, Supervisor, SuperAdmin yang boleh proses tahap
+        if (!auth()->user()->hasAnyRole(['Mechanic', 'Supervisor', 'SuperAdmin'])) {
+            return back()->withErrors(['stage' => 'Anda tidak memiliki izin untuk memproses tahapan. Hanya Mekanik, Supervisor, dan Admin yang diperbolehkan.']);
+        }
+
         $currentStage = $component->current_stage;
 
-        // Cegah stage melebihi 8
-        if ($currentStage >= 8) {
-            return back()->withErrors(['stage' => 'Komponen sudah mencapai tahap akhir (Delivery).']);
+        // Cegah stage melebihi 9
+        if ($currentStage >= 9) {
+            return back()->withErrors(['stage' => 'Komponen sudah mencapai tahap akhir (Final Inspection).']);
+        }
+
+        // Cek apakah checksheet tahap ini sudah diisi 100%
+        $checksheet = $component->checksheets()->where('stage_number', $currentStage)->first();
+        if ($checksheet && !$checksheet->is_complete) {
+            return back()->withErrors(['stage' => 'Checksheet tahap ini belum selesai diisi. Progress saat ini: ' . $checksheet->progress . '%. Harap selesaikan checksheet sebelum melanjutkan.']);
         }
 
         $nextStage = $currentStage + 1;
 
-        // === TAHAP 3: Measuring & Inspection ===
-        if ($currentStage == 3) {
+        // === TAHAP 4: Measurement & Inspection ===
+        if ($currentStage == 4) {
             $request->validate([
                 'parts'                 => 'required|array|min:1',
                 'parts.*.name'          => 'required|string',
@@ -139,8 +175,8 @@ class ComponentController extends Controller
             }
         }
 
-        // === TAHAP 6: Quality Gate (Test Bench) ===
-        if ($currentStage == 6) {
+        // === TAHAP 7: Quality Gate (Test Performance) ===
+        if ($currentStage == 7) {
             $request->validate([
                 'oil_pressure' => 'required|numeric|min:0',
             ]);
@@ -165,10 +201,10 @@ class ComponentController extends Controller
         }
 
         // Update status komponen
-        $isDelivery = ($nextStage == 8);
+        $isFinalCompleted = ($nextStage == 9);
         $component->update([
             'current_stage' => $nextStage,
-            'status'        => $isDelivery ? 'Ready for Use' : 'On Progress',
+            'status'        => $isFinalCompleted ? 'Ready for Use' : 'On Progress',
         ]);
 
         // Buat log untuk tahapan selanjutnya
@@ -180,16 +216,16 @@ class ComponentController extends Controller
             'notes'        => 'Memulai: ' . $stageNote,
         ];
 
-        // Jika sudah tahap akhir (Delivery/RFU), langsung tutup lognya
-        if ($isDelivery) {
+        // Jika sudah tahap akhir (Final Inspection/RFU), langsung tutup lognya
+        if ($isFinalCompleted) {
             $logData['end_time'] = now();
-            $logData['notes']    = 'Komponen selesai overhaul - Ready for Use (RFU)';
+            $logData['notes']    = 'Final Inspection selesai - Komponen Ready for Use (RFU)';
         }
 
         $component->overhaulLogs()->create($logData);
 
         return redirect()->route('components.show', $component->comp_id)
-            ->with('success', 'Berhasil memproses ke ' . ($isDelivery ? 'status Ready for Use (RFU)!' : 'Tahap ' . $nextStage . ' (' . $stageNote . ')'));
+            ->with('success', 'Berhasil memproses ke ' . ($isFinalCompleted ? 'status Ready for Use (RFU)!' : 'Tahap ' . $nextStage . ' (' . $stageNote . ')'));
     }
 
     /**
