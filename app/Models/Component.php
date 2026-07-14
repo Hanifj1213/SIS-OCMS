@@ -16,8 +16,13 @@ class Component extends Model
         'model_type',
         'major_category',
         'current_stage',
+        'is_waiting_approval',
         'qr_code_path',
         'status',
+    ];
+
+    protected $casts = [
+        'is_waiting_approval' => 'boolean',
     ];
 
     /**

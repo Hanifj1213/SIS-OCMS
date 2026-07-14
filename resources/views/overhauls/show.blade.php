@@ -641,59 +641,85 @@
         <div class="section-title fade-up">Aksi</div>
         <div class="glass-card fade-up">
             @if($comp->current_stage < 9)
-                <form action="{{ route('components.updateStage', $comp->comp_id) }}" method="POST">
-                    @csrf
-
-                    @if($comp->current_stage == 4)
-                    <div style="background: var(--accent-purple-dim); border: 1px solid rgba(167, 139, 250, 0.15); border-radius: 14px; padding: 28px; margin-bottom: 24px;">
-                        <div class="section-title" style="color: var(--accent-purple); margin-bottom: 16px;">📐 Form Inspeksi Digital (Measurement & Inspection)</div>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 8px;">
-                            <div class="ocms-label" style="margin: 0;">Nama Part</div>
-                            <div class="ocms-label" style="margin: 0;">Nilai Aktual (mm)</div>
-                            <div class="ocms-label" style="margin: 0;">Keputusan</div>
-                        </div>
-                        @php $parts = ['Crankshaft', 'Piston Ring', 'Cylinder Liner']; @endphp
-                        @foreach($parts as $index => $part)
-                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 10px; align-items: center;">
-                            <div>
-                                <input type="hidden" name="parts[{{ $index }}][name]" value="{{ $part }}">
-                                <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-primary);">{{ $part }}</span>
-                            </div>
-                            <div>
-                                <input type="number" step="0.01" min="0" name="parts[{{ $index }}][actual_value]" class="ocms-input" placeholder="0.00" required style="font-family: 'JetBrains Mono', monospace; padding: 10px 14px;">
-                            </div>
-                            <div>
-                                <select name="parts[{{ $index }}][decision]" class="ocms-select" required style="padding: 10px 14px;">
-                                    <option value="Reused">✅ Reused</option>
-                                    <option value="Repair">🔧 Repair</option>
-                                    <option value="Replace">🔴 Replace</option>
-                                </select>
-                            </div>
-                        </div>
-                        @endforeach
-                        <p style="font-size: 0.7rem; color: var(--accent-red); margin-top: 12px; font-weight: 500;">⚠ "Replace" otomatis memicu permintaan parts ke gudang.</p>
+                @if($comp->is_waiting_approval)
+                    <div style="background: var(--accent-gold-dim); border: 1px solid rgba(212,175,55,0.15); border-radius: 14px; padding: 24px; margin-bottom: 24px; text-align: center;">
+                        <p style="font-size: 1rem; font-weight: 700; color: var(--accent-gold); margin-bottom: 8px;">⏳ Menunggu Approval Management</p>
+                        <p style="font-size: 0.85rem; color: var(--text-secondary);">Komponen ini sedang menunggu persetujuan dari Management untuk lanjut ke Tahap {{ $comp->current_stage + 1 }}.</p>
                     </div>
-                    @endif
-
-                    @if($comp->current_stage == 7)
-                    <div style="background: var(--accent-purple-dim); border: 1px solid rgba(167, 139, 250, 0.15); border-radius: 14px; padding: 28px; margin-bottom: 24px;">
-                        <div class="section-title" style="color: var(--accent-purple); margin-bottom: 16px;">🧪 Quality Gate — Test Performance</div>
-                        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 16px;">Standar Tekanan Oli: <strong style="color: var(--text-primary);">40 – 50 psi</strong></p>
-                        <label class="ocms-label">Tekanan Oli Aktual (psi)</label>
-                        <input type="number" step="0.1" min="0" name="oil_pressure" class="ocms-input" placeholder="45.0" value="{{ old('oil_pressure') }}" required style="max-width: 300px; font-family: 'JetBrains Mono', monospace;">
-                        <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 8px;">Nilai di luar 40-50 psi akan ditolak oleh Quality Gate.</p>
-                    </div>
-                    @endif
-
+                    
                     <div style="display: flex; justify-content: space-between; align-items: center;">
                         <a href="{{ route('components.index') }}" class="btn-secondary">← Kembali</a>
-                        @role('Mechanic|Supervisor|SuperAdmin')
-                        <button type="submit" class="btn-primary">Proses ke Tahap {{ $comp->current_stage + 1 }} →</button>
+                        @role('Management|SuperAdmin')
+                        <div style="display: flex; gap: 12px;">
+                            <form action="{{ route('components.rejectStage', $comp->comp_id) }}" method="POST" style="margin:0;">
+                                @csrf
+                                <button type="submit" class="btn-secondary" style="color: var(--accent-red); border-color: rgba(248,113,113,0.3);">❌ Tolak</button>
+                            </form>
+                            <form action="{{ route('components.approveStage', $comp->comp_id) }}" method="POST" style="margin:0;">
+                                @csrf
+                                <button type="submit" class="btn-primary" style="background: linear-gradient(135deg, var(--accent-green), #059669);">✅ Approve ke Tahap {{ $comp->current_stage + 1 }}</button>
+                            </form>
+                        </div>
                         @else
-                        <span style="font-size: 0.75rem; color: var(--text-muted); font-style: italic;">Hanya Mekanik/Supervisor yang bisa memproses tahap.</span>
+                        <span style="font-size: 0.75rem; color: var(--text-muted); font-style: italic;">Hanya Management yang bisa memberikan approval.</span>
                         @endrole
                     </div>
-                </form>
+                @else
+                    <form action="{{ route('components.updateStage', $comp->comp_id) }}" method="POST">
+                        @csrf
+
+                        @if($comp->current_stage == 4)
+                        <div style="background: var(--accent-purple-dim); border: 1px solid rgba(167, 139, 250, 0.15); border-radius: 14px; padding: 28px; margin-bottom: 24px;">
+                            <div class="section-title" style="color: var(--accent-purple); margin-bottom: 16px;">📐 Form Inspeksi Digital (Measurement & Inspection)</div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 8px;">
+                                <div class="ocms-label" style="margin: 0;">Nama Part</div>
+                                <div class="ocms-label" style="margin: 0;">Nilai Aktual (mm)</div>
+                                <div class="ocms-label" style="margin: 0;">Keputusan</div>
+                            </div>
+                            @php $parts = ['Crankshaft', 'Piston Ring', 'Cylinder Liner']; @endphp
+                            @foreach($parts as $index => $part)
+                            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 10px; align-items: center;">
+                                <div>
+                                    <input type="hidden" name="parts[{{ $index }}][name]" value="{{ $part }}">
+                                    <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-primary);">{{ $part }}</span>
+                                </div>
+                                <input type="number" step="0.01" min="0" name="parts[{{ $index }}][actual_value]" class="ocms-input" placeholder="0.00" value="{{ old('parts.'.$index.'.actual_value') }}" required>
+                                <select name="parts[{{ $index }}][decision]" class="ocms-select" required>
+                                    <option value="" disabled selected>Pilih Keputusan...</option>
+                                    <option value="Reused" {{ old('parts.'.$index.'.decision') == 'Reused' ? 'selected' : '' }}>🟢 Reused (Pakai Kembali)</option>
+                                    <option value="Repair" {{ old('parts.'.$index.'.decision') == 'Repair' ? 'selected' : '' }}>🟡 Repair (Perbaikan)</option>
+                                    <option value="Replace" {{ old('parts.'.$index.'.decision') == 'Replace' ? 'selected' : '' }}>🔴 Replace (Ganti Baru)</option>
+                                </select>
+                            </div>
+                            @endforeach
+                            <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 12px;">*Jika ada keputusan "Replace", sistem Smart Inventory akan otomatis membuat Part Request (PR) ke Gudang.</p>
+                        </div>
+                        @endif
+
+                        @if($comp->current_stage == 7)
+                        <div style="background: var(--accent-purple-dim); border: 1px solid rgba(167, 139, 250, 0.15); border-radius: 14px; padding: 28px; margin-bottom: 24px;">
+                            <div class="section-title" style="color: var(--accent-purple); margin-bottom: 16px;">🧪 Quality Gate — Test Performance</div>
+                            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 16px;">Standar Tekanan Oli: <strong style="color: var(--text-primary);">40 – 50 psi</strong></p>
+                            <label class="ocms-label">Tekanan Oli Aktual (psi)</label>
+                            <input type="number" step="0.1" min="0" name="oil_pressure" class="ocms-input" placeholder="45.0" value="{{ old('oil_pressure') }}" required style="max-width: 300px; font-family: 'JetBrains Mono', monospace;">
+                            <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 8px;">Nilai di luar 40-50 psi akan ditolak oleh Quality Gate.</p>
+                        </div>
+                        @endif
+                        <div style="margin-bottom: 24px;">
+                            <label class="ocms-label" style="display: block; margin-bottom: 8px;">Catatan / Remarks (Opsional)</label>
+                            <textarea name="remarks" class="ocms-input" placeholder="Tambahkan catatan untuk Management sebelum mengajukan approval..." style="width: 100%; min-height: 80px; resize: vertical;"></textarea>
+                        </div>
+
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <a href="{{ route('components.index') }}" class="btn-secondary">← Kembali</a>
+                            @role('Mechanic|Supervisor|SuperAdmin')
+                            <button type="submit" class="btn-primary">Ajukan Approval ke Tahap {{ $comp->current_stage + 1 }} →</button>
+                            @else
+                            <span style="font-size: 0.75rem; color: var(--text-muted); font-style: italic;">Hanya Mekanik/Supervisor yang bisa mengajukan proses.</span>
+                            @endrole
+                        </div>
+                    </form>
+                @endif
             @else
                 <div style="background: var(--accent-green-dim); border: 1px solid rgba(52, 211, 153, 0.15); border-radius: 14px; padding: 24px; margin-bottom: 24px; text-align: center;">
                     <p style="font-size: 1rem; font-weight: 700; color: var(--accent-green);">🎉 Komponen telah selesai overhaul — Ready for Use (RFU)</p>

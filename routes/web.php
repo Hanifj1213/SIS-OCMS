@@ -75,6 +75,10 @@ Route::middleware(['auth'])->group(function () {
         ->name('components.printPdf');
     Route::post('components/{component}/update-stage', [ComponentController::class, 'updateStage'])
         ->name('components.updateStage');
+    Route::post('components/{component}/approve-stage', [ComponentController::class, 'approveStage'])
+        ->name('components.approveStage');
+    Route::post('components/{component}/reject-stage', [ComponentController::class, 'rejectStage'])
+        ->name('components.rejectStage');
 
     // Resource route komponen
     Route::resource('components', ComponentController::class);

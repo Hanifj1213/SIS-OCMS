@@ -140,6 +140,10 @@ class ComponentController extends Controller
             return back()->withErrors(['stage' => 'Komponen sudah mencapai tahap akhir (Final Inspection).']);
         }
 
+        if ($component->is_waiting_approval) {
+            return back()->withErrors(['stage' => 'Komponen ini sedang menunggu approval Management.']);
+        }
+
         // Cek apakah checksheet tahap ini sudah diisi 100%
         $checksheet = $component->checksheets()->where('stage_number', $currentStage)->first();
         if ($checksheet && !$checksheet->is_complete) {
@@ -190,6 +194,45 @@ class ComponentController extends Controller
             }
         }
 
+        // Tambahkan catatan mekanik ke log saat ini
+        if ($request->filled('remarks')) {
+            $currentLog = $component->overhaulLogs()
+                ->where('stage_number', $currentStage)
+                ->latest('log_id')
+                ->first();
+
+            if ($currentLog) {
+                $currentLog->update([
+                    'notes' => $currentLog->notes . "\n\nCatatan Mekanik: " . $request->remarks
+                ]);
+            }
+        }
+
+        // Ubah status menjadi menunggu approval
+        $component->update([
+            'is_waiting_approval' => true,
+        ]);
+
+        return redirect()->route('components.show', $component->comp_id)
+            ->with('success', 'Progress tahap ' . $currentStage . ' selesai. Menunggu Approval Management untuk lanjut ke Tahap ' . $nextStage . '.');
+    }
+
+    /**
+     * Setujui transisi tahap oleh Management
+     */
+    public function approveStage(Component $component)
+    {
+        if (!auth()->user()->hasRole('Management')) {
+            return back()->withErrors(['approval' => 'Hanya role Management yang dapat memberikan approval.']);
+        }
+
+        if (!$component->is_waiting_approval) {
+            return back()->withErrors(['approval' => 'Komponen ini tidak sedang menunggu approval.']);
+        }
+
+        $currentStage = $component->current_stage;
+        $nextStage = $currentStage + 1;
+
         // Tutup log tahapan saat ini
         $currentLog = $component->overhaulLogs()
             ->where('stage_number', $currentStage)
@@ -203,29 +246,51 @@ class ComponentController extends Controller
         // Update status komponen
         $isFinalCompleted = ($nextStage == 9);
         $component->update([
-            'current_stage' => $nextStage,
-            'status'        => $isFinalCompleted ? 'Ready for Use' : 'On Progress',
+            'current_stage'       => $nextStage,
+            'is_waiting_approval' => false,
+            'status'              => $isFinalCompleted ? 'Ready for Use' : 'On Progress',
         ]);
 
         // Buat log untuk tahapan selanjutnya
         $stageNote = self::STAGE_NAMES[$nextStage] ?? 'Tahap ' . $nextStage;
         $logData = [
             'stage_number' => $nextStage,
-            'mechanic_id'  => auth()->id(),
+            'mechanic_id'  => auth()->id(), // Idealnya mencatat yang approve atau tetap mekanik sebelumnya, tapi kita pakai auth() untuk jejak Management yang trigger
             'start_time'   => now(),
-            'notes'        => 'Memulai: ' . $stageNote,
+            'notes'        => 'Memulai: ' . $stageNote . ' (Approved)',
         ];
 
         // Jika sudah tahap akhir (Final Inspection/RFU), langsung tutup lognya
         if ($isFinalCompleted) {
             $logData['end_time'] = now();
-            $logData['notes']    = 'Final Inspection selesai - Komponen Ready for Use (RFU)';
+            $logData['notes']    = 'Final Inspection selesai - Komponen Ready for Use (RFU) (Approved)';
         }
 
         $component->overhaulLogs()->create($logData);
 
         return redirect()->route('components.show', $component->comp_id)
-            ->with('success', 'Berhasil memproses ke ' . ($isFinalCompleted ? 'status Ready for Use (RFU)!' : 'Tahap ' . $nextStage . ' (' . $stageNote . ')'));
+            ->with('success', 'Approval berhasil! Komponen berlanjut ke ' . ($isFinalCompleted ? 'status Ready for Use (RFU)' : 'Tahap ' . $nextStage));
+    }
+
+    /**
+     * Tolak transisi tahap oleh Management
+     */
+    public function rejectStage(Component $component)
+    {
+        if (!auth()->user()->hasRole('Management')) {
+            return back()->withErrors(['approval' => 'Hanya role Management yang dapat menolak approval.']);
+        }
+
+        if (!$component->is_waiting_approval) {
+            return back()->withErrors(['approval' => 'Komponen ini tidak sedang menunggu approval.']);
+        }
+
+        $component->update([
+            'is_waiting_approval' => false,
+        ]);
+
+        return redirect()->route('components.show', $component->comp_id)
+            ->with('success', 'Approval ditolak. Komponen dikembalikan ke mekanik pada tahap ' . $component->current_stage . '.');
     }
 
     /**
