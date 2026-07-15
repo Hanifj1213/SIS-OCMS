@@ -13,8 +13,22 @@ class Component extends Model
 
     protected $fillable = [
         'serial_number',
+        'egi',
+        'unit_code',
+        'unit_serial_no',
+        'site_district',
         'model_type',
         'major_category',
+        'component_model',
+        'pn_assy',
+        'status_ovh',
+        'core_category',
+        'smr',
+        'life_time',
+        'date_defitted',
+        'manifest',
+        'way_bill',
+        'date_delivery',
         'current_stage',
         'is_waiting_approval',
         'qr_code_path',
@@ -23,6 +37,10 @@ class Component extends Model
 
     protected $casts = [
         'is_waiting_approval' => 'boolean',
+        'date_defitted' => 'date',
+        'date_delivery' => 'date',
+        'smr' => 'integer',
+        'life_time' => 'integer',
     ];
 
     /**

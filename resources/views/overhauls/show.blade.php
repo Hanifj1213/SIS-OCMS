@@ -3,7 +3,7 @@
     <div class="section fade-up">
         <div class="ocms-page-header">
             <h1>{{ $comp->serial_number }}</h1>
-            <p>{{ $comp->model_type }}</p>
+            <p>{{ $comp->egi ?? $comp->model_type }} — {{ $comp->major_category }}</p></p>
         </div>
     </div>
 
@@ -22,38 +22,102 @@
         </div>
     @endif
 
-    {{-- Info + QR Code --}}
+    {{-- Damage Core Info + QR Code --}}
     <div class="section" style="display: grid; grid-template-columns: 1fr 240px; gap: 20px;">
         <div class="glass-card fade-up">
-            <div class="section-title" style="margin-bottom: 16px;">Informasi Utama</div>
-            <table style="width: 100%;">
-                <tr>
-                    <td style="padding: 10px 0; color: var(--text-muted); width: 35%; font-size: 0.85rem;">Serial Number</td>
-                    <td class="mono" style="padding: 10px 0; font-size: 0.95rem;">{{ $comp->serial_number }}</td>
-                </tr>
-                <tr>
-                    <td style="padding: 10px 0; color: var(--text-muted); font-size: 0.85rem;">Model Alat</td>
-                    <td style="padding: 10px 0; font-size: 0.85rem;">{{ $comp->model_type }}</td>
-                </tr>
-                <tr>
-                    <td style="padding: 10px 0; color: var(--text-muted); font-size: 0.85rem;">Kategori</td>
-                    <td style="padding: 10px 0;"><span class="badge badge-cyan">{{ $comp->major_category }}</span></td>
-                </tr>
-                <tr>
-                    <td style="padding: 10px 0; color: var(--text-muted); font-size: 0.85rem;">Status</td>
-                    <td style="padding: 10px 0;">
-                        @if($comp->status == 'On Progress')
-                            <span class="badge badge-gold">🔧 {{ $stageNames[$comp->current_stage] ?? 'Tahap '.$comp->current_stage }}</span>
-                        @else
-                            <span class="badge badge-green">✅ Ready for Use (RFU)</span>
-                        @endif
-                    </td>
-                </tr>
-                <tr>
-                    <td style="padding: 10px 0; color: var(--text-muted); font-size: 0.85rem;">Terdaftar</td>
-                    <td style="padding: 10px 0; font-size: 0.85rem; color: var(--text-secondary);">{{ $comp->created_at->format('d M Y H:i') }} WIB</td>
-                </tr>
-            </table>
+            <div class="section-title" style="margin-bottom: 16px;">📋 Damage Core — Informasi Komponen</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0;">
+                {{-- Left Column --}}
+                <div style="border-right: 1px solid rgba(255,255,255,0.04);">
+                    <div style="display: flex; padding: 10px 16px 10px 0; border-bottom: 1px solid rgba(255,255,255,0.03);">
+                        <span style="color: var(--text-muted); width: 40%; font-size: 0.8rem;">EGI</span>
+                        <span class="mono" style="font-size: 0.85rem; font-weight: 600;">{{ $comp->egi ?? '-' }}</span>
+                    </div>
+                    <div style="display: flex; padding: 10px 16px 10px 0; border-bottom: 1px solid rgba(255,255,255,0.03);">
+                        <span style="color: var(--text-muted); width: 40%; font-size: 0.8rem;">Unit Code</span>
+                        <span class="mono" style="font-size: 0.85rem;">{{ $comp->unit_code ?? '-' }}</span>
+                    </div>
+                    <div style="display: flex; padding: 10px 16px 10px 0; border-bottom: 1px solid rgba(255,255,255,0.03);">
+                        <span style="color: var(--text-muted); width: 40%; font-size: 0.8rem;">Unit Serial No.</span>
+                        <span class="mono" style="font-size: 0.85rem;">{{ $comp->unit_serial_no ?? '-' }}</span>
+                    </div>
+                    <div style="display: flex; padding: 10px 16px 10px 0; border-bottom: 1px solid rgba(255,255,255,0.03);">
+                        <span style="color: var(--text-muted); width: 40%; font-size: 0.8rem;">Site / District</span>
+                        <span style="font-size: 0.85rem;">{{ $comp->site_district ?? '-' }}</span>
+                    </div>
+                    <div style="display: flex; padding: 10px 16px 10px 0; border-bottom: 1px solid rgba(255,255,255,0.03);">
+                        <span style="color: var(--text-muted); width: 40%; font-size: 0.8rem;">SMR</span>
+                        <span class="mono" style="font-size: 0.85rem; font-weight: 600; color: var(--accent-cyan);">{{ $comp->smr ? number_format($comp->smr) : '-' }}</span>
+                    </div>
+                    <div style="display: flex; padding: 10px 16px 10px 0; border-bottom: 1px solid rgba(255,255,255,0.03);">
+                        <span style="color: var(--text-muted); width: 40%; font-size: 0.8rem;">Manifest</span>
+                        <span style="font-size: 0.85rem;">{{ $comp->manifest ?? '-' }}</span>
+                    </div>
+                    <div style="display: flex; padding: 10px 16px 10px 0;">
+                        <span style="color: var(--text-muted); width: 40%; font-size: 0.8rem;">Way Bill</span>
+                        <span style="font-size: 0.85rem;">{{ $comp->way_bill ?? '-' }}</span>
+                    </div>
+                </div>
+                {{-- Right Column --}}
+                <div style="padding-left: 16px;">
+                    <div style="display: flex; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.03);">
+                        <span style="color: var(--text-muted); width: 45%; font-size: 0.8rem;">Component Model</span>
+                        <span style="font-size: 0.85rem;"><span class="badge badge-cyan">{{ $comp->major_category }}</span></span>
+                    </div>
+                    <div style="display: flex; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.03);">
+                        <span style="color: var(--text-muted); width: 45%; font-size: 0.8rem;">Comp Serial No.</span>
+                        <span class="mono" style="font-size: 0.85rem; font-weight: 600;">{{ $comp->serial_number }}</span>
+                    </div>
+                    <div style="display: flex; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.03);">
+                        <span style="color: var(--text-muted); width: 45%; font-size: 0.8rem;">P/N Assy</span>
+                        <span class="mono" style="font-size: 0.85rem;">{{ $comp->pn_assy ?? '-' }}</span>
+                    </div>
+                    <div style="display: flex; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.03);">
+                        <span style="color: var(--text-muted); width: 45%; font-size: 0.8rem;">Status OVH</span>
+                        <span>
+                            @if($comp->status_ovh == 'SCHEDULE')
+                                <span class="badge badge-green">📅 SCHEDULE</span>
+                            @elseif($comp->status_ovh == 'UNSCHEDULE')
+                                <span class="badge badge-gold">⚠️ UNSCHEDULE</span>
+                            @else
+                                <span style="font-size: 0.85rem;">-</span>
+                            @endif
+                        </span>
+                    </div>
+                    <div style="display: flex; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.03);">
+                        <span style="color: var(--text-muted); width: 45%; font-size: 0.8rem;">Core Category</span>
+                        <span style="font-size: 0.85rem;">
+                            @if($comp->core_category == 'A')
+                                <span class="badge badge-cyan" title="Kondisi komponen running, lengkap (Schedule Overhaul)">Cat. A</span>
+                            @elseif($comp->core_category == 'B')
+                                <span class="badge badge-gold" title="Kondisi Main Shaft Jammed, Gear broken (Unschedule Overhaul)">Cat. B</span>
+                            @elseif($comp->core_category == 'C')
+                                <span class="badge badge-red" title="Kondisi Housing Jebol / Broken (Unschedule Overhaul)">Cat. C</span>
+                            @else
+                                -
+                            @endif
+                        </span>
+                    </div>
+                    <div style="display: flex; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.03);">
+                        <span style="color: var(--text-muted); width: 45%; font-size: 0.8rem;">Life Time</span>
+                        <span class="mono" style="font-size: 0.85rem; font-weight: 600; color: var(--accent-cyan);">{{ $comp->life_time ? number_format($comp->life_time) : '-' }}</span>
+                    </div>
+                    <div style="display: flex; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.03);">
+                        <span style="color: var(--text-muted); width: 45%; font-size: 0.8rem;">Date Received</span>
+                        <span style="font-size: 0.85rem;">{{ $comp->date_defitted ? $comp->date_defitted->format('d M Y') : '-' }}</span>
+                    </div>
+                    <div style="display: flex; padding: 10px 0;">
+                        <span style="color: var(--text-muted); width: 45%; font-size: 0.8rem;">Status Overhaul</span>
+                        <span>
+                            @if($comp->status == 'On Progress')
+                                <span class="badge badge-gold">🔧 {{ $stageNames[$comp->current_stage] ?? 'Tahap '.$comp->current_stage }}</span>
+                            @else
+                                <span class="badge badge-green">✅ Ready for Use (RFU)</span>
+                            @endif
+                        </span>
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="glass-card fade-up" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
             <div class="section-title">QR Code</div>
@@ -70,12 +134,12 @@
         <div class="section-title fade-up">Progress Overhaul</div>
         <div class="glass-card fade-up" style="padding: 32px;">
             <div class="stage-bar">
-                @for($i = 1; $i <= 9; $i++)
+                @for($i = 1; $i <= 7; $i++)
                     <div class="stage-node {{ $i < $comp->current_stage ? 'completed' : ($i == $comp->current_stage ? 'active' : 'pending') }}">
                         <div style="font-size: 1.1rem; font-weight: 800;">{{ $i }}</div>
                         <div style="font-size: 0.55rem; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.05em;">{{ explode(' (', $stageNames[$i] ?? '')[0] }}</div>
                     </div>
-                    @if($i < 9)
+                    @if($i < 7)
                         <div class="stage-connector {{ $i < $comp->current_stage ? 'done' : 'undone' }}"></div>
                     @endif
                 @endfor
@@ -191,7 +255,7 @@
 
     {{-- Checksheet Section (Inline Interactive) --}}
     @php $currentChecksheet = $comp->checksheets->where('stage_number', $comp->current_stage)->first(); @endphp
-    @if($currentChecksheet && $comp->current_stage < 9)
+    @if($currentChecksheet && $comp->current_stage < 7)
     <div class="section">
         <div class="section-title fade-up">Checksheet — {{ $stageNames[$comp->current_stage] ?? '' }}</div>
         <div class="glass-card fade-up" id="csContainer">
@@ -640,7 +704,7 @@
     <div class="section">
         <div class="section-title fade-up">Aksi</div>
         <div class="glass-card fade-up">
-            @if($comp->current_stage < 9)
+            @if($comp->current_stage < 7)
                 @if($comp->is_waiting_approval)
                     <div style="background: var(--accent-gold-dim); border: 1px solid rgba(212,175,55,0.15); border-radius: 14px; padding: 24px; margin-bottom: 24px; text-align: center;">
                         <p style="font-size: 1rem; font-weight: 700; color: var(--accent-gold); margin-bottom: 8px;">⏳ Menunggu Approval Management</p>
@@ -668,7 +732,7 @@
                     <form action="{{ route('components.updateStage', $comp->comp_id) }}" method="POST">
                         @csrf
 
-                        @if($comp->current_stage == 4)
+                        @if($comp->current_stage == 2)
                         <div style="background: var(--accent-purple-dim); border: 1px solid rgba(167, 139, 250, 0.15); border-radius: 14px; padding: 28px; margin-bottom: 24px;">
                             <div class="section-title" style="color: var(--accent-purple); margin-bottom: 16px;">📐 Form Inspeksi Digital (Measurement & Inspection)</div>
                             <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 8px;">
@@ -696,7 +760,7 @@
                         </div>
                         @endif
 
-                        @if($comp->current_stage == 7)
+                        @if($comp->current_stage == 5)
                         <div style="background: var(--accent-purple-dim); border: 1px solid rgba(167, 139, 250, 0.15); border-radius: 14px; padding: 28px; margin-bottom: 24px;">
                             <div class="section-title" style="color: var(--accent-purple); margin-bottom: 16px;">🧪 Quality Gate — Test Performance</div>
                             <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 16px;">Standar Tekanan Oli: <strong style="color: var(--text-primary);">40 – 50 psi</strong></p>

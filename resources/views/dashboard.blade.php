@@ -46,18 +46,16 @@
     <div class="section">
         <div class="section-title fade-up">📈 Distribusi Komponen per Tahapan (On Progress)</div>
         <div class="glass-card fade-up" style="padding: 32px;">
-            <div style="display: grid; grid-template-columns: repeat(9, 1fr); gap: 12px;">
+            <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 12px;">
                 @php
                     $stageLabels = [
                         1 => 'Receiving',
-                        2 => 'Disassembly',
-                        3 => 'Washing',
-                        4 => 'Measuring',
-                        5 => 'Machining',
-                        6 => 'Assembly',
-                        7 => 'Test Perf.',
-                        8 => 'Painting',
-                        9 => 'Final Insp.',
+                        2 => 'DIS Assembling',
+                        3 => 'Machining',
+                        4 => 'Assembly',
+                        5 => 'Test Perf.',
+                        6 => 'Painting',
+                        7 => 'RFU/Delivery',
                     ];
                 @endphp
                 @foreach($stageDistribution as $stage => $count)

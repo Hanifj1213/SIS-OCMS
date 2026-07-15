@@ -17,14 +17,12 @@ class ComponentController extends Controller
      */
     public const STAGE_NAMES = [
         1 => 'Receiving (Penerimaan DC)',
-        2 => 'Disassembling (Pembongkaran)',
-        3 => 'Washing (Pencucian)',
-        4 => 'Measurement & Inspection (Pengukuran)',
-        5 => 'Machining & Fabrication (Perbaikan)',
-        6 => 'Assembly (Perakitan)',
-        7 => 'Test Performance (Uji Fungsi)',
-        8 => 'Painting (Pengecatan)',
-        9 => 'Final Inspection (Inspeksi Akhir)',
+        2 => 'DIS Assembling (Pembongkaran, Pencucian & Pengukuran)',
+        3 => 'Machining & Fabrication (Perbaikan)',
+        4 => 'Assembly (Perakitan)',
+        5 => 'Test Performance (Uji Fungsi)',
+        6 => 'Painting (Pengecatan)',
+        7 => 'RFU/Delivery (Siap Kirim)',
     ];
 
     /**
@@ -50,23 +48,66 @@ class ComponentController extends Controller
     public function store(Request $request)
     {
         $validCategories = [
-            'Engine', 'TC/Transmission', 'Differential', 'Final Drive', 'PTO',
-            'Control Valve', 'Hydraulic Pump', 'Travel Motor', 'Swing Motor',
-            'Swing Machinery', 'Hydraulic Cylinder',
+            'Engine',
+            'TC/Transmission',
+            'Differential',
+            'Final Drive',
+            'PTO',
+            'Control Valve',
+            'Hydraulic Pump',
+            'Travel Motor',
+            'Swing Motor',
+            'Swing Machinery',
+            'Hydraulic Cylinder',
         ];
 
+        $validStatusOvh = ['SCHEDULE', 'UNSCHEDULE'];
+
         $request->validate([
-            'serial_number'  => 'required|string|max:100|unique:components,serial_number',
-            'model_type'     => 'required|string|max:255',
+            // Data Unit
+            'egi' => 'required|string|max:100',
+            'unit_code' => 'required|string|max:100',
+            'unit_serial_no' => 'nullable|string|max:100',
+            'site_district' => 'required|string|max:100',
+            // Data Komponen
             'major_category' => 'required|string|in:' . implode(',', $validCategories),
+            'serial_number' => 'required|string|max:100|unique:components,serial_number',
+            'pn_assy' => 'nullable|string|max:100',
+            'status_ovh' => 'required|string|in:' . implode(',', $validStatusOvh),
+            'core_category' => 'nullable|string|in:A,B,C',
+            // Informasi Operasional
+            'smr' => 'nullable|integer|min:0',
+            'life_time' => 'nullable|integer|min:0',
+            'date_defitted' => 'nullable|date',
+            // Logistik
+            'manifest' => 'nullable|string|max:255',
+            'way_bill' => 'nullable|string|max:255',
         ]);
 
         $component = Component::create([
-            'serial_number'  => strtoupper(trim($request->serial_number)),
-            'model_type'     => trim($request->model_type),
+            // Data Unit
+            'egi' => strtoupper(trim($request->egi)),
+            'unit_code' => strtoupper(trim($request->unit_code)),
+            'unit_serial_no' => $request->unit_serial_no ? strtoupper(trim($request->unit_serial_no)) : null,
+            'site_district' => trim($request->site_district),
+            // Data Komponen
             'major_category' => $request->major_category,
-            'current_stage'  => 1,
-            'status'         => 'On Progress',
+            'component_model' => $request->major_category, // Component Model = sama dengan kategori
+            'serial_number' => strtoupper(trim($request->serial_number)),
+            'model_type' => strtoupper(trim($request->egi)), // backward compat
+            'pn_assy' => $request->pn_assy ? strtoupper(trim($request->pn_assy)) : null,
+            'status_ovh' => $request->status_ovh,
+            'core_category' => $request->core_category,
+            // Informasi Operasional
+            'smr' => $request->smr,
+            'life_time' => $request->life_time,
+            'date_defitted' => $request->date_defitted,
+            // Logistik
+            'manifest' => $request->manifest ? trim($request->manifest) : null,
+            'way_bill' => $request->way_bill ? trim($request->way_bill) : null,
+            // Default
+            'current_stage' => 1,
+            'status' => 'On Progress',
         ]);
 
         // Generate QR Code
@@ -87,9 +128,9 @@ class ComponentController extends Controller
         // Create initial log (Stage 1: Receiving)
         $component->overhaulLogs()->create([
             'stage_number' => 1,
-            'mechanic_id'  => auth()->id(),
-            'start_time'   => now(),
-            'notes'        => 'Komponen diterima di PRC (Receiving)',
+            'mechanic_id' => auth()->id(),
+            'start_time' => now(),
+            'notes' => 'Komponen diterima di PRC (Receiving)',
         ]);
 
         // Auto-generate checksheet from template for Stage 1
@@ -99,10 +140,10 @@ class ComponentController extends Controller
 
         if ($template) {
             ComponentChecksheet::create([
-                'comp_id'      => $component->comp_id,
+                'comp_id' => $component->comp_id,
                 'stage_number' => 1,
-                'items'        => $template->items,
-                'answers'      => [],
+                'items' => $template->items,
+                'answers' => [],
             ]);
         }
 
@@ -135,9 +176,9 @@ class ComponentController extends Controller
 
         $currentStage = $component->current_stage;
 
-        // Cegah stage melebihi 9
-        if ($currentStage >= 9) {
-            return back()->withErrors(['stage' => 'Komponen sudah mencapai tahap akhir (Final Inspection).']);
+        // Cegah stage melebihi 7
+        if ($currentStage >= 7) {
+            return back()->withErrors(['stage' => 'Komponen sudah mencapai tahap akhir (RFU/Delivery).']);
         }
 
         if ($component->is_waiting_approval) {
@@ -152,35 +193,35 @@ class ComponentController extends Controller
 
         $nextStage = $currentStage + 1;
 
-        // === TAHAP 4: Measurement & Inspection ===
-        if ($currentStage == 4) {
+        // === TAHAP 2: DIS Assembling (termasuk Measurement & Inspection) ===
+        if ($currentStage == 2) {
             $request->validate([
-                'parts'                 => 'required|array|min:1',
-                'parts.*.name'          => 'required|string',
-                'parts.*.actual_value'  => 'required|numeric|min:0',
-                'parts.*.decision'      => 'required|in:Reused,Repair,Replace',
+                'parts' => 'required|array|min:1',
+                'parts.*.name' => 'required|string',
+                'parts.*.actual_value' => 'required|numeric|min:0',
+                'parts.*.decision' => 'required|in:Reused,Repair,Replace',
             ]);
 
             foreach ($request->parts as $partData) {
                 $component->inspectionDetails()->create([
-                    'part_name'    => $partData['name'],
+                    'part_name' => $partData['name'],
                     'actual_value' => $partData['actual_value'],
-                    'decision'     => $partData['decision'],
+                    'decision' => $partData['decision'],
                 ]);
 
                 // Smart Inventory Trigger: otomatis buat Part Request jika Replace
                 if ($partData['decision'] === 'Replace') {
                     $component->partRequests()->create([
                         'part_name' => $partData['name'],
-                        'qty'       => 1,
-                        'status'    => 'Pending',
+                        'qty' => 1,
+                        'status' => 'Pending',
                     ]);
                 }
             }
         }
 
-        // === TAHAP 7: Quality Gate (Test Performance) ===
-        if ($currentStage == 7) {
+        // === TAHAP 5: Quality Gate (Test Performance) ===
+        if ($currentStage == 5) {
             $request->validate([
                 'oil_pressure' => 'required|numeric|min:0',
             ]);
@@ -244,26 +285,26 @@ class ComponentController extends Controller
         }
 
         // Update status komponen
-        $isFinalCompleted = ($nextStage == 9);
+        $isFinalCompleted = ($nextStage == 7);
         $component->update([
-            'current_stage'       => $nextStage,
+            'current_stage' => $nextStage,
             'is_waiting_approval' => false,
-            'status'              => $isFinalCompleted ? 'Ready for Use' : 'On Progress',
+            'status' => $isFinalCompleted ? 'Ready for Use' : 'On Progress',
         ]);
 
         // Buat log untuk tahapan selanjutnya
         $stageNote = self::STAGE_NAMES[$nextStage] ?? 'Tahap ' . $nextStage;
         $logData = [
             'stage_number' => $nextStage,
-            'mechanic_id'  => auth()->id(), // Idealnya mencatat yang approve atau tetap mekanik sebelumnya, tapi kita pakai auth() untuk jejak Management yang trigger
-            'start_time'   => now(),
-            'notes'        => 'Memulai: ' . $stageNote . ' (Approved)',
+            'mechanic_id' => auth()->id(), // Idealnya mencatat yang approve atau tetap mekanik sebelumnya, tapi kita pakai auth() untuk jejak Management yang trigger
+            'start_time' => now(),
+            'notes' => 'Memulai: ' . $stageNote . ' (Approved)',
         ];
 
-        // Jika sudah tahap akhir (Final Inspection/RFU), langsung tutup lognya
+        // Jika sudah tahap akhir (RFU/Delivery), langsung tutup lognya
         if ($isFinalCompleted) {
             $logData['end_time'] = now();
-            $logData['notes']    = 'Final Inspection selesai - Komponen Ready for Use (RFU) (Approved)';
+            $logData['notes'] = 'RFU/Delivery selesai - Komponen Ready for Use (RFU) (Approved)';
         }
 
         $component->overhaulLogs()->create($logData);

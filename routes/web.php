@@ -41,7 +41,7 @@ Route::get('/dashboard', function () {
 
     // Data per-stage untuk chart
     $stageDistribution = [];
-    for ($i = 1; $i <= 9; $i++) {
+    for ($i = 1; $i <= 7; $i++) {
         $stageDistribution[$i] = \App\Models\Component::where('current_stage', $i)
             ->where('status', 'On Progress')
             ->count();
