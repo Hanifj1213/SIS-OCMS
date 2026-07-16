@@ -32,8 +32,28 @@
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                     <div>
                         <label for="egi" class="ocms-label">EGI <span style="color: var(--accent-red);">*</span></label>
-                        <input id="egi" class="ocms-input" type="text" name="egi" value="{{ old('egi') }}" required
+                        {{-- Text input (non-Engine or fallback) --}}
+                        <input id="egi_text" class="ocms-input" type="text" name="egi" value="{{ old('egi') }}" required
                             placeholder="Contoh: D155A-6" style="font-family: 'JetBrains Mono', monospace;">
+                        {{-- Dropdown (Engine only) --}}
+                        <select id="egi_select" class="ocms-select" style="display: none; font-family: 'JetBrains Mono', monospace;">
+                            <option value="">— Pilih Model EGI —</option>
+                            <option value="PC2000-8" {{ old('egi') == 'PC2000-8' ? 'selected' : '' }}>PC2000-8 (76 item)</option>
+                            <option value="PC1250-8" {{ old('egi') == 'PC1250-8' ? 'selected' : '' }}>PC1250-8 (78 item)</option>
+                            <option value="D375-6" {{ old('egi') == 'D375-6' ? 'selected' : '' }}>D375-6 (64 item)</option>
+                            <option value="D155-6" {{ old('egi') == 'D155-6' ? 'selected' : '' }}>D155-6 (49 item)</option>
+                            <option value="WA800-3" {{ old('egi') == 'WA800-3' ? 'selected' : '' }}>WA800-3 (56 item)</option>
+                            <option value="GD825A-2" {{ old('egi') == 'GD825A-2' ? 'selected' : '' }}>GD825A-2 (57 item)</option>
+                            <option value="HD785-7" {{ old('egi') == 'HD785-7' ? 'selected' : '' }}>HD785-7 (78 item)</option>
+                            <option value="HD465-7R" {{ old('egi') == 'HD465-7R' ? 'selected' : '' }}>HD465-7R (61 item)</option>
+                            <option value="__OTHER__">Lainnya (ketik manual)</option>
+                        </select>
+                        {{-- Custom EGI input (saat pilih "Lainnya") --}}
+                        <input id="egi_custom" class="ocms-input" type="text" value="{{ old('egi_custom') }}"
+                            placeholder="Ketik model EGI manual..." style="display: none; margin-top: 8px; font-family: 'JetBrains Mono', monospace;">
+                        <p id="egi_hint" style="display: none; font-size: 0.7rem; color: var(--accent-gold); margin-top: 6px; font-style: italic;">
+                            ⚡ Model ini punya checksheet khusus dengan item inspeksi spesifik
+                        </p>
                         @error('egi')
                             <p style="font-size: 0.75rem; color: var(--accent-red); margin-top: 6px;">{{ $message }}</p>
                         @enderror
@@ -245,5 +265,74 @@
         </div>
 
     </form>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const categorySelect = document.getElementById('major_category');
+        const egiText = document.getElementById('egi_text');
+        const egiSelect = document.getElementById('egi_select');
+        const egiCustom = document.getElementById('egi_custom');
+        const egiHint = document.getElementById('egi_hint');
+
+        function toggleEgiMode() {
+            const isEngine = categorySelect.value === 'Engine';
+
+            if (isEngine) {
+                // Engine mode: show dropdown, hide text input
+                egiText.style.display = 'none';
+                egiText.removeAttribute('name');
+                egiText.removeAttribute('required');
+
+                egiSelect.style.display = '';
+                
+                handleEgiSelectChange();
+            } else {
+                // Non-Engine mode: show text input, hide dropdown & custom
+                egiText.style.display = '';
+                egiText.setAttribute('name', 'egi');
+                egiText.setAttribute('required', 'required');
+
+                egiSelect.style.display = 'none';
+                egiCustom.style.display = 'none';
+                egiCustom.removeAttribute('name');
+                egiCustom.removeAttribute('required');
+                egiHint.style.display = 'none';
+            }
+        }
+
+        function handleEgiSelectChange() {
+            const val = egiSelect.value;
+
+            if (val === '__OTHER__') {
+                // Show custom input
+                egiCustom.style.display = '';
+                egiCustom.setAttribute('name', 'egi');
+                egiCustom.setAttribute('required', 'required');
+                egiSelect.removeAttribute('name');
+                egiHint.style.display = 'none';
+            } else {
+                // Selected a known model
+                egiCustom.style.display = 'none';
+                egiCustom.removeAttribute('name');
+                egiCustom.removeAttribute('required');
+                egiSelect.setAttribute('name', 'egi');
+
+                if (val) {
+                    egiSelect.setAttribute('required', 'required');
+                    egiHint.style.display = '';
+                } else {
+                    egiSelect.setAttribute('required', 'required');
+                    egiHint.style.display = 'none';
+                }
+            }
+        }
+
+        categorySelect.addEventListener('change', toggleEgiMode);
+        egiSelect.addEventListener('change', handleEgiSelectChange);
+
+        // Initialize on page load (handles old() values)
+        toggleEgiMode();
+    });
+    </script>
 
 </x-app-layout>

@@ -38,7 +38,21 @@
                 @forelse($components as $index => $comp)
                     <tr>
                         <td>{{ $index + 1 }}</td>
-                        <td class="mono" style="font-weight: 600;">{{ $comp->egi ?? $comp->model_type }}</td>
+                        <td class="mono" style="font-weight: 600;">
+                            {{ $comp->egi ?? $comp->model_type }}
+                            @php
+                                $knownEgis = ['PC2000-8','PC1250-8','D375-6','D155-6','WA800-3','GD825A-2','HD785-7','HD465-7R'];
+                                $egiUpper = strtoupper(trim($comp->egi ?? ''));
+                                $hasTemplate = in_array($egiUpper, array_map('strtoupper', $knownEgis));
+                            @endphp
+                            @if($comp->major_category === 'Engine')
+                                @if($hasTemplate)
+                                    <span title="Checksheet khusus tersedia" style="font-size: 0.55rem; background: rgba(52,211,153,0.15); color: #34D399; padding: 2px 6px; border-radius: 6px; margin-left: 4px; font-weight: 700;">CS ✓</span>
+                                @else
+                                    <span title="Menggunakan checksheet generik" style="font-size: 0.55rem; background: rgba(212,175,55,0.15); color: #D4AF37; padding: 2px 6px; border-radius: 6px; margin-left: 4px; font-weight: 700;">CS ⚠</span>
+                                @endif
+                            @endif
+                        </td>
                         <td class="mono">{{ $comp->unit_code ?? '-' }}</td>
                         <td class="mono" style="font-weight: 600;">{{ $comp->serial_number }}</td>
                         <td><span class="badge badge-cyan">{{ $comp->major_category }}</span></td>
