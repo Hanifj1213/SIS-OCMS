@@ -286,12 +286,6 @@
                 </div>
                 <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 16px; gap: 8px; flex-wrap: wrap;">
                     <button onclick="csNav(-1)" id="csBtnPrev" class="cs-nav-btn" disabled>← Prev</button>
-                    @if(auth()->user()->hasAnyRole(['Mechanic', 'Supervisor', 'SuperAdmin']))
-                    <div style="display: flex; gap: 8px;">
-                        <button onclick="csOpenAddModal()" class="cs-add-btn">+ Tambah</button>
-                        <button onclick="csRemoveCurrentItem()" id="csBtnDel" class="cs-del-nav-btn"> - Hapus</button>
-                    </div>
-                    @endif
                     <button onclick="csNav(1)" id="csBtnNext" class="cs-nav-btn">Next →</button>
                 </div>
             </div>
@@ -342,6 +336,13 @@
 
     {{-- Toast --}}
     <div id="csToast" style="position:fixed; bottom:80px; left:50%; transform:translateX(-50%) translateY(20px); background:rgba(52,211,153,0.15); border:1px solid rgba(52,211,153,0.3); color:var(--accent-green); padding:10px 20px; border-radius:10px; font-size:0.8rem; font-weight:600; opacity:0; transition:all 0.3s; z-index:200; pointer-events:none;"></div>
+
+    {{-- Image Lightbox --}}
+    <div id="csLightbox" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.9); backdrop-filter:blur(12px); z-index:1100; align-items:center; justify-content:center; padding:24px; cursor:zoom-out;" onclick="csCloseLightbox()">
+        <button onclick="csCloseLightbox()" style="position:fixed; top:20px; right:24px; color:white; font-size:2rem; background:rgba(255,255,255,0.1); border:none; width:40px; height:40px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; z-index:1101;">×</button>
+        <img id="csLightboxImg" src="" alt="" style="max-width:95%; max-height:90vh; object-fit:contain; border-radius:8px; box-shadow:0 16px 64px rgba(0,0,0,0.5);">
+        <div id="csLightboxLabel" style="position:fixed; bottom:24px; left:50%; transform:translateX(-50%); color:var(--accent-gold); font-size:0.85rem; font-weight:700; background:rgba(0,0,0,0.6); padding:8px 20px; border-radius:8px;"></div>
+    </div>
 
     <style>
         .cs-view-btn {
@@ -464,6 +465,15 @@
         }
 
         // ===== VIEW TOGGLE =====
+        // Item-number-based reference image mapping
+        function csGetRefImage(itemNum) {
+            if (itemNum >= 1 && itemNum <= 18) return { src: '/images/inspection/right-side-view.png', label: 'Right Side View' };
+            if (itemNum >= 21 && itemNum <= 27) return { src: '/images/inspection/rear-side-view-1.png', label: 'Rear Side View 1' };
+            if (itemNum >= 28 && itemNum <= 53) return { src: '/images/inspection/left-side-view.png', label: 'Left Side View' };
+            if (itemNum >= 54 && itemNum <= 64) return { src: '/images/inspection/rear-side-view-2.png', label: 'Rear Side View 2' };
+            return null;
+        }
+
         window.csSetView = function(view) {
             currentView = view;
             document.getElementById('csSlideView').style.display = view === 'slide' ? '' : 'none';
@@ -471,7 +481,16 @@
             document.getElementById('csViewSlide').classList.toggle('cs-view-active', view === 'slide');
             document.getElementById('csViewList').classList.toggle('cs-view-active', view === 'list');
             if (view === 'slide') renderSlide();
-            else renderList();
+            else if (view === 'list') renderList();
+        };
+
+        window.csOpenLightbox = function(src, label) {
+            document.getElementById('csLightboxImg').src = src;
+            document.getElementById('csLightboxLabel').textContent = label;
+            document.getElementById('csLightbox').style.display = 'flex';
+        };
+        window.csCloseLightbox = function() {
+            document.getElementById('csLightbox').style.display = 'none';
         };
 
         // ===== PROGRESS UPDATE =====
@@ -511,7 +530,18 @@
             const item = items[currentIndex];
             const cur = answers[item.id] || null;
 
+            const itemNum = currentIndex + 1;
+            const refImg = csGetRefImage(itemNum);
+            let refHtml = '';
+            if (refImg) {
+                refHtml = `<div style="margin-bottom:10px; text-align:center;">
+                    <img src="${refImg.src}" alt="${refImg.label}" style="width:200px; max-height:150px; object-fit:contain; border-radius:8px; border:1px solid rgba(212,175,55,0.3); cursor:zoom-in; opacity:0.85; transition:all 0.25s;" onclick="csOpenLightbox('${refImg.src}', '${refImg.label}')" title="📷 ${refImg.label}" onmouseover="this.style.opacity=1;this.style.borderColor='var(--accent-gold)'" onmouseout="this.style.opacity=0.85;this.style.borderColor='rgba(212,175,55,0.3)'">
+                    <div style="font-size:0.5rem; font-weight:600; color:var(--accent-gold); text-transform:uppercase; letter-spacing:0.1em; margin-top:3px;">📷 ${refImg.label}</div>
+                </div>`;
+            }
+
             el.innerHTML = `
+                ${refHtml}
                 <div style="font-size:0.6rem; font-weight:700; text-transform:uppercase; letter-spacing:0.12em; color:var(--accent-gold); margin-bottom:8px;">${item.group || ''}</div>
                 <div style="font-family:'JetBrains Mono'; font-size:2.2rem; font-weight:900; color:rgba(255,255,255); line-height:1; margin-bottom:6px;">#${String(currentIndex+1).padStart(2,'0')}</div>
                 <div style="font-size:1.15rem; font-weight:700; color:var(--text-primary); margin-bottom:4px; line-height:1.3;">${item.label}</div>
@@ -593,7 +623,7 @@
                     }
 
                     const delBtn = CAN_INTERACT ?
-                        `<button class="cs-del-btn" onclick="event.stopPropagation(); csRemoveItem(${item._idx})">🗑️</button>` : '';
+                        `<button class="cs-del-btn" onclick="event.stopPropagation(); csRemoveItem(${item._idx})">🗑️</button><button class="cs-del-btn" onclick="event.stopPropagation(); csOpenAddModal()" style="color:var(--accent-green); border-color:rgba(52,211,153,0.2);" title="Tambah Item Baru">➕</button>` : '';
 
                     html += `
                         <div class="cs-list-item" onclick="csGoToItem(${item._idx})">

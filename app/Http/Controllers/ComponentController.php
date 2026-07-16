@@ -249,13 +249,58 @@ class ComponentController extends Controller
             }
         }
 
-        // Ubah status menjadi menunggu approval
-        $component->update([
-            'is_waiting_approval' => true,
-        ]);
+        // Cek apakah tahap ini memerlukan approval sebelum lanjut ke tahap berikutnya
+        $requiresApproval = in_array($currentStage, [2, 3, 4, 5]);
 
-        return redirect()->route('components.show', $component->comp_id)
-            ->with('success', 'Progress tahap ' . $currentStage . ' selesai. Menunggu Approval Management untuk lanjut ke Tahap ' . $nextStage . '.');
+        if ($requiresApproval) {
+            // Ubah status menjadi menunggu approval
+            $component->update([
+                'is_waiting_approval' => true,
+            ]);
+
+            return redirect()->route('components.show', $component->comp_id)
+                ->with('success', 'Progress tahap ' . $currentStage . ' selesai. Menunggu Approval Management untuk lanjut ke Tahap ' . $nextStage . '.');
+        } else {
+            // Auto-transition (tidak perlu approval)
+            
+            // Tutup log tahapan saat ini
+            $currentLog = $component->overhaulLogs()
+                ->where('stage_number', $currentStage)
+                ->latest('log_id')
+                ->first();
+
+            if ($currentLog) {
+                $currentLog->update(['end_time' => now()]);
+            }
+
+            // Update status komponen
+            $isFinalCompleted = ($nextStage == 7);
+            $component->update([
+                'current_stage' => $nextStage,
+                'is_waiting_approval' => false,
+                'status' => $isFinalCompleted ? 'Ready for Use' : 'On Progress',
+            ]);
+
+            // Buat log untuk tahapan selanjutnya
+            $stageNote = self::STAGE_NAMES[$nextStage] ?? 'Tahap ' . $nextStage;
+            $logData = [
+                'stage_number' => $nextStage,
+                'mechanic_id' => auth()->id(),
+                'start_time' => now(),
+                'notes' => 'Memulai: ' . $stageNote,
+            ];
+
+            // Jika sudah tahap akhir (RFU/Delivery), langsung tutup lognya
+            if ($isFinalCompleted) {
+                $logData['end_time'] = now();
+                $logData['notes'] = 'RFU/Delivery selesai - Komponen Ready for Use (RFU)';
+            }
+
+            $component->overhaulLogs()->create($logData);
+
+            return redirect()->route('components.show', $component->comp_id)
+                ->with('success', 'Tahap ' . $currentStage . ' selesai! Komponen langsung berlanjut ke ' . ($isFinalCompleted ? 'status Ready for Use (RFU)' : 'Tahap ' . $nextStage));
+        }
     }
 
     /**
