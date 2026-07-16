@@ -8,6 +8,7 @@ class ChecksheetTemplate extends Model
 {
     protected $fillable = [
         'major_category',
+        'egi_model',
         'stage_number',
         'template_name',
         'items',

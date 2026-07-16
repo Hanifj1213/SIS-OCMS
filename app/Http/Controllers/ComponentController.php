@@ -134,9 +134,21 @@ class ComponentController extends Controller
         ]);
 
         // Auto-generate checksheet from template for Stage 1
+        // Try EGI-specific template first, then fallback to generic
+        $egiNormalized = strtoupper(trim($request->egi));
         $template = ChecksheetTemplate::where('major_category', $request->major_category)
             ->where('stage_number', 1)
+            ->where(function ($q) use ($egiNormalized) {
+                $q->whereRaw('UPPER(egi_model) = ?', [$egiNormalized]);
+            })
             ->first();
+
+        if (!$template) {
+            $template = ChecksheetTemplate::where('major_category', $request->major_category)
+                ->where('stage_number', 1)
+                ->whereNull('egi_model')
+                ->first();
+        }
 
         if ($template) {
             ComponentChecksheet::create([
