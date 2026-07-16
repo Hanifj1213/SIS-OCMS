@@ -175,9 +175,9 @@
         }
 
         .cs-slide-ref-thumb {
-            width: 240px;
+            width: 420px;
             height: auto;
-            max-height: 180px;
+            max-height: 300px;
             object-fit: contain;
             border-radius: 10px;
             border: 1px solid rgba(212, 175, 55, 0.3);
@@ -901,13 +901,18 @@
             let currentMode = 'slide';
             let daftarFilter = 'all';
 
-            // Item-number-based reference image mapping
-            function getRefImage(itemNum) {
-                if (itemNum >= 1 && itemNum <= 18) return { src: '/images/inspection/right-side-view.png', label: 'Right Side View' };
-                if (itemNum >= 21 && itemNum <= 27) return { src: '/images/inspection/rear-side-view-1.png', label: 'Rear Side View 1' };
-                if (itemNum >= 28 && itemNum <= 53) return { src: '/images/inspection/left-side-view.png', label: 'Left Side View' };
-                if (itemNum >= 54 && itemNum <= 64) return { src: '/images/inspection/rear-side-view-2.png', label: 'Rear Side View 2' };
-                return null;
+            // Group-based reference image mapping per EGI
+            function getRefImage(item) {
+                if (!item.group || item.custom) return null;
+                const knownEgis = ['d375-6','hd785-7','d155-6','wa800-3','gd825a-2','hd465-7r','pc1250-8','pc2000-8'];
+                let egi = "{{ strtolower(trim($comp->egi ?? 'd375-6')) }}";
+                if (!knownEgis.includes(egi)) egi = 'd375-6'; // fallback
+                const slug = item.group.toLowerCase().replace(/ /g, '-');
+
+                return {
+                    src: '/images/inspection/' + egi + '/' + slug + '.png',
+                    label: item.group
+                };
             }
 
             window.toggleMode = function (mode) {
@@ -989,9 +994,8 @@
                 const currentAnswer = answers[item.id] || null;
                 document.getElementById('progressGroup').textContent = item.group || '—';
 
-                // Get reference image for this item number
-                const itemNum = currentIndex + 1;
-                const refImg = getRefImage(itemNum);
+                // Get reference image for this item
+                const refImg = getRefImage(item);
                 let refHtml = '';
                 if (refImg) {
                     refHtml = `<div class="cs-slide-ref">

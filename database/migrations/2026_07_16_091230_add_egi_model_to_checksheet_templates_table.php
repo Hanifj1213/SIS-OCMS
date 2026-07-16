@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::table('checksheet_templates', function (Blueprint $table) {
             $table->string('egi_model')->nullable()->after('major_category');
+            $table->dropUnique(['major_category', 'stage_number']);
             $table->unique(['major_category', 'egi_model', 'stage_number'], 'ct_category_egi_stage_unique');
         });
     }

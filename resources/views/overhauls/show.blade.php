@@ -296,8 +296,9 @@
                 <div style="display: flex; gap: 6px; margin-bottom: 16px; flex-wrap: wrap;">
                     <button onclick="csFilter('all')" class="cs-filter-btn cs-filter-active" data-filter="all">Semua</button>
                     <button onclick="csFilter('Right Side View')" class="cs-filter-btn" data-filter="Right Side View">Right Side</button>
-                    <button onclick="csFilter('Left Side View')" class="cs-filter-btn" data-filter="Left Side View">Left Side</button>
                     <button onclick="csFilter('Rear Side View')" class="cs-filter-btn" data-filter="Rear Side View">Rear Side</button>
+                    <button onclick="csFilter('Left Side View')" class="cs-filter-btn" data-filter="Left Side View">Left Side</button>
+                    <button onclick="csFilter('Front Side View')" class="cs-filter-btn" data-filter="Front Side View">Front Side</button>
                     <button onclick="csFilter('Custom Items')" class="cs-filter-btn" data-filter="Custom Items">Custom</button>
                 </div>
                 {{-- Item List --}}
@@ -465,13 +466,18 @@
         }
 
         // ===== VIEW TOGGLE =====
-        // Item-number-based reference image mapping
-        function csGetRefImage(itemNum) {
-            if (itemNum >= 1 && itemNum <= 18) return { src: '/images/inspection/right-side-view.png', label: 'Right Side View' };
-            if (itemNum >= 21 && itemNum <= 27) return { src: '/images/inspection/rear-side-view-1.png', label: 'Rear Side View 1' };
-            if (itemNum >= 28 && itemNum <= 53) return { src: '/images/inspection/left-side-view.png', label: 'Left Side View' };
-            if (itemNum >= 54 && itemNum <= 64) return { src: '/images/inspection/rear-side-view-2.png', label: 'Rear Side View 2' };
-            return null;
+        // Group-based reference image mapping per EGI
+        function csGetRefImage(item) {
+            if (!item.group || item.custom) return null;
+            const knownEgis = ['d375-6','hd785-7','d155-6','wa800-3','gd825a-2','hd465-7r','pc1250-8','pc2000-8'];
+            let egi = "{{ strtolower(trim($comp->egi ?? 'd375-6')) }}";
+            if (!knownEgis.includes(egi)) egi = 'd375-6'; // fallback
+            const slug = item.group.toLowerCase().replace(/ /g, '-');
+
+            return {
+                src: '/images/inspection/' + egi + '/' + slug + '.png',
+                label: item.group
+            };
         }
 
         window.csSetView = function(view) {
@@ -530,13 +536,12 @@
             const item = items[currentIndex];
             const cur = answers[item.id] || null;
 
-            const itemNum = currentIndex + 1;
-            const refImg = csGetRefImage(itemNum);
+            const refImg = csGetRefImage(item);
             let refHtml = '';
             if (refImg) {
-                refHtml = `<div style="margin-bottom:10px; text-align:center;">
-                    <img src="${refImg.src}" alt="${refImg.label}" style="width:200px; max-height:150px; object-fit:contain; border-radius:8px; border:1px solid rgba(212,175,55,0.3); cursor:zoom-in; opacity:0.85; transition:all 0.25s;" onclick="csOpenLightbox('${refImg.src}', '${refImg.label}')" title="📷 ${refImg.label}" onmouseover="this.style.opacity=1;this.style.borderColor='var(--accent-gold)'" onmouseout="this.style.opacity=0.85;this.style.borderColor='rgba(212,175,55,0.3)'">
-                    <div style="font-size:0.5rem; font-weight:600; color:var(--accent-gold); text-transform:uppercase; letter-spacing:0.1em; margin-top:3px;">📷 ${refImg.label}</div>
+                refHtml = `<div style="margin-bottom:14px; text-align:center;">
+                    <img src="${refImg.src}" alt="${refImg.label}" style="width:420px; max-height:300px; object-fit:contain; border-radius:10px; border:1px solid rgba(212,175,55,0.3); cursor:zoom-in; opacity:0.85; transition:all 0.25s;" onclick="csOpenLightbox('${refImg.src}', '${refImg.label}')" title="📷 ${refImg.label}" onmouseover="this.style.opacity=1;this.style.borderColor='var(--accent-gold)'" onmouseout="this.style.opacity=0.85;this.style.borderColor='rgba(212,175,55,0.3)'">
+                    <div style="font-size:0.55rem; font-weight:600; color:var(--accent-gold); text-transform:uppercase; letter-spacing:0.1em; margin-top:4px;">📷 ${refImg.label}</div>
                 </div>`;
             }
 
