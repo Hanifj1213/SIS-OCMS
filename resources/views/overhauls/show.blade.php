@@ -469,14 +469,25 @@
         // Group-based reference image mapping per EGI
         function csGetRefImage(item) {
             if (!item.group || item.custom) return null;
-            const knownEgis = ['d375-6','hd785-7','d155-6','wa800-3','gd825a-2','hd465-7r','pc1250-8','pc2000-8'];
+            const knownEgis = ['d375-6','hd785-7','d155-6','wa800-3','gd825a-2','hd465-7r','pc1250-8','pc2000-8','hd1500-7'];
             let egi = "{{ strtolower(trim($comp->egi ?? 'd375-6')) }}";
             if (!knownEgis.includes(egi)) egi = 'd375-6'; // fallback
-            const slug = item.group.toLowerCase().replace(/ /g, '-');
+            
+            const majorCategory = "{{ $comp->major_category }}";
+            let slug = '';
+            let label = '';
+            
+            if (majorCategory === 'Engine') {
+                slug = item.group.toLowerCase().replace(/ /g, '-');
+                label = item.group;
+            } else {
+                slug = majorCategory.toLowerCase().replace(/\//g, '-').replace(/ /g, '-');
+                label = majorCategory + ' Reference';
+            }
 
             return {
                 src: '/images/inspection/' + egi + '/' + slug + '.png',
-                label: item.group
+                label: label
             };
         }
 

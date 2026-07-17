@@ -41,11 +41,13 @@
                         <td class="mono" style="font-weight: 600;">
                             {{ $comp->egi ?? $comp->model_type }}
                             @php
-                                $knownEgis = ['PC2000-8','PC1250-8','D375-6','D155-6','WA800-3','GD825A-2','HD785-7','HD465-7R'];
+                                $knownEgis = ['PC2000-8','PC1250-8','D375-6','D155-6','WA800-3','GD825A-2','HD785-7','HD465-7R','HD1500-7'];
+                                $templatedCategories = ['Engine', 'TC/Transmission', 'Final Drive', 'Differential', 'PTO', 'Swing Machinery', 'Control Valve'];
                                 $egiUpper = strtoupper(trim($comp->egi ?? ''));
                                 $hasTemplate = in_array($egiUpper, array_map('strtoupper', $knownEgis));
+                                $isTemplatedCategory = in_array($comp->major_category, $templatedCategories);
                             @endphp
-                            @if($comp->major_category === 'Engine')
+                            @if($isTemplatedCategory)
                                 @if($hasTemplate)
                                     <span title="Checksheet khusus tersedia" style="font-size: 0.55rem; background: rgba(52,211,153,0.15); color: #34D399; padding: 2px 6px; border-radius: 6px; margin-left: 4px; font-weight: 700;">CS ✓</span>
                                 @else

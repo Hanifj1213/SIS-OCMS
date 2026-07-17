@@ -3,6 +3,8 @@
 namespace Database\Seeders;
 
 use App\Models\ChecksheetTemplate;
+use App\Models\Component;
+use App\Models\ComponentChecksheet;
 use Illuminate\Database\Seeder;
 
 class ChecksheetTemplateSeeder extends Seeder
@@ -275,6 +277,24 @@ class ChecksheetTemplateSeeder extends Seeder
             ]
         );
 
+        // Pastikan setiap item Engine menampilkan halaman referensi view yang
+        // sama dengan pembagian item pada checksheet sumber.
+        $withEngineViews = static function (array $items, array $viewEndItems): array {
+            foreach ($items as &$item) {
+                $itemNumber = (int) substr($item['id'], 4);
+
+                foreach ($viewEndItems as $lastItem => $view) {
+                    if ($itemNumber <= $lastItem) {
+                        $item['group'] = $view;
+                        break;
+                    }
+                }
+            }
+            unset($item);
+
+            return $items;
+        };
+
         // =============================================
         // D155-6
         // =============================================
@@ -282,7 +302,7 @@ class ChecksheetTemplateSeeder extends Seeder
             ['major_category' => 'Engine', 'stage_number' => 1, 'egi_model' => 'D155-6'],
             [
                 'template_name' => 'Engine Receiving Inspection Sheet',
-                'items' => [
+                'items' => $withEngineViews([
 
                     // === Left Side View ===
                     ['id' => 'RCV-001', 'group' => 'Left Side View', 'label' => 'Painting (Y / B) YELLOW'],
@@ -340,7 +360,12 @@ class ChecksheetTemplateSeeder extends Seeder
                     ['id' => 'RCV-047', 'group' => 'Rear Side View', 'label' => 'Pilot bearing'],
                     ['id' => 'RCV-048', 'group' => 'Rear Side View', 'label' => 'Rear bracket engine'],
                     ['id' => 'RCV-049', 'group' => 'Rear Side View', 'label' => 'Flywheel assy'],
-                ],
+                ], [
+                    21 => 'Left Side View',
+                    31 => 'Front Side View',
+                    45 => 'Right Side View',
+                    49 => 'Rear Side View',
+                ]),
             ]
         );
 
@@ -351,7 +376,7 @@ class ChecksheetTemplateSeeder extends Seeder
             ['major_category' => 'Engine', 'stage_number' => 1, 'egi_model' => 'WA800-3'],
             [
                 'template_name' => 'Engine Receiving Inspection Sheet',
-                'items' => [
+                'items' => $withEngineViews([
 
                     // === Right Side View ===
                     ['id' => 'RCV-001', 'group' => 'Right Side View', 'label' => 'Painting'],
@@ -397,7 +422,7 @@ class ChecksheetTemplateSeeder extends Seeder
                     // === Rear Side View ===
                     ['id' => 'RCV-038', 'group' => 'Rear Side View', 'label' => 'Flywheel housing'],
                     ['id' => 'RCV-039', 'group' => 'Rear Side View', 'label' => 'Flywheel'],
-                    ['id' => 'RCV-040', 'group' => 'Rear Side View', 'label' => 'Engine position sensor (Industrial)'],
+                    ['id' => 'RCV-040', 'group' => 'Rear Side View', 'label' => 'Engine position sensor (Industrial) / Engine speed sensor (G.drive, gen set)'],
                     ['id' => 'RCV-041', 'group' => 'Rear Side View', 'label' => 'Engine speed sensor (Industrial)'],
                     ['id' => 'RCV-042', 'group' => 'Rear Side View', 'label' => 'Alternator'],
                     ['id' => 'RCV-043', 'group' => 'Rear Side View', 'label' => 'Fan hub'],
@@ -416,7 +441,12 @@ class ChecksheetTemplateSeeder extends Seeder
                     ['id' => 'RCV-054', 'group' => 'Front Side View', 'label' => 'Air Compressor'],
                     ['id' => 'RCV-055', 'group' => 'Front Side View', 'label' => 'Wiring hardness'],
                     ['id' => 'RCV-056', 'group' => 'Front Side View', 'label' => 'Oil Level'],
-                ],
+                ], [
+                    17 => 'Right Side View',
+                    37 => 'Left Side View',
+                    52 => 'Rear Side View',
+                    56 => 'Front Side View',
+                ]),
             ]
         );
 
@@ -427,7 +457,7 @@ class ChecksheetTemplateSeeder extends Seeder
             ['major_category' => 'Engine', 'stage_number' => 1, 'egi_model' => 'GD825A-2'],
             [
                 'template_name' => 'Engine Receiving Inspection Sheet',
-                'items' => [
+                'items' => $withEngineViews([
 
                     // === Left Side View ===
                     ['id' => 'RCV-001', 'group' => 'Left Side View', 'label' => 'Painting ( Y / B )'],
@@ -505,7 +535,12 @@ class ChecksheetTemplateSeeder extends Seeder
                     ['id' => 'RCV-067', 'group' => 'Rear Side View', 'label' => 'Stiker Attention Installation Report'],
                     ['id' => 'RCV-068', 'group' => 'Rear Side View', 'label' => 'Sticker Information Cleaner'],
                     ['id' => 'RCV-069', 'group' => 'Rear Side View', 'label' => 'Check Mounting Bolt (Rear Bracket & Front Support)'],
-                ],
+                ], [
+                    20 => 'Left Side View',
+                    37 => 'Front Side View',
+                    57 => 'Right Side View',
+                    69 => 'Rear Side View',
+                ]),
             ]
         );
 
@@ -516,7 +551,7 @@ class ChecksheetTemplateSeeder extends Seeder
             ['major_category' => 'Engine', 'stage_number' => 1, 'egi_model' => 'HD465-7R'],
             [
                 'template_name' => 'Engine Receiving Inspection Sheet',
-                'items' => [
+                'items' => $withEngineViews([
 
                     // === Left Side View ===
                     ['id' => 'RCV-001', 'group' => 'Left Side View', 'label' => 'Painting Y / B'],
@@ -586,7 +621,12 @@ class ChecksheetTemplateSeeder extends Seeder
                     ['id' => 'RCV-059', 'group' => 'Front Side View', 'label' => 'S/N :'],
                     ['id' => 'RCV-060', 'group' => 'Front Side View', 'label' => 'RFID Tag, Traceability mounting bolt'],
                     ['id' => 'RCV-061', 'group' => 'Front Side View', 'label' => 'Front hanger'],
-                ],
+                ], [
+                    24 => 'Left Side View',
+                    35 => 'Rear Side View',
+                    49 => 'Right Side View',
+                    61 => 'Front Side View',
+                ]),
             ]
         );
 
@@ -597,7 +637,7 @@ class ChecksheetTemplateSeeder extends Seeder
             ['major_category' => 'Engine', 'stage_number' => 1, 'egi_model' => 'PC1250-8'],
             [
                 'template_name' => 'Engine Receiving Inspection Sheet',
-                'items' => [
+                'items' => $withEngineViews([
 
                     // === Right Side View ===
                     ['id' => 'RCV-001', 'group' => 'Right Side View', 'label' => 'Painting ( Y / B )'],
@@ -684,7 +724,12 @@ class ChecksheetTemplateSeeder extends Seeder
                     ['id' => 'RCV-076', 'group' => 'Front Side View', 'label' => 'Alternator Drive Pulley'],
                     ['id' => 'RCV-077', 'group' => 'Front Side View', 'label' => 'Tension Pulley Assy'],
                     ['id' => 'RCV-078', 'group' => 'Front Side View', 'label' => 'V-belt Alternator'],
-                ],
+                ], [
+                    20 => 'Right Side View',
+                    40 => 'Rear Side View',
+                    67 => 'Left Side View',
+                    78 => 'Front Side View',
+                ]),
             ]
         );
 
@@ -695,7 +740,7 @@ class ChecksheetTemplateSeeder extends Seeder
             ['major_category' => 'Engine', 'stage_number' => 1, 'egi_model' => 'PC2000-8'],
             [
                 'template_name' => 'Engine Receiving Inspection Sheet',
-                'items' => [
+                'items' => $withEngineViews([
 
                     // === Left Side View ===
                     ['id' => 'RCV-001', 'group' => 'Left Side View', 'label' => 'Painting (Y/B) Yellow'],
@@ -780,9 +825,409 @@ class ChecksheetTemplateSeeder extends Seeder
                     ['id' => 'RCV-074', 'group' => 'Front Side View', 'label' => 'Cooling Fan'],
                     ['id' => 'RCV-075', 'group' => 'Front Side View', 'label' => 'Masking condition'],
                     ['id' => 'RCV-076', 'group' => 'Front Side View', 'label' => 'Check Mounting Bolt (Rear Bracket & Front Support)'],
-                ],
+                ], [
+                    28 => 'Left Side View',
+                    38 => 'Rear Side View',
+                    57 => 'Right Side View',
+                    76 => 'Front Side View',
+                ]),
             ]
         );
 
+
+        // =============================================
+        // POWERTRAIN - Stage 1: Receiving Inspection
+        // Setiap item di bawah ditranskripsi berurutan dari kolom ITEM
+        // pada gambar checksheet asli, termasuk baris tanpa nomor.
+        // =============================================
+        $makePowertrainItems = static function (string $prefix, array $labels): array {
+            return array_map(
+                static fn (string $label, int $index): array => [
+                    'id' => sprintf('%s-%03d', $prefix, $index + 1),
+                    'group' => 'Visual Inspection',
+                    'label' => $label,
+                ],
+                $labels,
+                array_keys($labels)
+            );
+        };
+
+        $powertrainTemplates = [
+            [
+                'category' => 'TC/Transmission',
+                'egi' => 'HD785-7',
+                'name' => 'TC/Transmission Receiving Inspection',
+                'prefix' => 'PTR',
+                'labels' => [
+                    'Torque Converter', 'Model', 'Serial Number', 'WO.no', 'T/C Valve', 'Lock Up Valve',
+                    'Transmission', 'Model', 'Serial Number', 'WO.no', 'Oil Filter ECMV', 'Breather',
+                    'ECMV Cover', 'Connector & Wiring Harness', 'Rear Bracket LH,RH', 'Drain Valve Oil',
+                    'Lubricating Valve', 'Oil Pan', 'T/M Housing', 'Bolt Connection', 'Temperature Sensor',
+                    'T/M name plate', 'Intermediate Shaft Speed Sensor', 'Front bracket',
+                    'Out put shaft Speed Sensor', 'T/C name plate', 'T/C Housing', 'PTO Spline',
+                    'Front Coupling', 'Rear coupling', 'Eye Bolt', 'Cover', 'Stand ( Original/STD )',
+                    'Painting', 'Packing',
+                ],
+            ],
+            [
+                'category' => 'TC/Transmission',
+                'egi' => 'D155-6',
+                'name' => 'TC/Transmission Receiving Inspection',
+                'prefix' => 'PTR',
+                'labels' => [
+                    'PTO', 'Torque Converter', 'Transmission', 'Steering Brake RH & LH', 'Sudden Brake Valve',
+                    'ECMV Brake', 'Centralized Pick Up Port', 'Piping & Hose Suction Pump', 'Front Support',
+                    'Piping Supply', 'Piping Lubrication PTO', 'Power Train Pump', 'Block Divider', 'Steering ECMV',
+                    'Main Relief', 'Scavenging Pump Assy', 'Scavenging piping', 'Lift Hanger (3pcs)',
+                    'Filter With Element Assy Steering Brake', 'Revolution Sensor', 'Coupling',
+                    'Warning (Sticker)', 'Painting condition', 'Packing / wraping', 'Stand', 'Bolt stand',
+                    'Name plate', 'Comp.S/N',
+                ],
+            ],
+            [
+                'category' => 'TC/Transmission',
+                'egi' => 'D375-6',
+                'name' => 'TC/Transmission Receiving Inspection',
+                'prefix' => 'PTR',
+                'labels' => [
+                    'Torque Converter', 'Model', 'Serial Number', 'Production Number', 'Scavenging pump',
+                    'Power Train Pump mounting', 'Steering Lub pump', 'Work Equipment pump', 'PTO', 'Coupling',
+                    'T/C Valve', 'Transmission', 'Model', 'Serial Number', 'Production Number',
+                    'Transmission Case', 'T/M ECMV Valve', 'Bevel Gear & Transver Case',
+                    'Steering & Brake RH + LH', 'Steering & Brake ECMV', 'Power train lubrication oil filter',
+                    'Power train oil filter', 'RPM/ Speed Sensor', 'Power Train Strainer', 'Drain Plug',
+                    'Centraized Press. detection port', 'Sudden Brake prevention Valve', 'Parking Brake Lever',
+                    'Level gauge oil', 'Oil feeler port', 'Birther', 'Front Support', 'Painting',
+                    'Steel Skid (stand)', 'Packing',
+                ],
+            ],
+            [
+                'category' => 'TC/Transmission',
+                'egi' => 'GD825A-2',
+                'name' => 'TC/Transmission Receiving Inspection',
+                'prefix' => 'PTR',
+                'labels' => [
+                    'Brither', 'Transmission Control Valve', 'Transmission', 'Model', 'Serial Number',
+                    'Production Number', 'PTO', 'Drai Plug', 'Strainer',
+                ],
+            ],
+            [
+                'category' => 'TC/Transmission',
+                'egi' => 'HD1500-7',
+                'name' => 'TC/Transmission Receiving Inspection',
+                'prefix' => 'PTR',
+                'labels' => [
+                    'Torque Converter', 'Oil Filter Assy', 'Wiring Harness', 'Lubricating Valve Assy', 'Oil Pan',
+                    'Magnetic Strainer with Cover', 'Drain Oil Plug', 'Revolution Sensor (Front)',
+                    'Revolution Sensor (Intermediate)', 'ECMV Assy (8 pcs)', 'T/C Regulator Valve',
+                    'Main Relief Valve', 'Lock Up Accumulator', 'Lock Up Accumulator Piping', 'Breather',
+                    'Eye Bolt Front (2 pcs)', 'Front Coupling', 'Bolt Mounting Coupling', 'Plate', 'PTO (3pcs)',
+                    'Eye Bolt Rear (2pcs)', 'Name Plate Original', 'Rear Coupling',
+                    'Bolt Mounting Coupling Rear', 'Plate', 'Painting', 'Stand', 'Masking', 'Sticker Oil Level',
+                ],
+            ],
+            [
+                'category' => 'TC/Transmission',
+                'egi' => 'WA800-3',
+                'name' => 'TC/Transmission Receiving Inspection',
+                'prefix' => 'PTR',
+                'labels' => [
+                    'Torque Converter Assy', 'Transmission Assy', 'Transfer Gear Assy', 'Cap Oil Filler',
+                    'Tube Oil Filler', 'Rear Output Coupling', 'Plate Retainer', 'Bolt', 'Magnetic Strainer',
+                    'Bolt Coupling', 'Input Coupling', 'Plate Retainer', 'PTO (3 gears)', 'Eye Rear Front (2pcs)',
+                    'Cover Bearing', 'Cover Idle Gear', 'Plate Retainer', 'Bolt Coupling',
+                    'Front Output Coupling', 'Hose Levelling', 'Drain Valve', 'Torque Converter Valve', 'Filter',
+                    'Main Relief', 'Breather', 'Transmission C/V Assy', 'Eye Bolt Front (2pcs)',
+                    'Painting condition', 'Packing / wraping', 'Stand', 'Bolt stand', 'Warning (Sticker)',
+                    'Name plate', 'Comp. S/N',
+                ],
+            ],
+            [
+                'category' => 'Final Drive',
+                'egi' => 'HD785-7',
+                'name' => 'Final Drive Receiving Inspection',
+                'prefix' => 'PFD',
+                'labels' => [
+                    'Comp. Model', 'Aplication', 'Serial Number', 'Wo No.', 'Sun Gear (19 teeth)',
+                    'Planetary gear (31 teeth)', 'Planetary gear Shaft', 'Ring Gear (87 teeth)', 'Inner hub',
+                    'Wheel Hub', 'Drive shaft', 'Reservoir tank', 'Cylinder', 'Gear', 'Stud bolt',
+                    'Cover and monting bolt', 'Stand', 'Painting', 'Packing',
+                ],
+            ],
+            [
+                'category' => 'Final Drive',
+                'egi' => 'D155-6',
+                'name' => 'Final Drive Receiving Inspection',
+                'prefix' => 'PFD',
+                'labels' => [
+                    'Hole protection', 'Bolt cover', 'Retainer', 'Sprocket', 'Cover', 'Rock Destroyer', 'Guard',
+                    'Bolt Guard', 'Bolt Sprocket', 'Name plate', 'COMP. S/N', 'Warning(Sticker)', 'Plug',
+                    'Warning (Sticker)', 'Painting condition', 'Packing / wraping', 'Stand', 'Bolt stand',
+                ],
+            ],
+            [
+                'category' => 'Final Drive',
+                'egi' => 'D375-6',
+                'name' => 'Final Drive Receiving Inspection',
+                'prefix' => 'PFD',
+                'labels' => [
+                    'Comp. Model', 'Aplication', 'Serial Number', 'Production No.', 'Floating Seal',
+                    'Sun Gear (16 teeth)', 'Carrier', 'Hub', 'Cover', 'Sprocket Boss', 'Sprocket teeth',
+                    'Floating Seal Guard', 'Cover', 'Planetary Pinion (26 teeth)', 'Ring Gear (68 teeth)',
+                    'Cover', 'No. 1 gear (79 teeth)', 'No. 1 gear Hub', 'No. 1 Pinion (20 teeth)',
+                    'Final Drive Case', 'Bearing Cage', 'Boss', 'Shaft', 'Wear Guard', 'Pivot Shaft',
+                ],
+            ],
+            [
+                'category' => 'Final Drive',
+                'egi' => 'GD825A-2',
+                'name' => 'Final Drive Receiving Inspection',
+                'prefix' => 'PFD',
+                'labels' => [
+                    'Shaft RH', 'Sprocket RH', 'Side case RH', 'Center case', 'Cover', 'Coupling',
+                    'Side case LH', 'Sprocket LH', 'Shaft LH', 'Case', 'Cover', 'Tube', 'Tube',
+                    'Stand', 'Painting', 'Packing',
+                ],
+            ],
+            [
+                'category' => 'Final Drive',
+                'egi' => 'PC1250-8',
+                'name' => 'Final Drive Receiving Inspection',
+                'prefix' => 'PFD',
+                'labels' => [
+                    'Final Drive', 'Model', 'Serial Number', 'Production No.', 'Level Plug', 'Drain Plug',
+                    'Cover', 'No. 2 Planetary Carrier', 'No. 2 Sun Gear', 'Drive Gear',
+                    'No. 1 Planetary Carrier', 'No. 2 Planetary Gear', 'Hub', 'Sprocket', 'Floating Seal',
+                    'Case', 'Coupling', 'No. 1 Sun Gear', 'Travel Motor', 'Idler Gear', 'No. Ring Gear',
+                    'No1. Planetary Gear', 'Driven Gear', 'No. 2 Ring Gear',
+                ],
+            ],
+            [
+                'category' => 'Final Drive',
+                'egi' => 'PC2000-8',
+                'name' => 'Final Drive Receiving Inspection',
+                'prefix' => 'PFD',
+                'labels' => [
+                    'Final Drive', 'Model', 'Serial Number', 'Production No.', 'No. 2 Planetary carrier',
+                    'No.2 ring gear(No.of teeth:69)', 'Floating seal', 'Housing', 'Sprocket', 'Hub', 'Housing',
+                    'No.1 Ring gear No.of teeth:80', 'No.1 Planetary gear (No.of teeth : 33)',
+                    'Drive gear (No.of teeth : 12)', 'Travel motor case', 'Travel motor',
+                    'No.1 sun gear (No.of teeth:13)', 'Driven gear (No.of teeth :67)', 'Case',
+                    'No.1 planetary carrier', 'No. 2 planetary gear (No.of teeth :26)',
+                    'No.2 Sun gear (No.of teeth : 15)',
+                ],
+            ],
+            [
+                'category' => 'Differential',
+                'egi' => 'HD785-7',
+                'name' => 'Differential Receiving Inspection',
+                'prefix' => 'PDF',
+                'labels' => [
+                    'Differential', 'Model', 'Serial Number', 'Wo No.', 'Case', 'Cage', 'Coupling', 'Cage',
+                    'Bevel gear', 'Nut', 'Cap', 'Bolt mounting bevel gear', 'Difflock', 'Stand', 'Painting',
+                    'Packing',
+                ],
+            ],
+            [
+                'category' => 'PTO',
+                'egi' => 'PC1250-8',
+                'name' => 'PTO Receiving Inspection',
+                'prefix' => 'PTO',
+                'labels' => [
+                    'Front Case', 'Breather', 'Oil dipstick', 'Plug', 'Valve assy', 'Center of HVP Shaft',
+                    'Center of Shaft', 'Center of HVP Shaft', 'Center of HVP Shaft', 'Bolt monting case',
+                    'Elbow', 'Rear case', 'Packing', 'Stand', 'Painting',
+                ],
+            ],
+            [
+                'category' => 'PTO',
+                'egi' => 'PC2000-8',
+                'name' => 'PTO Receiving Inspection',
+                'prefix' => 'PTO',
+                'labels' => [
+                    'Power Take Off', 'Model', 'Serial Number', 'WO No', 'Driven gear teeth 57', 'Coupling',
+                    'Main Shaft', 'Conection plate', 'PTO Case', 'Driven gear teeth 72,60',
+                    'Driven gear teeth 56', 'Breather', 'A - Centre of HVP 375+375 Shaft',
+                    'B - Centre of HVP 375+375 Shaft', 'C - Centre fan pump 95+95 Shaft',
+                    'D - Centre input Shaft',
+                ],
+            ],
+            [
+                'category' => 'Swing Machinery',
+                'egi' => 'PC1250-8',
+                'name' => 'Swing Machinery Receiving Inspection',
+                'prefix' => 'SWM',
+                'labels' => [
+                    'Case', 'Cover', 'Bolt monting Gear', 'Gear', 'Drain valve', 'Cover', 'Shaft', 'Packing',
+                    'Painting', 'Stand',
+                ],
+            ],
+            [
+                'category' => 'Swing Machinery',
+                'egi' => 'PC2000-8',
+                'name' => 'Swing Machinery Receiving Inspection',
+                'prefix' => 'SWM',
+                'labels' => [
+                    'Pinion Gear (Masked)', 'Main Case', 'Top Cover', 'Bracket Mounting Tube', 'Tube', 'Hose',
+                    'Breather', 'Drain Valve with Hose', 'Warning (Sticker)', 'Name plate', 'Painting condition',
+                    'Packing / wraping', 'Stand', 'Bolt stand',
+                ],
+            ],
+            [
+                'category' => 'Control Valve',
+                'egi' => 'PC1250-8',
+                'name' => 'Control Valve Receiving Inspection',
+                'prefix' => 'CVL',
+                'labels' => [
+                    'Spool (5pcs)', 'Main Relief Valve', 'Suction Valve', 'Suction Safety Valve (5pcs)',
+                    'Plug (4pcs)', 'Jet Sensor Relief Valve', 'Cover (5pcs)', 'Name Plate',
+                    'Painting condition', 'Packing / wraping', 'Stand', 'Bolt stand',
+                ],
+            ],
+            [
+                'category' => 'Control Valve',
+                'egi' => 'PC2000-8',
+                'name' => 'Control Valve Receiving Inspection',
+                'prefix' => 'CVL',
+                'labels' => [
+                    'Spool & Cover (5pcs)', 'Safety Suction Valve', '2 Stage Safety Suction Valve', 'Main Relief',
+                    'Spool & Cover (5pcs)', 'Plug (7pcs)', 'Spool & Cover (5pcs)', 'Plug',
+                    'Spool & Cover (5pcs)', 'Safety Suction Valve', 'Sensor to Controller', 'Valve Block',
+                    'Flange', 'Sensor to Controller', 'Painting condition', 'Packing / wraping', 'Stand',
+                    'Bolt stand',
+                ],
+            ],
+        ];
+
+        foreach ($powertrainTemplates as $template) {
+            ChecksheetTemplate::updateOrCreate(
+                [
+                    'major_category' => $template['category'],
+                    'stage_number' => 1,
+                    'egi_model' => $template['egi'],
+                ],
+                [
+                    'template_name' => $template['name'],
+                    'items' => $makePowertrainItems($template['prefix'], $template['labels']),
+                ]
+            );
+        }
+
+
+        // =============================================
+        // GENERIC FALLBACKS FOR POWERTRAIN
+        // =============================================
+
+        ChecksheetTemplate::updateOrCreate(
+            ['major_category' => 'TC/Transmission', 'stage_number' => 1, 'egi_model' => null],
+            [
+                'template_name' => 'TC/Transmission Receiving Inspection (Generic)',
+                'items' => [
+                    ['id' => 'PTR-001', 'group' => 'Visual Inspection', 'label' => 'Painting condition'],
+                    ['id' => 'PTR-002', 'group' => 'Visual Inspection', 'label' => 'Nameplate information & serial number'],
+                    ['id' => 'PTR-003', 'group' => 'Visual Inspection', 'label' => 'Housing assembly (no crack/damage)'],
+                    ['id' => 'PTR-011', 'group' => 'Fluids & Plugs', 'label' => 'Oil level / condition'],
+                    ['id' => 'PTR-014', 'group' => 'Fluids & Plugs', 'label' => 'Check for oil leakage'],
+                ]
+            ]
+        );
+
+        ChecksheetTemplate::updateOrCreate(
+            ['major_category' => 'Final Drive', 'stage_number' => 1, 'egi_model' => null],
+            [
+                'template_name' => 'Final Drive Receiving Inspection (Generic)',
+                'items' => [
+                    ['id' => 'PFD-001', 'group' => 'Visual Inspection', 'label' => 'Painting condition'],
+                    ['id' => 'PFD-003', 'group' => 'Housing & Covers', 'label' => 'Main housing (no crack)'],
+                    ['id' => 'PFD-005', 'group' => 'Housing & Covers', 'label' => 'Floating seal area / leak check'],
+                    ['id' => 'PFD-008', 'group' => 'Fluids & Plugs', 'label' => 'Oil level / condition'],
+                ]
+            ]
+        );
+
+        ChecksheetTemplate::updateOrCreate(
+            ['major_category' => 'Differential', 'stage_number' => 1, 'egi_model' => null],
+            [
+                'template_name' => 'Differential Receiving Inspection (Generic)',
+                'items' => [
+                    ['id' => 'PDF-001', 'group' => 'Visual Inspection', 'label' => 'Painting condition'],
+                    ['id' => 'PDF-002', 'group' => 'Visual Inspection', 'label' => 'Housing assembly (no crack/damage)'],
+                    ['id' => 'PDF-006', 'group' => 'Fluids & Plugs', 'label' => 'Drain plug'],
+                ]
+            ]
+        );
+
+        ChecksheetTemplate::updateOrCreate(
+            ['major_category' => 'PTO', 'stage_number' => 1, 'egi_model' => null],
+            [
+                'template_name' => 'PTO Receiving Inspection (Generic)',
+                'items' => [
+                    ['id' => 'PTO-001', 'group' => 'Visual Inspection', 'label' => 'Painting & Nameplate'],
+                    ['id' => 'PTO-002', 'group' => 'Visual Inspection', 'label' => 'PTO Case / Housing'],
+                    ['id' => 'PTO-006', 'group' => 'Fluids & Plugs', 'label' => 'Oil drain plug / check metal particles'],
+                ]
+            ]
+        );
+
+        ChecksheetTemplate::updateOrCreate(
+            ['major_category' => 'Swing Machinery', 'stage_number' => 1, 'egi_model' => null],
+            [
+                'template_name' => 'Swing Machinery Receiving Inspection (Generic)',
+                'items' => [
+                    ['id' => 'SWM-001', 'group' => 'Visual Inspection', 'label' => 'Painting & Nameplate'],
+                    ['id' => 'SWM-002', 'group' => 'Visual Inspection', 'label' => 'Swing machinery housing'],
+                    ['id' => 'SWM-006', 'group' => 'Fluids & Plugs', 'label' => 'Oil level gauge / dipstick'],
+                ]
+            ]
+        );
+
+        ChecksheetTemplate::updateOrCreate(
+            ['major_category' => 'Control Valve', 'stage_number' => 1, 'egi_model' => null],
+            [
+                'template_name' => 'Control Valve Receiving Inspection (Generic)',
+                'items' => [
+                    ['id' => 'CVL-001', 'group' => 'Visual Inspection', 'label' => 'Painting & Nameplate'],
+                    ['id' => 'CVL-002', 'group' => 'Visual Inspection', 'label' => 'Valve block / body (no crack/damage)'],
+                    ['id' => 'CVL-003', 'group' => 'Components', 'label' => 'Spool caps & covers'],
+                ]
+            ]
+        );
+
+        // Refresh hanya snapshot Receiving yang belum pernah diisi. Snapshot
+        // yang sudah memiliki jawaban harus tetap utuh untuk menjaga jejak audit.
+        Component::query()
+            ->where('current_stage', 1)
+            ->get()
+            ->each(function (Component $component): void {
+                $egi = strtoupper(trim((string) $component->egi));
+                $template = ChecksheetTemplate::query()
+                    ->where('major_category', $component->major_category)
+                    ->where('stage_number', 1)
+                    ->whereRaw('UPPER(egi_model) = ?', [$egi])
+                    ->first();
+
+                $template ??= ChecksheetTemplate::query()
+                    ->where('major_category', $component->major_category)
+                    ->where('stage_number', 1)
+                    ->whereNull('egi_model')
+                    ->first();
+
+                if (!$template) {
+                    return;
+                }
+
+                $checksheet = ComponentChecksheet::firstOrNew([
+                    'comp_id' => $component->comp_id,
+                    'stage_number' => 1,
+                ]);
+
+                if ($checksheet->exists && ($checksheet->completed_at || !empty($checksheet->answers))) {
+                    return;
+                }
+
+                $checksheet->items = $template->items;
+                $checksheet->answers = [];
+                $checksheet->save();
+            });
     }
 }

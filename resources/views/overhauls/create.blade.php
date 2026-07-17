@@ -35,18 +35,10 @@
                         {{-- Text input (non-Engine or fallback) --}}
                         <input id="egi_text" class="ocms-input" type="text" name="egi" value="{{ old('egi') }}" required
                             placeholder="Contoh: D155A-6" style="font-family: 'JetBrains Mono', monospace;">
-                        {{-- Dropdown (Engine only) --}}
+                        {{-- Dropdown (For components with specific templates) --}}
                         <select id="egi_select" class="ocms-select" style="display: none; font-family: 'JetBrains Mono', monospace;">
                             <option value="">— Pilih Model EGI —</option>
-                            <option value="PC2000-8" {{ old('egi') == 'PC2000-8' ? 'selected' : '' }}>PC2000-8 (76 item)</option>
-                            <option value="PC1250-8" {{ old('egi') == 'PC1250-8' ? 'selected' : '' }}>PC1250-8 (78 item)</option>
-                            <option value="D375-6" {{ old('egi') == 'D375-6' ? 'selected' : '' }}>D375-6 (64 item)</option>
-                            <option value="D155-6" {{ old('egi') == 'D155-6' ? 'selected' : '' }}>D155-6 (49 item)</option>
-                            <option value="WA800-3" {{ old('egi') == 'WA800-3' ? 'selected' : '' }}>WA800-3 (56 item)</option>
-                            <option value="GD825A-2" {{ old('egi') == 'GD825A-2' ? 'selected' : '' }}>GD825A-2 (57 item)</option>
-                            <option value="HD785-7" {{ old('egi') == 'HD785-7' ? 'selected' : '' }}>HD785-7 (78 item)</option>
-                            <option value="HD465-7R" {{ old('egi') == 'HD465-7R' ? 'selected' : '' }}>HD465-7R (61 item)</option>
-                            <option value="__OTHER__">Lainnya (ketik manual)</option>
+                            <!-- Options will be populated by JS -->
                         </select>
                         {{-- Custom EGI input (saat pilih "Lainnya") --}}
                         <input id="egi_custom" class="ocms-input" type="text" value="{{ old('egi_custom') }}"
@@ -274,20 +266,55 @@
         const egiCustom = document.getElementById('egi_custom');
         const egiHint = document.getElementById('egi_hint');
 
-        function toggleEgiMode() {
-            const isEngine = categorySelect.value === 'Engine';
+        const oldEgi = "{{ old('egi') }}";
 
-            if (isEngine) {
-                // Engine mode: show dropdown, hide text input
+        const templateMap = {
+            'Engine': ['PC2000-8', 'PC1250-8', 'D375-6', 'D155-6', 'WA800-3', 'GD825A-2', 'HD785-7', 'HD465-7R'],
+            'TC/Transmission': ['HD785-7', 'D155-6', 'D375-6', 'GD825A-2', 'HD1500-7', 'WA800-3'],
+            'Final Drive': ['HD785-7', 'D155-6', 'D375-6', 'GD825A-2', 'PC1250-8', 'PC2000-8'],
+            'Differential': ['HD785-7'],
+            'PTO': ['PC1250-8', 'PC2000-8'],
+            'Swing Machinery': ['PC1250-8', 'PC2000-8'],
+            'Control Valve': ['PC1250-8', 'PC2000-8']
+        };
+
+        function populateEgiSelect(category) {
+            // Keep the first option
+            egiSelect.innerHTML = '<option value="">— Pilih Model EGI —</option>';
+            
+            if (templateMap[category]) {
+                templateMap[category].forEach(model => {
+                    const opt = document.createElement('option');
+                    opt.value = model;
+                    opt.textContent = model;
+                    if (oldEgi === model) opt.selected = true;
+                    egiSelect.appendChild(opt);
+                });
+            }
+            
+            // Add 'Other' option
+            const otherOpt = document.createElement('option');
+            otherOpt.value = '__OTHER__';
+            otherOpt.textContent = 'Lainnya (ketik manual)';
+            egiSelect.appendChild(otherOpt);
+        }
+
+        function toggleEgiMode() {
+            const category = categorySelect.value;
+            const hasTemplates = templateMap.hasOwnProperty(category);
+
+            if (hasTemplates) {
+                // Category has templates: show dropdown, hide text input
                 egiText.style.display = 'none';
                 egiText.removeAttribute('name');
                 egiText.removeAttribute('required');
 
+                populateEgiSelect(category);
                 egiSelect.style.display = '';
                 
                 handleEgiSelectChange();
             } else {
-                // Non-Engine mode: show text input, hide dropdown & custom
+                // No templates for this category: show text input, hide dropdown & custom
                 egiText.style.display = '';
                 egiText.setAttribute('name', 'egi');
                 egiText.setAttribute('required', 'required');
@@ -327,11 +354,28 @@
             }
         }
 
-        categorySelect.addEventListener('change', toggleEgiMode);
+        categorySelect.addEventListener('change', function() {
+            toggleEgiMode();
+            // Reset selection when category changes
+            if (templateMap.hasOwnProperty(categorySelect.value)) {
+                egiSelect.value = '';
+                handleEgiSelectChange();
+            }
+        });
+        
         egiSelect.addEventListener('change', handleEgiSelectChange);
 
         // Initialize on page load (handles old() values)
         toggleEgiMode();
+        
+        // Handle case where oldEgi was custom text while in a templated category
+        if (templateMap.hasOwnProperty(categorySelect.value) && oldEgi) {
+            if (!templateMap[categorySelect.value].includes(oldEgi)) {
+                egiSelect.value = '__OTHER__';
+                egiCustom.value = oldEgi;
+                handleEgiSelectChange();
+            }
+        }
     });
     </script>
 
