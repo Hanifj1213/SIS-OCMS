@@ -1,10 +1,10 @@
 <x-app-layout>
 
     <div class="section fade-up">
-        <div class="ocms-page-header" style="display: flex; justify-content: space-between; align-items: flex-start;">
+        <div class="ocms-page-header" style="display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap;">
             <div>
                 <h1>Daftar Komponen</h1>
-                <p>{{ $components->count() }} komponen terdaftar dalam sistem</p>
+                <p><span id="componentCount">{{ $components->count() }}</span> komponen terdaftar dalam sistem</p>
             </div>
             @role('SuperAdmin|Planner/Warehouse')
             <a href="{{ route('components.create') }}" class="btn-primary">
@@ -18,7 +18,12 @@
         <div class="alert alert-success fade-up">✅ {{ session('success') }}</div>
     @endif
 
-    <div class="glass-card fade-up" style="padding: 0; overflow: hidden;">
+    {{-- Pencarian cepat --}}
+    <div class="section fade-up" style="margin-bottom: 20px;">
+        <input type="search" id="componentSearch" class="ocms-input" placeholder="🔍 Cari EGI, unit code, serial number, site, status..." style="max-width: 420px;">
+    </div>
+
+    <div class="glass-card fade-up table-scroll" style="padding: 0;">
         <table class="ocms-table">
             <thead>
                 <tr>
@@ -36,7 +41,7 @@
             </thead>
             <tbody>
                 @forelse($components as $index => $comp)
-                    <tr>
+                    <tr data-comp-id="{{ $comp->comp_id }}">
                         <td>{{ $index + 1 }}</td>
                         <td class="mono" style="font-weight: 600;">
                             {{ $comp->egi ?? $comp->model_type }}
@@ -68,10 +73,10 @@
                                 <span style="color: var(--text-muted);">-</span>
                             @endif
                         </td>
-                        <td>
+                        <td class="js-stage-cell">
                             <span class="badge badge-cyan">{{ $comp->current_stage }}/7</span>
                         </td>
-                        <td>
+                        <td class="js-status-cell">
                             @if($comp->status == 'On Progress')
                                 <span class="badge badge-gold">🔧 On Progress</span>
                             @else
@@ -94,5 +99,41 @@
             </tbody>
         </table>
     </div>
+
+    <script>
+        // === Pencarian cepat (client-side) ===
+        document.getElementById('componentSearch').addEventListener('input', function() {
+            const q = this.value.toLowerCase().trim();
+            document.querySelectorAll('tr[data-comp-id]').forEach(row => {
+                row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+            });
+        });
+
+        // === Realtime: update badge Tahap & Status tiap 10 detik ===
+        ocmsPoll('{{ route('status.components') }}', 10000, function(data) {
+            const rows = document.querySelectorAll('tr[data-comp-id]');
+
+            // Ada komponen baru / terhapus → muat ulang daftar
+            if (data.count !== rows.length) {
+                location.reload();
+                return;
+            }
+
+            data.components.forEach(comp => {
+                const row = document.querySelector('tr[data-comp-id="' + comp.comp_id + '"]');
+                if (!row) return;
+
+                const stageCell = row.querySelector('.js-stage-cell');
+                const newStage = '<span class="badge badge-cyan">' + comp.current_stage + '/7</span>';
+                if (stageCell && stageCell.innerHTML.trim() !== newStage) stageCell.innerHTML = newStage;
+
+                const statusCell = row.querySelector('.js-status-cell');
+                const newStatus = comp.status === 'On Progress'
+                    ? '<span class="badge badge-gold">🔧 On Progress</span>'
+                    : '<span class="badge badge-green">✅ ' + comp.status + '</span>';
+                if (statusCell && statusCell.innerHTML.trim() !== newStatus) statusCell.innerHTML = newStatus;
+            });
+        });
+    </script>
 
 </x-app-layout>

@@ -11,7 +11,7 @@
         <div class="alert alert-success fade-up">✅ {{ session('success') }}</div>
     @endif
 
-    <div class="glass-card fade-up" style="padding: 0; overflow: hidden;">
+    <div class="glass-card fade-up table-scroll" style="padding: 0;">
         <table class="ocms-table">
             <thead>
                 <tr>
@@ -26,7 +26,7 @@
             </thead>
             <tbody>
                 @forelse($partRequests as $index => $pr)
-                <tr>
+                <tr data-req-id="{{ $pr->req_id }}" data-status="{{ $pr->status }}">
                     <td>{{ $index + 1 }}</td>
                     <td>
                         <a href="{{ route('components.show', $pr->component->comp_id) }}" class="mono" style="color: var(--accent-cyan); text-decoration: none;">
@@ -76,5 +76,26 @@
             </tbody>
         </table>
     </div>
+
+    <script>
+        // === Realtime: pantau perubahan status part request tiap 10 detik ===
+        // Kolom Aksi (tombol Tersedia/Kosong) dirender di server berdasarkan
+        // status & role, jadi kalau ada perubahan kita reload halamannya.
+        ocmsPoll('{{ route('status.partRequests') }}', 10000, function(data) {
+            const rows = document.querySelectorAll('tr[data-req-id]');
+
+            if (data.count !== rows.length) {
+                location.reload();
+                return;
+            }
+
+            const changed = data.requests.some(req => {
+                const row = document.querySelector('tr[data-req-id="' + req.req_id + '"]');
+                return row && row.dataset.status !== req.status;
+            });
+
+            if (changed) location.reload();
+        });
+    </script>
 
 </x-app-layout>

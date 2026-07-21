@@ -19,7 +19,7 @@
         </div>
     @endif
 
-    <div class="glass-card fade-up" style="padding: 0; overflow: hidden;">
+    <div class="glass-card fade-up table-scroll" style="padding: 0;">
         <table class="ocms-table">
             <thead>
                 <tr>

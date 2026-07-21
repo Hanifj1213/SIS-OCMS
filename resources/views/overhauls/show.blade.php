@@ -3,7 +3,7 @@
     <div class="section fade-up">
         <div class="ocms-page-header">
             <h1>{{ $comp->serial_number }}</h1>
-            <p>{{ $comp->egi ?? $comp->model_type }} — {{ $comp->major_category }}</p></p>
+            <p>{{ $comp->egi ?? $comp->model_type }} — {{ $comp->major_category }}</p>
         </div>
     </div>
 
@@ -220,7 +220,7 @@
     @if($comp->inspectionDetails->count() > 0)
     <div class="section">
         <div class="section-title fade-up">Hasil Inspeksi & Pengukuran</div>
-        <div class="glass-card fade-up" style="padding: 0; overflow: hidden;">
+        <div class="glass-card fade-up table-scroll" style="padding: 0;">
             <table class="ocms-table">
                 <thead>
                     <tr>
@@ -255,7 +255,7 @@
     @if($comp->partRequests->count() > 0)
     <div class="section">
         <div class="section-title fade-up">Permintaan Suku Cadang</div>
-        <div class="glass-card fade-up" style="padding: 0; overflow: hidden;">
+        <div class="glass-card fade-up table-scroll" style="padding: 0;">
             <table class="ocms-table">
                 <thead>
                     <tr>
@@ -331,40 +331,58 @@
         </div>
 
         <script>
-        // Mencegah bug auto-scroll ke atas saat mengedit sel di iframe Google Sheets
+        // Mencegah bug auto-scroll ke atas saat mengedit sel di iframe Google Sheets.
+        //
+        // Cara kerja:
+        // - Saat fokus berpindah ke iframe (window 'blur'), posisi scroll "dikunci".
+        //   Setiap kali browser mencoba auto-scroll (Google Sheets sering memanggil
+        //   focus() internal yang membuat parent scroll ke atas), posisi langsung
+        //   dikembalikan secara instant (mengabaikan scroll-behavior: smooth).
+        // - Interaksi APA PUN di luar iframe (wheel, sentuhan layar, klik) langsung
+        //   melepas fokus iframe dan membuka kunci, jadi scroll halaman tidak
+        //   pernah "ke-lock" — termasuk di touchscreen.
         document.addEventListener('DOMContentLoaded', function() {
             const iframe = document.getElementById('gsheet-iframe');
             if (!iframe) return;
-            
-            let scrollX = window.scrollX;
-            let scrollY = window.scrollY;
-            let isMouseOverIframe = false;
-            
-            iframe.addEventListener('mouseenter', () => isMouseOverIframe = true);
-            iframe.addEventListener('mouseleave', () => isMouseOverIframe = false);
-            
+
+            let pinX = window.scrollX;
+            let pinY = window.scrollY;
+            let pinned = false;
+
             window.addEventListener('scroll', function() {
-                if (document.activeElement === iframe) {
-                    window.scrollTo(scrollX, scrollY);
-                } else {
-                    scrollX = window.scrollX;
-                    scrollY = window.scrollY;
+                if (!pinned) {
+                    pinX = window.scrollX;
+                    pinY = window.scrollY;
+                } else if (window.scrollX !== pinX || window.scrollY !== pinY) {
+                    // Auto-scroll dari iframe terdeteksi — kembalikan posisi semula
+                    window.scrollTo({ left: pinX, top: pinY, behavior: 'instant' });
                 }
+            }, { passive: true });
+
+            // Fokus masuk ke iframe → kunci posisi scroll saat ini
+            window.addEventListener('blur', function() {
+                setTimeout(function() {
+                    if (document.activeElement === iframe) pinned = true;
+                }, 0);
             });
 
-            // Blur iframe ketika mouse berada di luar iframe agar halaman bisa di-scroll lagi
-            document.addEventListener('mousemove', function(e) {
-                if (document.activeElement === iframe && e.target !== iframe) {
-                    // Jika mouse keluar dari area iframe, simpan posisi scroll terakhir
-                    scrollX = window.scrollX;
-                    scrollY = window.scrollY;
-                }
+            // Fokus kembali ke halaman → buka kunci
+            window.addEventListener('focus', function() {
+                pinned = false;
             });
-            
-            document.addEventListener('wheel', function() {
-                if (document.activeElement === iframe && !isMouseOverIframe) {
-                    document.activeElement.blur();
+
+            // Interaksi di luar iframe → lepas fokus iframe + buka kunci.
+            // Event ini tidak akan terpicu saat user berinteraksi DI DALAM
+            // iframe (event tertelan oleh dokumen iframe), jadi aman.
+            function releaseIframeFocus() {
+                pinned = false;
+                if (document.activeElement === iframe) {
+                    iframe.blur();
+                    window.focus();
                 }
+            }
+            ['wheel', 'touchstart', 'mousedown'].forEach(function(evt) {
+                document.addEventListener(evt, releaseIframeFocus, { passive: true });
             });
         });
         </script>
@@ -414,7 +432,6 @@
                 </div>
                 @if(!$isReviewMode && auth()->user()->hasAnyRole(['Mechanic', 'Supervisor', 'SuperAdmin']))
                 <div style="margin-top: 12px; text-align: center;">
-                <div style="margin-top: 12px; text-align: center;">
                     <button onclick="csOpenAddModal()" class="cs-add-btn" style="width: 100%;">+ Tambah Item Kustom</button>
                 </div>
                 @endif
@@ -425,7 +442,7 @@
     @endif
 
     {{-- Add Item Modal --}}
-    <div id="csAddModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); backdrop-filter:blur(8px); z-index:1000; display:none; align-items:center; justify-content:center; padding:24px;">
+    <div id="csAddModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); backdrop-filter:blur(8px); z-index:1000; align-items:center; justify-content:center; padding:24px;">
         <div style="background:linear-gradient(170deg,#0f3d36,var(--bg-secondary)); border:1px solid var(--glass-border-light); border-radius:20px; padding:32px; width:100%; max-width:420px;">
             <div class="section-title" style="color:var(--accent-gold); margin-bottom:20px;">+ Tambah Item Checksheet</div>
             <label style="font-size:0.7rem; font-weight:600; color:var(--text-secondary); text-transform:uppercase; letter-spacing:0.08em; display:block; margin-bottom:6px;">Nama Item</label>
@@ -980,6 +997,44 @@
     @endif
 
     @if(!$isReviewMode)
+    {{-- Realtime: pantau perubahan status komponen (stage, approval, part request) --}}
+    <script>
+        (function() {
+            let fingerprint = null;
+            let formDirty = false;
+
+            // Jangan auto-reload kalau user sedang mengetik di form
+            // (form inspeksi, remarks, dsb.) agar isian tidak hilang.
+            document.addEventListener('input', function(e) {
+                if (e.target.closest('form')) formDirty = true;
+            });
+
+            ocmsPoll('{{ route('status.component', $comp->comp_id) }}', 8000, function(data) {
+                if (fingerprint === null) {
+                    fingerprint = data.fingerprint;
+                    return;
+                }
+                if (data.fingerprint === fingerprint) return;
+
+                fingerprint = data.fingerprint;
+
+                if (formDirty) {
+                    // Tampilkan banner agar user reload manual tanpa kehilangan isian
+                    if (!document.getElementById('staleBanner')) {
+                        const banner = document.createElement('div');
+                        banner.id = 'staleBanner';
+                        banner.style.cssText = 'position:fixed; top:76px; left:50%; transform:translateX(-50%); z-index:500; background:rgba(212,175,55,0.95); color:#0B2B26; padding:12px 20px; border-radius:12px; font-size:0.8rem; font-weight:700; box-shadow:0 8px 32px rgba(0,0,0,0.4); cursor:pointer; display:flex; align-items:center; gap:10px;';
+                        banner.innerHTML = '🔄 Status komponen berubah — klik untuk memuat ulang';
+                        banner.onclick = () => location.reload();
+                        document.body.appendChild(banner);
+                    }
+                } else {
+                    location.reload();
+                }
+            });
+        })();
+    </script>
+
     {{-- Action Section --}}
     <div class="section">
         <div class="section-title fade-up">Aksi</div>

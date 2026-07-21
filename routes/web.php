@@ -4,6 +4,7 @@ use App\Http\Controllers\ChecksheetController;
 use App\Http\Controllers\ComponentController;
 use App\Http\Controllers\PartRequestController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\StatusController;
 use App\Http\Controllers\UserManagementController;
 use Illuminate\Support\Facades\Route;
 
@@ -20,36 +21,7 @@ Route::get('/', function () {
 
 // Dashboard — TANPA middleware 'verified' karena kita tidak pakai email verification
 Route::get('/dashboard', function () {
-    $onProgress  = \App\Models\Component::where('status', 'On Progress')->count();
-    $readyForUse = \App\Models\Component::where('status', 'Ready for Use')->count();
-
-    // Hitung rata-rata lead time (jam) dari komponen RFU
-    $avgLeadTime = 0;
-    $rfuComponents = \App\Models\Component::where('status', 'Ready for Use')->get();
-    if ($rfuComponents->count() > 0) {
-        $totalHours = 0;
-        foreach ($rfuComponents as $comp) {
-            $firstLog = $comp->overhaulLogs()->orderBy('start_time', 'asc')->first();
-            $lastLog  = $comp->overhaulLogs()->orderBy('end_time', 'desc')->first();
-            if ($firstLog && $lastLog && $firstLog->start_time && $lastLog->end_time) {
-                $totalHours += \Carbon\Carbon::parse($firstLog->start_time)
-                    ->diffInHours(\Carbon\Carbon::parse($lastLog->end_time));
-            }
-        }
-        $avgLeadTime = $rfuComponents->count() > 0 ? round($totalHours / $rfuComponents->count(), 1) : 0;
-    }
-
-    // Data per-stage untuk chart
-    $stageDistribution = [];
-    for ($i = 1; $i <= 7; $i++) {
-        $stageDistribution[$i] = \App\Models\Component::where('current_stage', $i)
-            ->where('status', 'On Progress')
-            ->count();
-    }
-
-    $pendingParts = \App\Models\PartRequest::where('status', 'Pending')->count();
-
-    return view('dashboard', compact('onProgress', 'readyForUse', 'avgLeadTime', 'stageDistribution', 'pendingParts'));
+    return view('dashboard', StatusController::dashboardMetrics());
 })->middleware(['auth'])->name('dashboard');
 
 // Grup route yang memerlukan autentikasi
@@ -59,6 +31,12 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/scan', function () {
         return view('overhauls.scan');
     })->name('scan');
+
+    // Status polling (realtime update tanpa refresh)
+    Route::get('/status/dashboard', [StatusController::class, 'dashboard'])->name('status.dashboard');
+    Route::get('/status/components', [StatusController::class, 'components'])->name('status.components');
+    Route::get('/status/components/{component}', [StatusController::class, 'component'])->name('status.component');
+    Route::get('/status/part-requests', [StatusController::class, 'partRequests'])->name('status.partRequests');
 
     // Checksheet routes (Typeform-style)
     Route::get('components/{component}/checksheet/{stage}', [ChecksheetController::class, 'show'])
@@ -82,8 +60,9 @@ Route::middleware(['auth'])->group(function () {
     Route::post('components/{component}/reject-stage', [ComponentController::class, 'rejectStage'])
         ->name('components.rejectStage');
 
-    // Resource route komponen
-    Route::resource('components', ComponentController::class);
+    // Resource route komponen (hanya action yang tersedia di controller)
+    Route::resource('components', ComponentController::class)
+        ->only(['index', 'create', 'store', 'show']);
 
     // Part Requests (Modul Gudang)
     Route::get('/part-requests', [PartRequestController::class, 'index'])->name('part-requests.index');

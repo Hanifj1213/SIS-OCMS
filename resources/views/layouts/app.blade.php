@@ -19,6 +19,29 @@
 
         @vite(['resources/css/app.css', 'resources/js/app.js'])
 
+        <script>
+            // === Helper polling status realtime ===
+            // Poll otomatis berhenti saat tab tidak terlihat dan langsung
+            // refresh sekali saat tab kembali aktif.
+            window.ocmsPoll = function(url, intervalMs, onData) {
+                let inFlight = false;
+
+                async function tick() {
+                    if (document.hidden || inFlight) return;
+                    inFlight = true;
+                    try {
+                        const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+                        if (res.ok) onData(await res.json());
+                    } catch (e) { /* jaringan putus sementara: coba lagi di tick berikutnya */ }
+                    inFlight = false;
+                }
+
+                const timer = setInterval(tick, intervalMs);
+                document.addEventListener('visibilitychange', () => { if (!document.hidden) tick(); });
+                return () => clearInterval(timer);
+            };
+        </script>
+
         <style>
             /* ============================================
                SIS-OCMS PREMIUM DESIGN SYSTEM
@@ -606,11 +629,37 @@
                 padding: 8px;
                 color: var(--text-secondary);
                 cursor: pointer;
+                font-size: 1rem;
+                line-height: 1;
             }
+            .ocms-mobile-menu {
+                display: none;
+                flex-direction: column;
+                gap: 4px;
+                padding: 12px 16px 16px;
+                border-top: 1px solid var(--glass-border);
+                background: rgba(11, 43, 38, 0.95);
+                backdrop-filter: blur(24px);
+            }
+            .ocms-mobile-menu.open { display: flex; }
+            .ocms-mobile-menu .ocms-nav-link { display: block; padding: 12px 16px; }
             @media (max-width: 768px) {
                 .mobile-menu-btn { display: flex; }
                 .ocms-nav-user .ocms-nav-username,
                 .ocms-nav-user .ocms-nav-role { display: none; }
+            }
+
+            /* Alert dismiss animation */
+            .alert.alert-dismissing {
+                opacity: 0;
+                transform: translateY(-8px);
+                transition: all 0.5s ease;
+            }
+
+            /* Tabel bisa discroll horizontal di layar kecil */
+            .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+            @media (max-width: 768px) {
+                .ocms-table { min-width: 720px; }
             }
         </style>
     </head>
@@ -648,12 +697,25 @@
                         <div class="ocms-nav-username">{{ Auth::user()->name }}</div>
                         <div class="ocms-nav-role">{{ Auth::user()->roles->pluck('name')->implode(', ') }}</div>
                     </div>
-                    <div class="ocms-nav-avatar">{{ strtoupper(substr(Auth::user()->name, 0, 2)) }}</div>
+                    <a href="{{ route('profile.edit') }}" class="ocms-nav-avatar" title="Profil Saya" style="text-decoration: none;">{{ strtoupper(substr(Auth::user()->name, 0, 2)) }}</a>
                     <form method="POST" action="{{ route('logout') }}" style="margin:0;">
                         @csrf
                         <button type="submit" class="ocms-nav-logout">Logout</button>
                     </form>
+                    <button type="button" class="mobile-menu-btn" onclick="document.getElementById('ocmsMobileMenu').classList.toggle('open')" aria-label="Menu">☰</button>
                 </div>
+            </div>
+
+            {{-- Mobile menu (muncul di layar < 768px) --}}
+            <div class="ocms-mobile-menu" id="ocmsMobileMenu">
+                <a href="{{ route('dashboard') }}" class="ocms-nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">Dashboard</a>
+                <a href="{{ route('components.index') }}" class="ocms-nav-link {{ request()->routeIs('components.*') ? 'active' : '' }}">Komponen</a>
+                <a href="{{ route('part-requests.index') }}" class="ocms-nav-link {{ request()->routeIs('part-requests.*') ? 'active' : '' }}">Gudang</a>
+                <a href="{{ route('scan') }}" class="ocms-nav-link {{ request()->routeIs('scan') ? 'active' : '' }}">Scan QR</a>
+                @role('SuperAdmin')
+                <a href="{{ route('admin.users.index') }}" class="ocms-nav-link {{ request()->routeIs('admin.*') ? 'active' : '' }}">Users</a>
+                @endrole
+                <a href="{{ route('profile.edit') }}" class="ocms-nav-link {{ request()->routeIs('profile.*') ? 'active' : '' }}">Profil Saya</a>
             </div>
         </nav>
 
@@ -744,6 +806,14 @@
                 },
                 delay: i * 0.05
             });
+        });
+
+        // === Auto-dismiss alert sukses setelah 6 detik ===
+        document.querySelectorAll('.alert-success').forEach(el => {
+            setTimeout(() => {
+                el.classList.add('alert-dismissing');
+                setTimeout(() => el.remove(), 600);
+            }, 6000);
         });
         </script>
     </body>

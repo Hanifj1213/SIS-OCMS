@@ -18,25 +18,25 @@
             <div class="glass-card metric-card metric-gold fade-up">
                 <div class="metric-icon">🔧</div>
                 <div class="metric-label">On Progress</div>
-                <div class="metric-value">{{ $onProgress }}</div>
+                <div class="metric-value" id="metricOnProgress">{{ $onProgress }}</div>
                 <div class="metric-sub">komponen aktif</div>
             </div>
             <div class="glass-card metric-card metric-green fade-up">
                 <div class="metric-icon">✅</div>
                 <div class="metric-label">Ready for Use</div>
-                <div class="metric-value">{{ $readyForUse }}</div>
+                <div class="metric-value" id="metricReadyForUse">{{ $readyForUse }}</div>
                 <div class="metric-sub">komponen selesai</div>
             </div>
             <div class="glass-card metric-card metric-cyan fade-up">
                 <div class="metric-icon">⏱</div>
                 <div class="metric-label">Avg Lead Time</div>
-                <div class="metric-value">{{ $avgLeadTime }}<span style="font-size: 1rem; font-weight: 400;">h</span></div>
+                <div class="metric-value"><span id="metricAvgLeadTime">{{ $avgLeadTime }}</span><span style="font-size: 1rem; font-weight: 400;">h</span></div>
                 <div class="metric-sub">jam rata-rata</div>
             </div>
             <div class="glass-card metric-card metric-red fade-up">
                 <div class="metric-icon">📦</div>
                 <div class="metric-label">Pending Parts</div>
-                <div class="metric-value">{{ $pendingParts }}</div>
+                <div class="metric-value" id="metricPendingParts">{{ $pendingParts }}</div>
                 <div class="metric-sub">permintaan gudang</div>
             </div>
         </div>
@@ -60,23 +60,53 @@
                 @endphp
                 @foreach($stageDistribution as $stage => $count)
                 <div style="text-align: center;">
-                    <div style="
-                        padding: 16px 4px;
-                        border-radius: 12px;
-                        font-family: 'JetBrains Mono', monospace;
-                        font-size: 1.4rem;
-                        font-weight: 800;
-                        {{ $count > 0
-                            ? 'background: var(--accent-cyan-dim); color: var(--accent-cyan); box-shadow: 0 0 20px rgba(72, 202, 228, 0.1);'
-                            : 'background: rgba(255,255,255,0.02); color: var(--text-muted);'
-                        }}
-                    ">{{ $count }}</div>
+                    <div class="stage-dist-cell {{ $count > 0 ? 'has-count' : '' }}" data-stage="{{ $stage }}">{{ $count }}</div>
                     <p style="font-size: 0.6rem; color: var(--text-muted); margin-top: 8px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">{{ $stageLabels[$stage] ?? 'Tahap '.$stage }}</p>
                 </div>
                 @endforeach
             </div>
         </div>
     </div>
+    @endrole
+
+    <style>
+        .stage-dist-cell {
+            padding: 16px 4px;
+            border-radius: 12px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.4rem;
+            font-weight: 800;
+            background: rgba(255,255,255,0.02);
+            color: var(--text-muted);
+            transition: all 0.4s;
+        }
+        .stage-dist-cell.has-count {
+            background: var(--accent-cyan-dim);
+            color: var(--accent-cyan);
+            box-shadow: 0 0 20px rgba(72, 202, 228, 0.1);
+        }
+    </style>
+
+    @role('SuperAdmin|Management|Supervisor|Planner/Warehouse')
+    <script>
+        // Realtime: perbarui metrik dashboard tiap 10 detik tanpa refresh
+        ocmsPoll('{{ route('status.dashboard') }}', 10000, function(data) {
+            const set = (id, val) => {
+                const el = document.getElementById(id);
+                if (el && el.textContent != String(val)) el.textContent = val;
+            };
+            set('metricOnProgress', data.onProgress);
+            set('metricReadyForUse', data.readyForUse);
+            set('metricAvgLeadTime', data.avgLeadTime);
+            set('metricPendingParts', data.pendingParts);
+
+            document.querySelectorAll('.stage-dist-cell').forEach(cell => {
+                const count = data.stageDistribution[cell.dataset.stage] ?? 0;
+                cell.textContent = count;
+                cell.classList.toggle('has-count', count > 0);
+            });
+        });
+    </script>
     @endrole
 
     {{-- Quick Access Modules --}}

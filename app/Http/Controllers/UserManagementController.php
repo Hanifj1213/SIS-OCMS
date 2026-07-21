@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
 
 class UserManagementController extends Controller
@@ -42,7 +41,8 @@ class UserManagementController extends Controller
         $user = User::create([
             'name'     => $request->name,
             'nik'      => strtoupper(trim($request->nik)),
-            'password' => Hash::make($request->password),
+            // Cast 'hashed' pada model User otomatis melakukan hashing
+            'password' => $request->password,
         ]);
 
         $user->assignRole($request->role);
