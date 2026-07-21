@@ -1,0 +1,1 @@
+@extends('errors.layout', ['statusCode' => 429, 'message' => 'Terlalu banyak permintaan. Tunggu sebentar lalu coba lagi.'])

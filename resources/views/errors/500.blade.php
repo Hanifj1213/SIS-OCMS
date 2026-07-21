@@ -1,0 +1,1 @@
+@extends('errors.layout', ['statusCode' => 500, 'message' => 'Kesalahan server internal.'])

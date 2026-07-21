@@ -1,0 +1,1 @@
+@extends('errors.layout', ['statusCode' => 404, 'message' => 'Halaman tidak ditemukan.'])

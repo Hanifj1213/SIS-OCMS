@@ -1,0 +1,1 @@
+@extends('errors.layout', ['statusCode' => 403, 'message' => 'Anda tidak memiliki izin mengakses halaman ini.'])
