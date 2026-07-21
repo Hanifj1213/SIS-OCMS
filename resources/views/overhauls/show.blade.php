@@ -330,7 +330,7 @@
             Sesuaikan nilai variabel di bawah jika tampilan Google Sheets berubah.
         --}}
         @php
-            $cropLeft = 46;   // lebar kolom nomor baris (px)
+            $cropLeft = 120;  // kolom nomor baris (±46px) + kolom A & B agar dokumen pas di kiri
             $cropTop = 25;    // tinggi baris huruf kolom (px)
             $cropBottom = 37; // tinggi bar tab sheet di bawah (px)
         @endphp
