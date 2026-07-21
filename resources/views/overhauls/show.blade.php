@@ -129,16 +129,49 @@
         </div>
     </div>
 
+    <style>
+        .stage-review-link {
+            color: inherit;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .stage-review-link:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.15);
+        }
+        .stage-node.reviewing {
+            outline: 2px solid var(--accent-gold);
+            outline-offset: 2px;
+        }
+    </style>
+
     {{-- Progress Bar --}}
     <div class="section">
         <div class="section-title fade-up">Progress Overhaul</div>
         <div class="glass-card fade-up" style="padding: 32px;">
             <div class="stage-bar">
                 @for($i = 1; $i <= 7; $i++)
-                    <div class="stage-node {{ $i < $comp->current_stage ? 'completed' : ($i == $comp->current_stage ? 'active' : 'pending') }}">
-                        <div style="font-size: 1.1rem; font-weight: 800;">{{ $i }}</div>
-                        <div style="font-size: 0.55rem; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.05em;">{{ explode(' (', $stageNames[$i] ?? '')[0] }}</div>
-                    </div>
+                    @php
+                        $stageCanReview = $i <= $comp->current_stage;
+                        $stageNodeClass = $i < $comp->current_stage ? 'completed' : ($i == $comp->current_stage ? 'active' : 'pending');
+                        if ($reviewStage === $i) $stageNodeClass .= ' reviewing';
+                        $stageHref = $i < $comp->current_stage
+                            ? route('components.show', ['component' => $comp->comp_id, 'review_stage' => $i]) . '#checksheet-review'
+                            : route('components.show', ['component' => $comp->comp_id]) . '#checksheet-review';
+                    @endphp
+                    @if($stageCanReview)
+                        <a href="{{ $stageHref }}"
+                           class="stage-node stage-review-link {{ $stageNodeClass }}"
+                           title="Lihat {{ $stageNames[$i] ?? 'Tahap '.$i }}">
+                            <div style="font-size: 1.1rem; font-weight: 800;">{{ $i }}</div>
+                            <div style="font-size: 0.55rem; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.05em;">{{ explode(' (', $stageNames[$i] ?? '')[0] }}</div>
+                        </a>
+                    @else
+                        <div class="stage-node {{ $stageNodeClass }}" title="Tahap ini belum aktif">
+                            <div style="font-size: 1.1rem; font-weight: 800;">{{ $i }}</div>
+                            <div style="font-size: 0.55rem; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.05em;">{{ explode(' (', $stageNames[$i] ?? '')[0] }}</div>
+                        </div>
+                    @endif
                     @if($i < 7)
                         <div class="stage-connector {{ $i < $comp->current_stage ? 'done' : 'undone' }}"></div>
                     @endif
@@ -253,18 +286,49 @@
     </div>
     @endif
 
-    {{-- Checksheet Section (Inline Interactive) --}}
-    @php $currentChecksheet = $comp->checksheets->where('stage_number', $comp->current_stage)->first(); @endphp
-    @if($currentChecksheet && $comp->current_stage < 7)
-    <div class="section">
-        <div class="section-title fade-up">Checksheet — {{ $stageNames[$comp->current_stage] ?? '' }}</div>
+    {{-- Checksheet Section (Inline Interactive / Review) --}}
+    @php
+        $checksheetStage = $reviewStage ?? $comp->current_stage;
+        $currentChecksheet = $comp->checksheets->where('stage_number', $checksheetStage)->first();
+        $isReviewMode = $reviewStage !== null;
+    @endphp
+    @if($isReviewMode && !$currentChecksheet)
+    <div class="section" id="checksheet-review">
+        <div class="section-title fade-up">Tahap {{ $checksheetStage }} — {{ $stageNames[$checksheetStage] ?? '' }}</div>
+        <div class="glass-card fade-up">
+            <div class="section-title" style="margin-bottom:12px;">Riwayat Tahap</div>
+            @php $reviewLogs = $comp->overhaulLogs->where('stage_number', $checksheetStage)->sortBy('start_time'); @endphp
+            @forelse($reviewLogs as $log)
+                <div style="padding:14px 0; border-bottom:1px solid rgba(255,255,255,0.05);">
+                    <div style="display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+                        <strong style="font-size:0.85rem;">{{ $stageNames[$checksheetStage] ?? 'Tahap '.$checksheetStage }}</strong>
+                        <span class="badge {{ $log->end_time ? 'badge-green' : 'badge-cyan' }}">{{ $log->end_time ? 'Selesai' : 'Aktif' }}</span>
+                    </div>
+                    <div style="font-size:0.75rem; color:var(--text-muted); margin-top:5px;">
+                        Petugas: {{ $log->mechanic ? $log->mechanic->name : 'Sistem' }} ·
+                        {{ $log->start_time ? \Carbon\Carbon::parse($log->start_time)->format('d/m/Y H:i') : '-' }}
+                        → {{ $log->end_time ? \Carbon\Carbon::parse($log->end_time)->format('d/m/Y H:i') : 'Sekarang' }}
+                    </div>
+                    @if($log->notes)
+                        <div style="font-size:0.75rem; color:var(--text-secondary); margin-top:5px; font-style:italic;">"{{ $log->notes }}"</div>
+                    @endif
+                </div>
+            @empty
+                <p style="color:var(--text-muted); font-size:0.8rem;">Belum ada log untuk tahap ini.</p>
+            @endforelse
+        </div>
+    </div>
+    @endif
+    @if($currentChecksheet)
+    <div class="section" id="checksheet-review">
+        <div class="section-title fade-up">Checksheet — {{ $stageNames[$checksheetStage] ?? '' }}</div>
         <div class="glass-card fade-up" id="csContainer">
 
             {{-- Header: Progress + View Toggle --}}
             <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 20px; flex-wrap: wrap;">
                 <div style="flex: 1; min-width: 200px;">
                     <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-primary); margin-bottom: 4px;">
-                        📋 {{ $comp->major_category }} Receiving Inspection
+                        📋 {{ $comp->major_category }} — {{ $stageNames[$checksheetStage] ?? 'Checksheet' }}
                     </div>
                     <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 8px;" id="csProgressText">
                         {{ count($currentChecksheet->answers ?? []) }} dari {{ count($currentChecksheet->items) }} item diperiksa
@@ -293,19 +357,12 @@
             {{-- ===== LIST VIEW ===== --}}
             <div id="csListView" style="display: none;">
                 {{-- Group Filters --}}
-                <div style="display: flex; gap: 6px; margin-bottom: 16px; flex-wrap: wrap;">
-                    <button onclick="csFilter('all')" class="cs-filter-btn cs-filter-active" data-filter="all">Semua</button>
-                    <button onclick="csFilter('Right Side View')" class="cs-filter-btn" data-filter="Right Side View">Right Side</button>
-                    <button onclick="csFilter('Rear Side View')" class="cs-filter-btn" data-filter="Rear Side View">Rear Side</button>
-                    <button onclick="csFilter('Left Side View')" class="cs-filter-btn" data-filter="Left Side View">Left Side</button>
-                    <button onclick="csFilter('Front Side View')" class="cs-filter-btn" data-filter="Front Side View">Front Side</button>
-                    <button onclick="csFilter('Custom Items')" class="cs-filter-btn" data-filter="Custom Items">Custom</button>
-                </div>
+                <div id="csFilterButtons" style="display: flex; gap: 6px; margin-bottom: 16px; flex-wrap: wrap;"></div>
                 {{-- Item List --}}
                 <div id="csItemList" style="max-height: 500px; overflow-y: auto; border-radius: 12px;">
                     <!-- Filled by JS -->
                 </div>
-                @if(auth()->user()->hasAnyRole(['Mechanic', 'Supervisor', 'SuperAdmin']))
+                @if(!$isReviewMode && auth()->user()->hasAnyRole(['Mechanic', 'Supervisor', 'SuperAdmin']))
                 <div style="margin-top: 12px; text-align: center;">
                     <button onclick="csOpenAddModal()" class="cs-add-btn" style="width: 100%;">+ Tambah Item Kustom</button>
                 </div>
@@ -324,9 +381,6 @@
             <label style="font-size:0.7rem; font-weight:600; color:var(--text-secondary); text-transform:uppercase; letter-spacing:0.08em; display:block; margin-bottom:6px;">Grup</label>
             <select id="csNewGroup" class="ocms-select" style="margin-bottom:20px;">
                 <option value="Custom Items">Custom Items</option>
-                <option value="Right Side View">Right Side View</option>
-                <option value="Left Side View">Left Side View</option>
-                <option value="Rear Side View">Rear Side View</option>
             </select>
             <div style="display:flex; gap:12px; justify-content:flex-end;">
                 <button onclick="csCloseAddModal()" class="btn-secondary" style="padding:10px 20px;">Batal</button>
@@ -451,8 +505,8 @@
     (function() {
         const CSRF = '{{ csrf_token() }}';
         const COMP_ID = {{ $comp->comp_id }};
-        const STAGE = {{ $comp->current_stage }};
-        const CAN_INTERACT = @json(auth()->user()->hasAnyRole(['Mechanic', 'Supervisor', 'SuperAdmin']));
+        const STAGE = {{ $checksheetStage }};
+        const CAN_INTERACT = @json(!$isReviewMode && auth()->user()->hasAnyRole(['Mechanic', 'Supervisor', 'SuperAdmin']));
 
         let items = @json($currentChecksheet->items);
         let answers = @json($currentChecksheet->answers ?? (object)[]);
@@ -466,29 +520,136 @@
         }
 
         // ===== VIEW TOGGLE =====
-        // Group-based reference image mapping per EGI
-        function csGetRefImage(item) {
-            if (!item.group || item.custom) return null;
-            const knownEgis = ['d375-6','hd785-7','d155-6','wa800-3','gd825a-2','hd465-7r','pc1250-8','pc2000-8','hd1500-7'];
-            let egi = "{{ strtolower(trim($comp->egi ?? 'd375-6')) }}";
-            if (!knownEgis.includes(egi)) egi = 'd375-6'; // fallback
-            
-            const majorCategory = "{{ $comp->major_category }}";
-            let slug = '';
-            let label = '';
-            
-            if (majorCategory === 'Engine') {
-                slug = item.group.toLowerCase().replace(/ /g, '-');
-                label = item.group;
-            } else {
-                slug = majorCategory.toLowerCase().replace(/\//g, '-').replace(/ /g, '-');
-                label = majorCategory + ' Reference';
+        function csGetStageTwoReferenceImages(source) {
+            if (!source) return [];
+
+            const root = '/images/inspection/d375-6/stage2/';
+            const mainline = source.match(/^D375-6 EG MAINLINE\.pdf p\.(\d+)(?:-(\d+))?$/);
+            if (mainline) {
+                const firstPage = Number(mainline[1]);
+                const lastPage = Number(mainline[2] || mainline[1]);
+                const images = [];
+
+                for (let page = firstPage; page <= lastPage; page++) {
+                    images.push({
+                        src: root + 'mainline-p' + String(page).padStart(2, '0') + '.jpg',
+                        label: 'D375-6 EG MAINLINE - halaman ' + page,
+                    });
+                }
+
+                return images;
             }
 
+            if (source === 'D375-6 EG SUBASSY.pdf p.2' || source === 'D375-6 EG SUBASSY.pdf p.5') {
+                const page = source.endsWith('p.2') ? '02' : '05';
+                return [{
+                    src: root + 'subassy-p' + page + '.jpg',
+                    label: 'D375-6 EG SUBASSY - halaman ' + Number(page),
+                }];
+            }
+
+            if (source === 'piston 170.pdf p.1 / PISTON CHECKSHEET2.pdf p.1') {
+                return [
+                    { src: root + 'piston170-p01.jpg', label: 'Piston, Piston Ring, Piston Pin - halaman 1' },
+                    { src: root + 'piston-checksheet-p01.jpg', label: 'Piston Measuring Check Sheet - halaman 1' },
+                ];
+            }
+
+            if (source === 'piston 170.pdf p.1') {
+                return [{ src: root + 'piston170-p01.jpg', label: 'Piston, Piston Ring, Piston Pin - halaman 1' }];
+            }
+
+            if (source === 'PISTON CHECKSHEET2.pdf p.1' || source === 'PISTON CHECKSHEET2.pdf p.2') {
+                const page = source.endsWith('p.1') ? '01' : '02';
+                return [{
+                    src: root + 'piston-checksheet-p' + page + '.jpg',
+                    label: 'Piston Measuring Check Sheet - halaman ' + Number(page),
+                }];
+            }
+
+            return [];
+        }
+
+        // Group-based reference images: Stage 2 uses the original full SOP
+        // page(s) registered in item.source. Receiving keeps the existing
+        // view image mapping for each EGI.
+        function csGetRefImage(item) {
+            if (!item.group || item.custom) return null;
+
+            const stageTwoImages = csGetStageTwoReferenceImages(item.source);
+            if (stageTwoImages.length > 0) {
+                return {
+                    images: stageTwoImages,
+                    label: item.group,
+                };
+            }
+
+            const knownEgis = ['d375-6','hd785-7','d155-6','wa800-3','gd825a-2','hd465-7r','pc1250-8','pc2000-8','hd1500-7'];
+            let egi = "{{ strtolower(trim($comp->egi ?? 'd375-6')) }}";
+            if (!knownEgis.includes(egi)) egi = 'd375-6';
+
+            const majorCategory = "{{ $comp->major_category }}";
+            const slug = majorCategory === 'Engine'
+                ? item.group.toLowerCase().replace(/ /g, '-')
+                : majorCategory.toLowerCase().replace(/\//g, '-').replace(/ /g, '-');
+
             return {
-                src: '/images/inspection/' + egi + '/' + slug + '.png',
-                label: label
+                images: [{
+                    src: '/images/inspection/' + egi + '/' + slug + '.png',
+                    label: majorCategory === 'Engine' ? item.group : majorCategory + ' Reference',
+                }],
+                label: majorCategory === 'Engine' ? item.group : majorCategory + ' Reference',
             };
+        }
+
+        function csGetGroups() {
+            return [...new Set(items.map(item => item.group || 'Lainnya'))];
+        }
+
+        function csRenderGroupControls() {
+            const filterContainer = document.getElementById('csFilterButtons');
+            if (filterContainer) {
+                filterContainer.replaceChildren();
+
+                const addFilterButton = (filter, label) => {
+                    const button = document.createElement('button');
+                    button.type = 'button';
+                    button.className = 'cs-filter-btn' + (currentFilter === filter ? ' cs-filter-active' : '');
+                    button.dataset.filter = filter;
+                    button.textContent = label;
+                    button.addEventListener('click', () => window.csFilter(filter));
+                    filterContainer.appendChild(button);
+                };
+
+                addFilterButton('all', 'Semua');
+                csGetGroups().forEach(group => addFilterButton(group, group));
+            }
+
+            const groupSelect = document.getElementById('csNewGroup');
+            if (groupSelect) {
+                const selected = groupSelect.value || 'Custom Items';
+                groupSelect.replaceChildren();
+
+                ['Custom Items', ...csGetGroups().filter(group => group !== 'Custom Items')].forEach(group => {
+                    const option = document.createElement('option');
+                    option.value = group;
+                    option.textContent = group;
+                    groupSelect.appendChild(option);
+                });
+
+                groupSelect.value = [...groupSelect.options].some(option => option.value === selected)
+                    ? selected
+                    : 'Custom Items';
+            }
+        }
+
+        function csGetItemNumber(item, fallbackIndex) {
+            if (!item.custom) {
+                const sourceNumber = String(item.id || '').match(/^[A-Z]+-(\d{3})$/);
+                if (sourceNumber) return parseInt(sourceNumber[1], 10);
+            }
+
+            return fallbackIndex + 1;
         }
 
         window.csSetView = function(view) {
@@ -550,18 +711,28 @@
             const refImg = csGetRefImage(item);
             let refHtml = '';
             if (refImg) {
-                refHtml = `<div style="margin-bottom:14px; text-align:center;">
-                    <img src="${refImg.src}" alt="${refImg.label}" style="width:420px; max-height:300px; object-fit:contain; border-radius:10px; border:1px solid rgba(212,175,55,0.3); cursor:zoom-in; opacity:0.85; transition:all 0.25s;" onclick="csOpenLightbox('${refImg.src}', '${refImg.label}')" title="📷 ${refImg.label}" onmouseover="this.style.opacity=1;this.style.borderColor='var(--accent-gold)'" onmouseout="this.style.opacity=0.85;this.style.borderColor='rgba(212,175,55,0.3)'">
-                    <div style="font-size:0.55rem; font-weight:600; color:var(--accent-gold); text-transform:uppercase; letter-spacing:0.1em; margin-top:4px;">📷 ${refImg.label}</div>
+                const multiplePages = refImg.images.length > 1;
+                const pageWidth = multiplePages ? 'min(30vw, 220px)' : '470px';
+                const pageHeight = multiplePages ? '250px' : '340px';
+                const imageHtml = refImg.images.map(image => `
+                    <div style="text-align:center; min-width:0;">
+                        <img src="${image.src}" alt="${image.label}" style="width:${pageWidth}; max-width:100%; height:${pageHeight}; object-fit:contain; border-radius:10px; border:1px solid rgba(212,175,55,0.3); cursor:zoom-in; opacity:0.9; transition:all 0.25s; background:rgba(255,255,255,0.02);" onclick="csOpenLightbox('${image.src}', '${image.label}')" title="📷 ${image.label}" onerror="this.parentElement.style.display='none'" onmouseover="this.style.opacity=1;this.style.borderColor='var(--accent-gold)'" onmouseout="this.style.opacity=0.9;this.style.borderColor='rgba(212,175,55,0.3)'">
+                        <div style="font-size:0.52rem; font-weight:600; color:var(--accent-gold); text-transform:uppercase; letter-spacing:0.08em; margin-top:4px;">📷 ${image.label}</div>
+                    </div>
+                `).join('');
+
+                refHtml = `<div style="margin-bottom:14px; display:flex; gap:8px; justify-content:center; align-items:flex-start; flex-wrap:wrap; max-width:760px;">
+                    ${imageHtml}
                 </div>`;
             }
 
             el.innerHTML = `
                 ${refHtml}
                 <div style="font-size:0.6rem; font-weight:700; text-transform:uppercase; letter-spacing:0.12em; color:var(--accent-gold); margin-bottom:8px;">${item.group || ''}</div>
-                <div style="font-family:'JetBrains Mono'; font-size:2.2rem; font-weight:900; color:rgba(255,255,255); line-height:1; margin-bottom:6px;">#${String(currentIndex+1).padStart(2,'0')}</div>
+                <div style="font-family:'JetBrains Mono'; font-size:2.2rem; font-weight:900; color:rgba(255,255,255); line-height:1; margin-bottom:6px;">#${String(csGetItemNumber(item, currentIndex)).padStart(2,'0')}</div>
                 <div style="font-size:1.15rem; font-weight:700; color:var(--text-primary); margin-bottom:4px; line-height:1.3;">${item.label}</div>
-                <div style="font-size:0.7rem; color:var(--text-muted); margin-bottom:24px;">${item.custom ? '⚡ Custom' : 'Item standar SOP'}</div>
+                ${item.standard ? `<div style="font-size:0.78rem; color:var(--text-secondary); line-height:1.45; max-width:620px; margin:0 auto 8px;">${item.standard}</div>` : ''}
+                <div style="font-size:0.65rem; color:var(--text-muted); margin-bottom:24px;">${item.custom ? '⚡ Custom' : 'Item standar SOP'}${item.source ? ' · ' + item.source : ''}</div>
                 <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
                     <button class="cs-answer-btn good ${cur==='good'?'selected':''}" onclick="csAnswer('good')" ${!CAN_INTERACT?'disabled':''}>
                         <span style="font-size:1.5rem;">✓</span><span style="font-size:0.7rem; font-weight:700; text-transform:uppercase;">Good</span>
@@ -643,9 +814,10 @@
 
                     html += `
                         <div class="cs-list-item" onclick="csGoToItem(${item._idx})">
-                            <div class="cs-list-num" style="${numStyle}">${item._idx + 1}</div>
+                            <div class="cs-list-num" style="${numStyle}">${csGetItemNumber(item, item._idx)}</div>
                             <div style="flex:1; min-width:0;">
                                 <div style="font-size:0.8rem; font-weight:600; color:var(--text-primary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${item.label}</div>
+                                ${item.standard ? `<div style="font-size:0.65rem; color:var(--text-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${item.standard}</div>` : ''}
                                 ${item.custom ? '<div style="font-size:0.6rem; color:var(--accent-gold);">⚡ Custom</div>' : ''}
                             </div>
                             ${statusHtml}
@@ -672,6 +844,7 @@
 
         // ===== ADD / REMOVE =====
         window.csRemoveItem = function(idx) {
+            if (!CAN_INTERACT) return;
             if (!confirm('Hapus item "' + items[idx].label + '" dari checksheet?')) return;
             const item = items[idx];
 
@@ -683,6 +856,10 @@
                 items.splice(idx, 1);
                 delete answers[item.id];
                 if (currentIndex >= items.length) currentIndex = Math.max(0, items.length - 1);
+                if (currentFilter !== 'all' && !items.some(item => item.group === currentFilter)) {
+                    currentFilter = 'all';
+                }
+                csRenderGroupControls();
                 updateProgress();
                 if (currentView === 'slide') renderSlide(); else renderList();
                 csToast('🗑️ Item dihapus');
@@ -690,6 +867,7 @@
         };
 
         window.csOpenAddModal = function() {
+            if (!CAN_INTERACT) return;
             const m = document.getElementById('csAddModal');
             m.style.display = 'flex';
             document.getElementById('csNewLabel').focus();
@@ -699,6 +877,7 @@
             document.getElementById('csNewLabel').value = '';
         };
         window.csSubmitAdd = function() {
+            if (!CAN_INTERACT) return;
             const label = document.getElementById('csNewLabel').value.trim();
             const group = document.getElementById('csNewGroup').value;
             if (!label) return;
@@ -711,6 +890,7 @@
                 if (data.success) {
                     items.push(data.item);
                     csCloseAddModal();
+                    csRenderGroupControls();
                     updateProgress();
                     if (currentView === 'slide') { currentIndex = items.length - 1; renderSlide(); }
                     else renderList();
@@ -740,12 +920,14 @@
         });
 
         // Init
+        csRenderGroupControls();
         renderSlide();
         updateProgress();
     })();
     </script>
     @endif
 
+    @if(!$isReviewMode)
     {{-- Action Section --}}
     <div class="section">
         <div class="section-title fade-up">Aksi</div>
@@ -841,5 +1023,6 @@
             @endif
         </div>
     </div>
+    @endif
 
 </x-app-layout>

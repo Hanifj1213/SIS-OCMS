@@ -901,17 +901,71 @@
             let currentMode = 'slide';
             let daftarFilter = 'all';
 
-            // Group-based reference image mapping per EGI
+            function getStageTwoReferenceImages(source) {
+                if (!source) return [];
+
+                const root = '/images/inspection/d375-6/stage2/';
+                const mainline = source.match(/^D375-6 EG MAINLINE\.pdf p\.(\d+)(?:-(\d+))?$/);
+                if (mainline) {
+                    const firstPage = Number(mainline[1]);
+                    const lastPage = Number(mainline[2] || mainline[1]);
+                    const images = [];
+
+                    for (let page = firstPage; page <= lastPage; page++) {
+                        images.push({
+                            src: root + 'mainline-p' + String(page).padStart(2, '0') + '.jpg',
+                            label: 'D375-6 EG MAINLINE - halaman ' + page,
+                        });
+                    }
+
+                    return images;
+                }
+
+                if (source === 'D375-6 EG SUBASSY.pdf p.2' || source === 'D375-6 EG SUBASSY.pdf p.5') {
+                    const page = source.endsWith('p.2') ? '02' : '05';
+                    return [{ src: root + 'subassy-p' + page + '.jpg', label: 'D375-6 EG SUBASSY - halaman ' + Number(page) }];
+                }
+
+                if (source === 'piston 170.pdf p.1 / PISTON CHECKSHEET2.pdf p.1') {
+                    return [
+                        { src: root + 'piston170-p01.jpg', label: 'Piston, Piston Ring, Piston Pin - halaman 1' },
+                        { src: root + 'piston-checksheet-p01.jpg', label: 'Piston Measuring Check Sheet - halaman 1' },
+                    ];
+                }
+
+                if (source === 'piston 170.pdf p.1') {
+                    return [{ src: root + 'piston170-p01.jpg', label: 'Piston, Piston Ring, Piston Pin - halaman 1' }];
+                }
+
+                if (source === 'PISTON CHECKSHEET2.pdf p.1' || source === 'PISTON CHECKSHEET2.pdf p.2') {
+                    const page = source.endsWith('p.1') ? '01' : '02';
+                    return [{ src: root + 'piston-checksheet-p' + page + '.jpg', label: 'Piston Measuring Check Sheet - halaman ' + Number(page) }];
+                }
+
+                return [];
+            }
+
+            // Stage 2 shows the full original SOP page(s); Stage 1 keeps the
+            // existing EGI view-image mapping.
             function getRefImage(item) {
                 if (!item.group || item.custom) return null;
+
+                const stageTwoImages = getStageTwoReferenceImages(item.source);
+                if (stageTwoImages.length > 0) {
+                    return { images: stageTwoImages, label: item.group };
+                }
+
                 const knownEgis = ['d375-6','hd785-7','d155-6','wa800-3','gd825a-2','hd465-7r','pc1250-8','pc2000-8'];
                 let egi = "{{ strtolower(trim($comp->egi ?? 'd375-6')) }}";
-                if (!knownEgis.includes(egi)) egi = 'd375-6'; // fallback
+                if (!knownEgis.includes(egi)) egi = 'd375-6';
                 const slug = item.group.toLowerCase().replace(/ /g, '-');
 
                 return {
-                    src: '/images/inspection/' + egi + '/' + slug + '.png',
-                    label: item.group
+                    images: [{
+                        src: '/images/inspection/' + egi + '/' + slug + '.png',
+                        label: item.group,
+                    }],
+                    label: item.group,
                 };
             }
 
@@ -998,12 +1052,16 @@
                 const refImg = getRefImage(item);
                 let refHtml = '';
                 if (refImg) {
-                    refHtml = `<div class="cs-slide-ref">
-                        <div style="text-align:center;">
-                            <img src="${refImg.src}" alt="${refImg.label}" class="cs-slide-ref-thumb" onclick="openLightbox('${refImg.src}', '${refImg.label}')" title="📷 ${refImg.label} — klik untuk perbesar">
-                            <div class="cs-slide-ref-label">📷 ${refImg.label}</div>
+                    const multiplePages = refImg.images.length > 1;
+                    const pageWidth = multiplePages ? 'min(30vw, 220px)' : '420px';
+                    const pageHeight = multiplePages ? '250px' : '300px';
+                    const imageHtml = refImg.images.map(image => `
+                        <div style="text-align:center; min-width:0;">
+                            <img src="${image.src}" alt="${image.label}" class="cs-slide-ref-thumb" style="width:${pageWidth}; height:${pageHeight}; max-width:100%; object-fit:contain;" onclick="openLightbox('${image.src}', '${image.label}')" title="📷 ${image.label} — klik untuk perbesar" onerror="this.parentElement.style.display='none'">
+                            <div class="cs-slide-ref-label">📷 ${image.label}</div>
                         </div>
-                    </div>`;
+                    `).join('');
+                    refHtml = `<div class="cs-slide-ref">${imageHtml}</div>`;
                 }
 
                 slide.innerHTML = `
@@ -1011,7 +1069,8 @@
                 <div class="cs-group-label">${item.group || ''}</div>
                 <div class="cs-item-number">#${String(currentIndex + 1).padStart(2, '0')}</div>
                 <div class="cs-item-label">${item.label}</div>
-                <div class="cs-item-meta">${item.custom ? '⚡ Custom Item' : 'Item standar SOP'}</div>
+                ${item.standard ? `<div style="font-size:0.78rem; color:var(--text-secondary); line-height:1.45; max-width:620px; margin:0 auto 8px;">${item.standard}</div>` : ''}
+                <div class="cs-item-meta">${item.custom ? '⚡ Custom Item' : 'Item standar SOP'}${item.source ? ' · ' + item.source : ''}</div>
                 <div class="cs-answers">
                     <button class="cs-answer-btn good ${currentAnswer === 'good' ? 'selected' : ''}" onclick="answer('good')" ${!canInteract ? 'disabled' : ''}>
                         <span class="cs-answer-icon">✓</span>

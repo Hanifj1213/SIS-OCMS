@@ -26,6 +26,42 @@ class ComponentController extends Controller
     ];
 
     /**
+     * Clone the EGI-specific template when a component enters a stage.
+     * Existing answers are never overwritten, so the snapshot remains an
+     * auditable record of the checklist used for that component.
+     */
+    private function ensureChecksheetForStage(Component $component, int $stage): void
+    {
+        if ($component->checksheets()->where('stage_number', $stage)->exists()) {
+            return;
+        }
+
+        $egi = strtoupper(trim((string) $component->egi));
+        $template = ChecksheetTemplate::query()
+            ->where('major_category', $component->major_category)
+            ->where('stage_number', $stage)
+            ->whereRaw('UPPER(egi_model) = ?', [$egi])
+            ->first();
+
+        $template ??= ChecksheetTemplate::query()
+            ->where('major_category', $component->major_category)
+            ->where('stage_number', $stage)
+            ->whereNull('egi_model')
+            ->first();
+
+        if (!$template) {
+            return;
+        }
+
+        ComponentChecksheet::create([
+            'comp_id' => $component->comp_id,
+            'stage_number' => $stage,
+            'items' => $template->items,
+            'answers' => [],
+        ]);
+    }
+
+    /**
      * Daftar semua komponen.
      */
     public function index()
@@ -166,14 +202,29 @@ class ComponentController extends Controller
     /**
      * Tampilkan detail komponen beserta riwayat log, inspeksi, dan part request.
      */
-    public function show(Component $component)
+    public function show(Request $request, Component $component)
     {
         // Eager load semua relasi untuk menghindari N+1 query
         $component->load(['overhaulLogs.mechanic', 'inspectionDetails', 'partRequests', 'checksheets']);
 
         $stageNames = self::STAGE_NAMES;
+        $requestedReviewStage = $request->integer('review_stage');
+        $reviewStage = null;
 
-        return view('overhauls.show', ['comp' => $component, 'stageNames' => $stageNames]);
+        // Review hanya boleh membuka tahap yang sudah pernah dicapai. Parameter
+        // ini tidak pernah mengubah current_stage atau status proses komponen.
+        if (
+            $requestedReviewStage >= 1 && $requestedReviewStage <= 7
+            && $requestedReviewStage < $component->current_stage
+        ) {
+            $reviewStage = $requestedReviewStage;
+        }
+
+        return view('overhauls.show', [
+            'comp' => $component,
+            'stageNames' => $stageNames,
+            'reviewStage' => $reviewStage,
+        ]);
     }
 
     /**
@@ -274,7 +325,7 @@ class ComponentController extends Controller
                 ->with('success', 'Progress tahap ' . $currentStage . ' selesai. Menunggu Approval Management untuk lanjut ke Tahap ' . $nextStage . '.');
         } else {
             // Auto-transition (tidak perlu approval)
-            
+
             // Tutup log tahapan saat ini
             $currentLog = $component->overhaulLogs()
                 ->where('stage_number', $currentStage)
@@ -292,6 +343,8 @@ class ComponentController extends Controller
                 'is_waiting_approval' => false,
                 'status' => $isFinalCompleted ? 'Ready for Use' : 'On Progress',
             ]);
+
+            $this->ensureChecksheetForStage($component, $nextStage);
 
             // Buat log untuk tahapan selanjutnya
             $stageNote = self::STAGE_NAMES[$nextStage] ?? 'Tahap ' . $nextStage;
@@ -348,6 +401,8 @@ class ComponentController extends Controller
             'is_waiting_approval' => false,
             'status' => $isFinalCompleted ? 'Ready for Use' : 'On Progress',
         ]);
+
+        $this->ensureChecksheetForStage($component, $nextStage);
 
         // Buat log untuk tahapan selanjutnya
         $stageNote = self::STAGE_NAMES[$nextStage] ?? 'Tahap ' . $nextStage;
