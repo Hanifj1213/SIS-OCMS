@@ -322,10 +322,22 @@
     @if($currentChecksheet)
     <div class="section" id="checksheet-review">
         @if($comp->egi === 'PC2000-8' && $checksheetStage == 2)
-        <div class="glass-card fade-up" style="padding: 0; overflow: hidden; height: 90vh; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);">
+        {{--
+            Google Sheets mode edit tidak punya opsi resmi untuk menyembunyikan
+            header baris/kolom dan bar tab sheet, jadi kita "crop": iframe dibuat
+            lebih besar dari kotaknya lalu digeser sehingga strip header kiri/atas
+            dan bar tab bawah terpotong di luar area terlihat.
+            Sesuaikan nilai variabel di bawah jika tampilan Google Sheets berubah.
+        --}}
+        @php
+            $cropLeft = 46;   // lebar kolom nomor baris (px)
+            $cropTop = 25;    // tinggi baris huruf kolom (px)
+            $cropBottom = 37; // tinggi bar tab sheet di bawah (px)
+        @endphp
+        <div class="glass-card fade-up" style="padding: 0; overflow: hidden; height: 90vh; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); position: relative;">
             <iframe id="gsheet-iframe"
                 src="https://docs.google.com/spreadsheets/d/1kIjBP4R4MWPkpFzXIU7Smcwnyy2DoR2Pzj2oggmn3tY/edit?usp=sharing&rm=minimal"
-                style="width: 100%; height: 100%; border: none;"
+                style="position: absolute; top: -{{ $cropTop }}px; left: -{{ $cropLeft }}px; width: calc(100% + {{ $cropLeft }}px); height: calc(100% + {{ $cropTop + $cropBottom }}px); border: none;"
                 allowfullscreen>
             </iframe>
         </div>
