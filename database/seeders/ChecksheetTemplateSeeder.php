@@ -1414,6 +1414,17 @@ class ChecksheetTemplateSeeder extends Seeder
                 $checksheet->save();
             });
 
+        $spreadsheetPath = base_path('excel_data_final.json');
+        if (file_exists($spreadsheetPath)) {
+            $spreadsheetItems = json_decode(file_get_contents($spreadsheetPath), true);
+            ChecksheetTemplate::updateOrCreate(
+                ['major_category' => 'Engine', 'stage_number' => 2, 'egi_model' => 'PC2000-8'],
+                [
+                    'template_name' => 'Engine DIS Assembling Spreadsheet — PC2000-8',
+                    'items' => $spreadsheetItems,
+                ]
+            );
+        }
 
         // =============================================
         // GENERIC FALLBACKS FOR POWERTRAIN

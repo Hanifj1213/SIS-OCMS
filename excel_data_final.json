@@ -1,0 +1,699 @@
+{
+  "header": {
+    "title": "DISASSEMBLY CHECK SHEET",
+    "subtitle": "KOMATSU ENGINE 12V140-3",
+    "fields": [
+      {
+        "label": "WO NUMBER",
+        "value": "",
+        "editable": true
+      },
+      {
+        "label": "ENGINE MODEL",
+        "value": "SAA12V140E-3",
+        "editable": false
+      },
+      {
+        "label": "ENGINE SER. NO",
+        "value": "",
+        "editable": true
+      },
+      {
+        "label": "MACHINE MODEL",
+        "value": "",
+        "editable": true
+      },
+      {
+        "label": "UNIT CODE",
+        "value": "",
+        "editable": true
+      },
+      {
+        "label": "PUBL. DATE",
+        "value": "",
+        "editable": true
+      },
+      {
+        "label": "REVISION NO.",
+        "value": "06",
+        "editable": false
+      },
+      {
+        "label": "DOCUMENT NO.",
+        "value": "",
+        "editable": true
+      }
+    ],
+    "process_fields": [
+      {
+        "label": "PROCESS",
+        "value": "",
+        "editable": true
+      },
+      {
+        "label": "START/date&time",
+        "value": "",
+        "editable": true
+      },
+      {
+        "label": "FINISH/date&time",
+        "value": "",
+        "editable": true
+      },
+      {
+        "label": "DISASSEMBLY BY",
+        "value": "",
+        "editable": true
+      }
+    ]
+  },
+  "items": [
+    {
+      "no": 1,
+      "parts": "Engine ass'y",
+      "conditions": [
+        "Setting engine to engine stand",
+        "Prepare to stable engine stand that will prevent",
+        "the engine from falling over, the set the engine",
+        "assembly on the stand and secure it in position.",
+        "Drain engine oil from oil pan (the amount of oil",
+        "differs according to the machine model)"
+      ],
+      "sub_rows": [],
+      "images": [
+        "/images/checksheet-12v140/img_79_row14.png"
+      ]
+    },
+    {
+      "no": 2,
+      "parts": "Oil Filter, Fuel Filter\nand\nCorrosion Resistor",
+      "conditions": [
+        "Remove and inspect the oil filter housing and lines",
+        "for damage to pipes, threads, bypass valves, etc",
+        "Remove corrosion resistor, tubes and mount.",
+        "Inspect for damage.",
+        "Inspect the fuel filter housing for cracks, pulled",
+        "threads and damage to fittings."
+      ],
+      "sub_rows": [],
+      "images": [
+        "/images/checksheet-12v140/img_43_row24.png"
+      ]
+    },
+    {
+      "no": 3,
+      "parts": "Air Cleaner Ass'y\nMuffler Ass'y",
+      "conditions": [
+        "Remove intake connector",
+        "Remove and inspect air cleaner if fitted. Check",
+        "for damage and missing bolts and nuts.",
+        "Remove and inspect muffler if fitted. Inspect",
+        "all nuts and bolts, clamps and adaptors."
+      ],
+      "sub_rows": [],
+      "images": []
+    },
+    {
+      "no": 4,
+      "parts": "Starter Motor\nAlternator",
+      "conditions": [
+        "Please note if not fitted to engine.",
+        "Please note if not fitted to engine."
+      ],
+      "sub_rows": [],
+      "images": [
+        "/images/checksheet-12v140/img_24_row41.png",
+        "/images/checksheet-12v140/img_25_row41.png"
+      ]
+    },
+    {
+      "no": 5,
+      "parts": "Compressor pipes",
+      "conditions": [
+        "Remove air compressor pipes and inspect for",
+        "damage."
+      ],
+      "sub_rows": [],
+      "images": [
+        "/images/checksheet-12v140/img_27_row46.png",
+        "/images/checksheet-12v140/img_28_row46.png",
+        "/images/checksheet-12v140/img_86_row50.png"
+      ]
+    },
+    {
+      "no": 6,
+      "parts": "Turbocharger",
+      "conditions": [
+        "Remove Turbocharger, mounting bolts and",
+        "adapters.",
+        "Remove turbo oil line fittings. Check pipes",
+        "and connections."
+      ],
+      "sub_rows": [],
+      "images": [
+        "/images/checksheet-12v140/img_26_row51.png"
+      ]
+    },
+    {
+      "no": 7,
+      "parts": "Exhaust Manifold",
+      "conditions": [
+        "Remove and inspect for cracks, pulled",
+        "threads, snapped studs and",
+        "missing bolts.",
+        "Doing Colour Check inspection",
+        "joint with QA Officer"
+      ],
+      "sub_rows": [],
+      "images": [
+        "/images/checksheet-12v140/img_31_row57.png"
+      ]
+    },
+    {
+      "no": 8,
+      "parts": "After Cooler",
+      "conditions": [
+        "Check for pulled threads and missing bolts.",
+        "Remove aftercooler and check for damage,",
+        "water leaks, dust entry etc.",
+        "Check aftercooler water tubes for cracks,",
+        "corrosion and any other damage."
+      ],
+      "sub_rows": [],
+      "images": [
+        "/images/checksheet-12v140/img_29_row64.png",
+        "/images/checksheet-12v140/img_30_row64.png"
+      ]
+    },
+    {
+      "no": 9,
+      "parts": "Injection Lines\nand Clamps",
+      "conditions": [
+        "Remove all lines and clamps. Check for wear",
+        "and damage."
+      ],
+      "sub_rows": [
+        {
+          "label": "RH",
+          "reuse": false,
+          "salvage": false,
+          "replace": false,
+          "remarks": ""
+        },
+        {
+          "label": "LH",
+          "reuse": false,
+          "salvage": false,
+          "replace": false,
+          "remarks": ""
+        }
+      ],
+      "images": [
+        "/images/checksheet-12v140/img_32_row72.png"
+      ]
+    },
+    {
+      "no": 10,
+      "parts": "Fuel Injection Pump",
+      "conditions": [
+        "Remove pump and mount, and inspect for",
+        "damage, missing parts and wear.",
+        "Check fuel pump oil lines for damage and",
+        "stripped threads.",
+        "Remove and check that fuel pump supply",
+        "and return lines are in good condition.",
+        "Check the fuel pump drive coupling for",
+        "signs of wear",
+        "Check the fuel pump boost tube and clamps for",
+        "damage.",
+        "Check the fuel pump drive couplings for",
+        "signs of  wear.",
+        "Check the fuel pump boost tube and clamps for",
+        "damage."
+      ],
+      "sub_rows": [],
+      "images": [
+        "/images/checksheet-12v140/img_33_row82.png",
+        "/images/checksheet-12v140/img_34_row82.png",
+        "/images/checksheet-12v140/img_35_row86.png"
+      ]
+    },
+    {
+      "no": 11,
+      "parts": "Water Pump",
+      "conditions": [
+        "Check for evidence of leakage.",
+        "Check for signs of wear and damage."
+      ],
+      "sub_rows": [],
+      "images": [
+        "/images/checksheet-12v140/img_36_row98.png",
+        "/images/checksheet-12v140/img_37_row98.png",
+        "/images/checksheet-12v140/img_84_row98.png"
+      ]
+    },
+    {
+      "no": 12,
+      "parts": "Breather",
+      "conditions": [
+        "Remove and inspect the breather and tube",
+        "The water pump is held by two mounting bolts",
+        "at the front and two mounting bolts at the rear"
+      ],
+      "sub_rows": [],
+      "images": [
+        "/images/checksheet-12v140/img_38_row103.png",
+        "/images/checksheet-12v140/img_88_row108.png"
+      ]
+    },
+    {
+      "no": 13,
+      "parts": "Air Compressor",
+      "conditions": [
+        "Check for damage and obvious signs of",
+        "wear.",
+        "Remove front compressor with spline shaft",
+        "Remove rear compressor with gear"
+      ],
+      "sub_rows": [],
+      "images": [
+        "/images/checksheet-12v140/img_39_row109.png",
+        "/images/checksheet-12v140/img_40_row109.png",
+        "/images/checksheet-12v140/img_89_row113.png"
+      ]
+    },
+    {
+      "no": 14,
+      "parts": "Oil Cooler",
+      "conditions": [
+        "Check oil cooler housing for cracks and pulled",
+        "threads.",
+        "Check oil cooler for dents and leaks."
+      ],
+      "sub_rows": [],
+      "images": [
+        "/images/checksheet-12v140/img_41_row114.png"
+      ]
+    },
+    {
+      "no": 15,
+      "parts": "Oil Filler and\nOil Level Gauge",
+      "conditions": [
+        "Remove oil filler and oil level gauge, check for",
+        "dents and cracks"
+      ],
+      "sub_rows": [],
+      "images": [
+        "/images/checksheet-12v140/img_42_row119.png"
+      ]
+    },
+    {
+      "no": 16,
+      "parts": "Rocker Covers\nand\nRocker Housing",
+      "conditions": [
+        "Remove Rocker Arm cover and check for cracks",
+        "and damage to seal face.",
+        "Note :"
+      ],
+      "sub_rows": [],
+      "images": [
+        "/images/checksheet-12v140/img_44_row123.png",
+        "/images/checksheet-12v140/img_45_row123.png"
+      ]
+    },
+    {
+      "no": 17,
+      "parts": "Rocker Arm",
+      "conditions": [
+        "Remove rocker arms and shafts and check",
+        "for wear and other damage.",
+        "Check the contact area on the crossheads are",
+        "from scuffing and wear.",
+        "Check the pushrods for bends and other",
+        "damage."
+      ],
+      "sub_rows": [],
+      "images": [
+        "/images/checksheet-12v140/img_85_row131.png",
+        "/images/checksheet-12v140/img_46_row132.png",
+        "/images/checksheet-12v140/img_47_row132.png"
+      ]
+    },
+    {
+      "no": 18,
+      "parts": "Cylinder Head",
+      "conditions": [
+        "Check cylinder head bolts for pin punch marks.",
+        "If there are five marks, renew bolts.",
+        "Check the exhaust face condition and bolt",
+        "holes for pulled threads.",
+        "Check the head surface for water marks or",
+        "damage.",
+        "Doing Colour Check inspection joint with                                QA Officer"
+      ],
+      "sub_rows": [],
+      "images": [
+        "/images/checksheet-12v140/img_48_row139.png"
+      ]
+    },
+    {
+      "no": 19,
+      "parts": "Cam Followers",
+      "conditions": [
+        "Inspect cam followers for damage to the",
+        "contact surface of the rollers.",
+        "Check condition of covers.",
+        "The mounting bolts of the cam follower is",
+        "a special bolt, so keep it in a safe place and",
+        "be careful not to lose it"
+      ],
+      "sub_rows": [],
+      "images": [
+        "/images/checksheet-12v140/img_49_row148.png",
+        "/images/checksheet-12v140/img_83_row148.png"
+      ]
+    },
+    {
+      "no": 20,
+      "parts": "Thermostat housing\nThermostat case",
+      "conditions": [
+        "Disconect thermostat case and thermostat",
+        "housing and check condition for cracked and",
+        "damage.",
+        "Check surface contact thermostat"
+      ],
+      "sub_rows": [],
+      "images": [
+        "/images/checksheet-12v140/img_50_row155.png"
+      ]
+    },
+    {
+      "no": 21,
+      "parts": "Vibration Damper\nand Pulleys",
+      "conditions": [
+        "Check vibration damper for damage.",
+        "Check pulleys for damage and wear.",
+        "Check belt tensioner for wear.",
+        "Check front trunnion mount."
+      ],
+      "sub_rows": [],
+      "images": [
+        "/images/checksheet-12v140/img_52_row162.png"
+      ]
+    },
+    {
+      "no": 22,
+      "parts": "Oil Pan",
+      "conditions": [
+        "Remove pan and check for dents and cracks.",
+        "Check oil level sensor",
+        "Check drain plug for pulled threads",
+        "Check oil pick up pipe for cracks in the welds",
+        "Check screen for damage."
+      ],
+      "sub_rows": [],
+      "images": [
+        "/images/checksheet-12v140/img_53_row168.png"
+      ]
+    },
+    {
+      "no": 23,
+      "parts": "Front Support and\nTiming Cover",
+      "conditions": [
+        "Remove and inspect front cover for damage",
+        "Check surface condition of seal running area",
+        "on front shaft."
+      ],
+      "sub_rows": [],
+      "images": [
+        "/images/checksheet-12v140/img_54_row175.png",
+        "/images/checksheet-12v140/img_57_row175.png"
+      ]
+    },
+    {
+      "no": 24,
+      "parts": "Timing Gears",
+      "conditions": [
+        "Inspect and record condition of individual",
+        "gears. Check for chipped teeth, cracks,",
+        "excessive backlash and end float.",
+        "Check shafts and bearings for wear.",
+        "Measure thickness of thrust plates for wear.",
+        "Check alternator drive.",
+        "Check fuel pump drive.",
+        "Check accessory drive.",
+        "Check water pump drive.",
+        "A . A",
+        "B1. B1",
+        "B2. B2",
+        "C . C",
+        "D. D",
+        "E. E",
+        "F . F",
+        "G . G",
+        "H . H",
+        "L . L",
+        "R . R"
+      ],
+      "sub_rows": [],
+      "images": [
+        "/images/checksheet-12v140/img_95_row184.png",
+        "/images/checksheet-12v140/img_58_row185.png",
+        "/images/checksheet-12v140/img_59_row185.png",
+        "/images/checksheet-12v140/img_60_row189.png",
+        "/images/checksheet-12v140/img_62_row189.png",
+        "/images/checksheet-12v140/img_51_row194.png",
+        "/images/checksheet-12v140/img_80_row200.png",
+        "/images/checksheet-12v140/img_96_row215.png"
+      ]
+    },
+    {
+      "no": 25,
+      "parts": "Camshaft",
+      "conditions": [
+        "Check camshaft journals for wear.",
+        "Check end float of camshaft.",
+        "Check cam surfaces for wear and other",
+        "damage",
+        "Check camshaft for bends."
+      ],
+      "sub_rows": [],
+      "images": [
+        "/images/checksheet-12v140/img_63_row216.png"
+      ]
+    },
+    {
+      "no": 26,
+      "parts": "Flywheel and\nFlywheel Housing",
+      "conditions": [
+        "Check bolts and bolt holes.",
+        "Check pilot bearing hole.",
+        "Inspect ring gear for chipped and worn teeth.",
+        "Check housing for cracks, check bolt holes."
+      ],
+      "sub_rows": [],
+      "images": [
+        "/images/checksheet-12v140/img_55_row222.png",
+        "/images/checksheet-12v140/img_56_row222.png"
+      ]
+    },
+    {
+      "no": 27,
+      "parts": "Oil Pump Ass'y\nPiston Cooling\nNozzles",
+      "conditions": [
+        "Check pump O-rings at inlet and outlet ports.",
+        "Check pump for wear and damage.",
+        "grooves, skirts and clodge"
+      ],
+      "sub_rows": [
+        {
+          "label": "RH",
+          "reuse": false,
+          "salvage": false,
+          "replace": false,
+          "remarks": ""
+        },
+        {
+          "label": "LH",
+          "reuse": false,
+          "salvage": false,
+          "replace": false,
+          "remarks": ""
+        }
+      ],
+      "images": [
+        "/images/checksheet-12v140/img_92_row227.png",
+        "/images/checksheet-12v140/img_61_row228.png",
+        "/images/checksheet-12v140/img_64_row232.png"
+      ]
+    },
+    {
+      "no": 28,
+      "parts": "Connecting Rods",
+      "conditions": [
+        "Check con rod for cracks and damage.",
+        "Check big end bore for scratches or distortion.",
+        "Check for damage on mating face of cap.",
+        "RH/LH",
+        "Standard side clereance (End Play)",
+        "0.300  0.454 mm"
+      ],
+      "sub_rows": [],
+      "images": [
+        "/images/checksheet-12v140/img_97_row243.png",
+        "/images/checksheet-12v140/img_66_row244.png",
+        "/images/checksheet-12v140/img_65_row248.png"
+      ]
+    },
+    {
+      "no": 29,
+      "parts": "Pistons",
+      "conditions": [
+        "Measure wear on piston skirt, ring grooves and",
+        "pin bore",
+        "Notes :"
+      ],
+      "sub_rows": [
+        {
+          "label": "RH",
+          "reuse": false,
+          "salvage": false,
+          "replace": false,
+          "remarks": ""
+        },
+        {
+          "label": "LH",
+          "reuse": false,
+          "salvage": false,
+          "replace": false,
+          "remarks": ""
+        }
+      ],
+      "images": [
+        "/images/checksheet-12v140/img_67_row253.png",
+        "/images/checksheet-12v140/img_68_row257.png"
+      ]
+    },
+    {
+      "no": 30,
+      "parts": "Crankshaft",
+      "conditions": [
+        "Inspect main and pin journals for scratches,",
+        "wear, cracks and discoloration.",
+        "Check that oil holes are not blocked.",
+        "Check fillet area for scratches.",
+        "Determine wear by measuring Æ of journals.",
+        "Check seal surface condition."
+      ],
+      "sub_rows": [],
+      "images": [
+        "/images/checksheet-12v140/img_94_row260.png",
+        "/images/checksheet-12v140/img_69_row261.png",
+        "/images/checksheet-12v140/img_70_row261.png",
+        "/images/checksheet-12v140/img_71_row265.png",
+        "/images/checksheet-12v140/img_74_row265.png"
+      ]
+    },
+    {
+      "no": 31,
+      "parts": "Main Cap",
+      "conditions": [
+        "Check cap bolts for number of punch marks.",
+        "Check cap fit to block.",
+        "Punch S/N engine at the front face of all main bering cap match with S/N engine block"
+      ],
+      "sub_rows": [],
+      "images": []
+    },
+    {
+      "no": 32,
+      "parts": "Cylinder Liners",
+      "conditions": [
+        "Check for pitting and cracks on the outer",
+        "circumference of the Cylinder liner",
+        "Inspect the inner surface for scoring and corrosion.",
+        "Check for pitting damage on seal grooves.",
+        "Measure inside Æ, roundness and cylindricity of",
+        "Cylinder liner"
+      ],
+      "sub_rows": [
+        {
+          "label": "RH",
+          "reuse": false,
+          "salvage": false,
+          "replace": false,
+          "remarks": ""
+        },
+        {
+          "label": "LH",
+          "reuse": false,
+          "salvage": false,
+          "replace": false,
+          "remarks": ""
+        }
+      ],
+      "images": [
+        "/images/checksheet-12v140/img_73_row275.png",
+        "/images/checksheet-12v140/img_72_row280.png"
+      ]
+    },
+    {
+      "no": 33,
+      "parts": "Cylinder Block\nATTACHED\nOUTSIDE DIAMETER OF CRANKSHAFT PIN JOURNAL AND MAIN JOURNAL\n6D170 - 3 Series\nSize\nStandard\n0.25 US\n0.50 US\n0.75 US\n1.00 US\nOut of Roundness\nTolerance :\n6D140 - 3 Series\nSize\nStandard\n0.25 US\n0.50 US\n0.75 US\n1.00 US\nOut of Roundness\nTolerance :\n12V140 - 1, 2 Series\nSize\nStandard\n0.25 US\n0.50 US\n0.75 US\n1.00 US\nOut of Roundness\nTolerance :\nOUTSIDE DIAMETER OF CAMSHAFT JOURNAL AND CAM HEIGHT\n12V140 - 1,2 Series\nCam Height\nIntake\nExhaust\nOD Chamshaft Journal\nSTD\n6D170 - 3 Series\nCam Height\nIntake\nExhaust\nOD Chamshaft Journal\nSTD",
+      "conditions": [
+        "Check for cracks in the block, especially in the",
+        "bolt hole part of the cylinder head.",
+        "Inspect the lower liner seal area.",
+        "Check the blind plug surface for corrosion.",
+        "Check all threads.",
+        "Check mounting surface of cylinder head for",
+        "distortion and corrosion.",
+        "Check for clogging of oil and water holes.",
+        "Doing Colour Check inspection joint with     QA Officer",
+        "Main Journal",
+        "Standard Size",
+        "140",
+        "139.75",
+        "139.5",
+        "139.25",
+        "139",
+        "0 - 0.010",
+        "Main Journal",
+        "Standard Size",
+        "120",
+        "119.75",
+        "119.5",
+        "119.25",
+        "119",
+        "0  0.010",
+        "Main Journal",
+        "Standard Size",
+        "148.000  147.980",
+        "147.750  147.730",
+        "147.500  147.480",
+        "147.250  147.230",
+        "147.000  146.980",
+        "0.010 and less",
+        "- 0.020",
+        "Std Size",
+        "55.48",
+        "55.75",
+        "Std Size",
+        "65",
+        "Std Size",
+        "89.8",
+        "90.1",
+        "Std Size",
+        "105"
+      ],
+      "sub_rows": [],
+      "images": [
+        "/images/checksheet-12v140/img_75_row286.png",
+        "/images/checksheet-12v140/img_76_row286.png",
+        "/images/checksheet-12v140/img_3_row324.png",
+        "/images/checksheet-12v140/img_4_row324.png"
+      ]
+    }
+  ],
+  "measurement_tables": []
+}

@@ -321,6 +321,56 @@
     @endif
     @if($currentChecksheet)
     <div class="section" id="checksheet-review">
+        @if($comp->egi === 'PC2000-8' && $checksheetStage == 2)
+        <div class="glass-card fade-up" style="padding: 0; overflow: hidden; height: 90vh; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);">
+            <iframe id="gsheet-iframe"
+                src="https://docs.google.com/spreadsheets/d/1kIjBP4R4MWPkpFzXIU7Smcwnyy2DoR2Pzj2oggmn3tY/edit?usp=sharing&rm=minimal"
+                style="width: 100%; height: 100%; border: none;"
+                allowfullscreen>
+            </iframe>
+        </div>
+
+        <script>
+        // Mencegah bug auto-scroll ke atas saat mengedit sel di iframe Google Sheets
+        document.addEventListener('DOMContentLoaded', function() {
+            const iframe = document.getElementById('gsheet-iframe');
+            if (!iframe) return;
+            
+            let scrollX = window.scrollX;
+            let scrollY = window.scrollY;
+            let isMouseOverIframe = false;
+            
+            iframe.addEventListener('mouseenter', () => isMouseOverIframe = true);
+            iframe.addEventListener('mouseleave', () => isMouseOverIframe = false);
+            
+            window.addEventListener('scroll', function() {
+                if (document.activeElement === iframe) {
+                    window.scrollTo(scrollX, scrollY);
+                } else {
+                    scrollX = window.scrollX;
+                    scrollY = window.scrollY;
+                }
+            });
+
+            // Blur iframe ketika mouse berada di luar iframe agar halaman bisa di-scroll lagi
+            document.addEventListener('mousemove', function(e) {
+                if (document.activeElement === iframe && e.target !== iframe) {
+                    // Jika mouse keluar dari area iframe, simpan posisi scroll terakhir
+                    scrollX = window.scrollX;
+                    scrollY = window.scrollY;
+                }
+            });
+            
+            document.addEventListener('wheel', function() {
+                if (document.activeElement === iframe && !isMouseOverIframe) {
+                    document.activeElement.blur();
+                }
+            });
+        });
+        </script>
+
+
+        @else
         <div class="section-title fade-up">Checksheet — {{ $stageNames[$checksheetStage] ?? '' }}</div>
         <div class="glass-card fade-up" id="csContainer">
 
@@ -364,6 +414,7 @@
                 </div>
                 @if(!$isReviewMode && auth()->user()->hasAnyRole(['Mechanic', 'Supervisor', 'SuperAdmin']))
                 <div style="margin-top: 12px; text-align: center;">
+                <div style="margin-top: 12px; text-align: center;">
                     <button onclick="csOpenAddModal()" class="cs-add-btn" style="width: 100%;">+ Tambah Item Kustom</button>
                 </div>
                 @endif
@@ -371,6 +422,7 @@
 
         </div>
     </div>
+    @endif
 
     {{-- Add Item Modal --}}
     <div id="csAddModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); backdrop-filter:blur(8px); z-index:1000; display:none; align-items:center; justify-content:center; padding:24px;">

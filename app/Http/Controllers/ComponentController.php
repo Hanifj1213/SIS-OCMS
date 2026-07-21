@@ -220,6 +220,10 @@ class ComponentController extends Controller
             $reviewStage = $requestedReviewStage;
         }
 
+        // Pastikan checksheet untuk stage ini sudah ter-generate dari template
+        $this->ensureChecksheetForStage($component, $reviewStage ?? $component->current_stage);
+        $component->load('checksheets'); // Reload jika baru digenerate
+
         return view('overhauls.show', [
             'comp' => $component,
             'stageNames' => $stageNames,

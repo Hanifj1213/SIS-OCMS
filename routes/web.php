@@ -65,6 +65,8 @@ Route::middleware(['auth'])->group(function () {
         ->name('checksheet.show');
     Route::post('components/{component}/checksheet/{stage}/answer', [ChecksheetController::class, 'saveAnswer'])
         ->name('checksheet.saveAnswer');
+    Route::post('components/{component}/spreadsheet-checksheet/{stage}', [ChecksheetController::class, 'saveSpreadsheet'])
+        ->name('checksheet.saveSpreadsheet');
     Route::post('components/{component}/checksheet/{stage}/add-item', [ChecksheetController::class, 'addItem'])
         ->name('checksheet.addItem');
     Route::delete('components/{component}/checksheet/{stage}/remove-item', [ChecksheetController::class, 'removeItem'])
