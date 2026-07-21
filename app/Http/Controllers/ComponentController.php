@@ -6,6 +6,7 @@ use App\Models\ChecksheetTemplate;
 use App\Models\Component;
 use App\Models\ComponentChecksheet;
 use App\Models\PartRequest;
+use App\Services\ChecksheetGsheetService;
 use Illuminate\Http\Request;
 use Endroid\QrCode\QrCode;
 use Endroid\QrCode\Writer\PngWriter;
@@ -195,6 +196,11 @@ class ComponentController extends Controller
             ]);
         }
 
+        // Duplikasi otomatis template Google Sheets disassembly per-EGI
+        // (jika dikonfigurasi). Gagal pun pendaftaran tetap sukses; akan
+        // dicoba lagi saat halaman detail dibuka.
+        app(ChecksheetGsheetService::class)->duplicateForComponent($component);
+
         return redirect()->route('components.show', $component->comp_id)
             ->with('success', 'Komponen "' . $component->serial_number . '" berhasil didaftarkan dan QR Code telah di-generate.');
     }
@@ -224,6 +230,11 @@ class ComponentController extends Controller
         $this->ensureChecksheetForStage($component, $reviewStage ?? $component->current_stage);
         $component->load('checksheets'); // Reload jika baru digenerate
 
+        // Retry duplikasi GSheet untuk komponen lama / yang gagal saat daftar
+        if (!$component->gsheet_url && $component->current_stage >= 2) {
+            app(ChecksheetGsheetService::class)->duplicateForComponent($component);
+        }
+
         return view('overhauls.show', [
             'comp' => $component,
             'stageNames' => $stageNames,
@@ -252,9 +263,16 @@ class ComponentController extends Controller
             return back()->withErrors(['stage' => 'Komponen ini sedang menunggu approval Management.']);
         }
 
-        // Cek apakah checksheet tahap ini sudah diisi 100%
+        // Cek apakah checksheet tahap ini sudah diisi 100%.
+        // Dikecualikan bila tahap ini memakai checksheet Google Sheets
+        // (spreadsheet menggantikan checksheet internal, progressnya tidak
+        // terlacak di database).
+        $usesGsheetChecksheet = $currentStage == 2
+            && $component->major_category === 'Engine'
+            && ($component->gsheet_url || strtoupper(trim((string) $component->egi)) === 'PC2000-8');
+
         $checksheet = $component->checksheets()->where('stage_number', $currentStage)->first();
-        if ($checksheet && !$checksheet->is_complete) {
+        if (!$usesGsheetChecksheet && $checksheet && !$checksheet->is_complete) {
             return back()->withErrors(['stage' => 'Checksheet tahap ini belum selesai diisi. Progress saat ini: ' . $checksheet->progress . '%. Harap selesaikan checksheet sebelum melanjutkan.']);
         }
 

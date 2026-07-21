@@ -319,9 +319,20 @@
         </div>
     </div>
     @endif
-    @if($currentChecksheet)
+    @php
+        // Spreadsheet disassembly milik komponen ini (hasil duplikasi template).
+        // Komponen PC2000-8 lama yang belum punya salinan memakai sheet legacy.
+        $gsheetEmbedUrl = null;
+        if ($checksheetStage == 2) {
+            $rawGsheet = $comp->gsheet_url
+                ?: ($comp->egi === 'PC2000-8' ? 'https://docs.google.com/spreadsheets/d/1kIjBP4R4MWPkpFzXIU7Smcwnyy2DoR2Pzj2oggmn3tY/edit?usp=sharing' : null);
+            if ($rawGsheet) {
+                $gsheetEmbedUrl = $rawGsheet . (str_contains($rawGsheet, '?') ? '&' : '?') . 'rm=minimal';
+            }
+        }
+    @endphp
+    @if($gsheetEmbedUrl)
     <div class="section" id="checksheet-review">
-        @if($comp->egi === 'PC2000-8' && $checksheetStage == 2)
         {{--
             Google Sheets mode edit tidak punya opsi resmi untuk menyembunyikan
             header baris/kolom dan bar tab sheet, jadi kita "crop": iframe dibuat
@@ -336,7 +347,7 @@
         @endphp
         <div class="glass-card fade-up" style="padding: 0; overflow: hidden; height: 90vh; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); position: relative;">
             <iframe id="gsheet-iframe"
-                src="https://docs.google.com/spreadsheets/d/1kIjBP4R4MWPkpFzXIU7Smcwnyy2DoR2Pzj2oggmn3tY/edit?usp=sharing&rm=minimal"
+                src="{{ $gsheetEmbedUrl }}"
                 style="position: absolute; top: -{{ $cropTop }}px; left: -{{ $cropLeft }}px; width: calc(100% + {{ $cropLeft }}px); height: calc(100% + {{ $cropTop + $cropBottom }}px); border: none;"
                 allowfullscreen>
             </iframe>
@@ -398,9 +409,11 @@
             });
         });
         </script>
+    </div>
+    @endif
 
-
-        @else
+    @if($currentChecksheet && !$gsheetEmbedUrl)
+    <div class="section" id="checksheet-review">
         <div class="section-title fade-up">Checksheet — {{ $stageNames[$checksheetStage] ?? '' }}</div>
         <div class="glass-card fade-up" id="csContainer">
 
@@ -451,7 +464,6 @@
 
         </div>
     </div>
-    @endif
 
     {{-- Add Item Modal --}}
     <div id="csAddModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); backdrop-filter:blur(8px); z-index:1000; align-items:center; justify-content:center; padding:24px;">

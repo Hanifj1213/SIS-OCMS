@@ -32,6 +32,7 @@ class Component extends Model
         'current_stage',
         'is_waiting_approval',
         'qr_code_path',
+        'gsheet_url',
         'status',
     ];
 
