@@ -135,4 +135,28 @@ class ChecksheetController extends Controller
             'total'   => count($items),
         ]);
     }
+
+    /**
+     * Simpan data JSON dari Jspreadsheet untuk komponen tahap tertentu.
+     */
+    public function saveSpreadsheet(Request $request, Component $component, int $stage)
+    {
+        if (!auth()->user()->hasAnyRole(['Mechanic', 'Supervisor', 'SuperAdmin'])) {
+            return response()->json(['error' => 'Tidak memiliki izin.'], 403);
+        }
+
+        $checksheet = $component->checksheets()
+            ->where('stage_number', $stage)
+            ->firstOrFail();
+
+        $answers = $request->input('answers', []);
+        
+        $checksheet->update([
+            'answers' => $answers,
+        ]);
+
+        return response()->json([
+            'success' => true,
+        ]);
+    }
 }
