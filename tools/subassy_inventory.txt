@@ -1,0 +1,316 @@
+﻿========== SA12V140E-1 ==========
+  [MEASURE] ACC DRIVE
+       FILE: SUB ASSY\ACC DRIVE\MEASURING\Alternator Drive Shaft and Gear 12V140-1,2.xls
+       SHEETS: Alt.Drive Shaft 12V140 Measure | Alt.Drive Shaft 12V140 (Rev) | Sheet1
+  [MEASURE] ACC DRIVE
+       FILE: SUB ASSY\ACC DRIVE\MEASURING\Lever Shaft ALL ENGINE.xlsx
+       SHEETS: FAN PULLEY (1) | FAN PULLEY (2) | FAN PULLEY (3) | Sheet3
+  [MEASURE] CAM FOLLOWER
+       FILE: SUB ASSY\CAM FOLLOWER\MEASUREMENT\Proses & Measuring CAM FOLLOWER ALL ENGINE.xlsx
+       SHEETS: CAM FOLLOWER Polish_12V140-1 | CAM FOLLOWER Polish_6D140-3 | CAM FOLLOWER Polish_6D170-3  | CAM FOLLOWER Polish_6D170-2 | CAM FOLLOWER Polish_6D140-2 | CAM FOLLOWER Polish_6D140-1 | CAM FOLLOWER Polish_6D140E-5 | CAM FOLLOWER Polish_6D170-1 | CAM FOLLOWER Polish_12V140-3 | CAM FOLLOWER Polish_6D125-2 | Sheet1
+  [DISASSY] COMPRESSOR
+       FILE: SUB ASSY\COMPRESSOR\DISSASEMBLY\006_AIR COMPRESSOR Disassembly check sheet.xls
+       SHEETS: Air Comp. Dissaasy checksheet
+  [MEASURE] CROSSHEAD
+       FILE: SUB ASSY\CROSSHEAD\SALVAGING\Salvage surface grinding Cross Head ALL ENGINE (2).xlsx
+       SHEETS: Cross head Salvage | Cross head Salvage (REv) | Sheet2
+  [MEASURE] CROSSHEAD
+       FILE: SUB ASSY\CROSSHEAD\SALVAGING\Salvage surface grinding Cross Head ALL ENGINE.xlsx
+       SHEETS: Cross head Salvage | Cross head Salvage (REv) | Sheet2
+  [MEASURE] CYL HEAD
+       FILE: SUB ASSY\CYL HEAD\DELIVERY SALVAGING\delivery&Receiving SALVAGING(NEW REVISI).xlsx
+       SHEETS: Crankshaft12V140-1 Salvage | Crankshaft 6D140 Series | Crankshaft 6D170E-2 Series | Crankshaft 6D170E-3 Series (2) | Con-Rod 12V140, 6D170 | Idler Gear & Shaft 12V140-1 | Idler Gear & Shaft 12V140-1 (2) | Idler Gear & Shaft 6d140-3 | Idler Gear & Shaft 6D170E - 3 | Cylinder head  Salvage  (REV) | Sheet2
+  [DISASSY] CYL HEAD
+       FILE: SUB ASSY\CYL HEAD\DISSASEMBLY\001.CYL. HEAD_disassembly check sheet REV 4..xls
+       SHEETS: Cyl.Head(Old_230409) | Cyl.Head(REV. NEW) (2) | Cyl.Head(REV. NEW) (3) | Cyl.Head
+  [DISASSY] CYL HEAD
+       FILE: SUB ASSY\CYL HEAD\DISSASEMBLY\001.CYL. HEAD_disassembly check sheet REV 4.ALL ENGINE.xls
+       SHEETS: Cyl.Head(Old_230409) | Cyl.Head(REV. NEW) (2) | Cyl.Head(REV. NEW) (3) | Cyl.Head
+  [MEASURE] CYL HEAD
+       FILE: SUB ASSY\CYL HEAD\MEASUREMENT\CYL HEAD MEASUREMENT NEW REVISI.xls
+       SHEETS: Cyl.Head 6D140-3 measurement. | Cyl.Head 6D170-3measurement. | Cyl.Head 6D170-2measurement (2) | Cyl.Head 6D140-2 measuremen | Cyl.Head 6D140-1measurement. | Cyl.Head 6D140-5 measuremen | Cyl.Head 6D170-1measurement  | Cyl.Head 6D155-4 measuremeN | Cyl.Head 6D125E-2 measuremen | Cyl.Head12V140-3(AFTER REVI (2 | Cyl.Head12V140-1 BEFORE REVISI | Cyl.Head12V140-1(AFTER REVISI) | Sheet1
+  [MEASURE] CYL HEAD
+       FILE: SUB ASSY\CYL HEAD\MEASUREMENT\Measuring cyl head (before fabrication).xlsx
+       SHEETS: 12V140E-3
+  [MEASURE] CYL HEAD
+       FILE: SUB ASSY\CYL HEAD\MEASUREMENT\proses & measuring  Cyl head(12V-1;6D170-3;6D140-5.xlsx
+       SHEETS: Cyl.Head12V140 measurement | Cyl.Head 6D140 measurement. | Cyl.Head 6D170 measurement.. | Sheet1
+  [MEASURE] CYL HEAD
+       FILE: SUB ASSY\CYL HEAD\MEASUREMENT\Salvage surface grinding CYLINDER HEAD ALL ENGINE.xlsx
+       SHEETS: Cylinder head  Salvage  | Sheet2
+  [MEASURE] ROCKER ARM
+       FILE: SUB ASSY\ROCKER ARM\MEASUREMENT\Proses & Measuring ROCKER ARM_and_ SHAFT ALL ENGINE.xlsx
+       SHEETS: Rocker Arm Shaft (6D140E-5) | Rocker Arm Shaft Polish (Rev) | Rocker Arm Polish_12V140 | Rocker Arm Polish_6D140E-3 | Rocker Arm Polish_6D170E-3 | Rocker Arm Polish_6D170E-2 | Rocker Arm Polish_6D170E-1 | Rocker Arm Polish_6D140E-2 | Rocker Arm Polish_6D140-01 | Rocker Arm Polish_6D140E-5 | Rocker Arm Polish_12V140 -3 | Rocker Arm Polish_6D125-2 | Rocker Arm Polish_6D155-4 | Sheet1
+  [MEASURE] ROCKER ARM
+       FILE: SUB ASSY\ROCKER ARM\MEASUREMENT\ROCKER ARM_7.xls
+       SHEETS: Rocker Arm Shaft (6D140E-5) | Rocker Arm 12V140-1 | Rocker Arm 6D170E-3 | Rocker Arm 6D170E-2 | Rocker Arm 6D170E-1 | Rocker Arm 6D140E-3 (2) | Rocker Arm 6D140E-2 | Rocker Arm 6D140E-1 | Rocker Arm 6D140E-5 | Rocker Arm 6D125-2 | Rocker Arm 6D155-4 | Rocker Arm 12V140-3 | Sheet1
+  [MEASURE] TIMING GEAR
+       FILE: SUB ASSY\TIMING GEAR\MEASURING\process IDLER GEAR AND SHAFT Process Checksheet.ALL ENGINE.xlsx
+       SHEETS: Idler Gear & Shaft 6D170-2 | Idler Gear&Shaft 6D170-1(HD465) | Idler Gear&Shaft 6D170-1(OTHER) | Idler Gear & Shaft 6D170E-3 | Idler Gear & Shaft 12V140-1E | Idler Gear & Shaft 12V140-1M  | Sheet2
+  [DISASSY] TURBOCHARGER
+       FILE: SUB ASSY\TURBOCHARGER\DISSASEMBLY\003.TURBO CHARGER_Disassembly check sheet REV 4.xls
+       SHEETS: Turbocharger Dissaasy
+  [MEASURE] WATERPUMP
+       FILE: SUB ASSY\WATERPUMP\MEASURING\Water Pump Shaft12V-3.xls
+       SHEETS: WATER PUMP SHAFT 1 | WATER PUMP SHAFT 2 | Sheet3
+  [MEASURE] WATERPUMP
+       FILE: SUB ASSY\WATERPUMP\MEASURING\WaterPumpShaft_3.xls
+       SHEETS: WATER PUMP SHAFT 2 | Sheet3
+
+========== SA6D140E-2 ==========
+  [MEASURE] CAM FOLLOWER
+       FILE: SUB ASSY\CAM FOLLOWER\MEASUREMENT\Proses & Measuring CAM FOLLOWER ALL ENGINE.xlsx
+       SHEETS: CAM FOLLOWER Polish_12V140-1 | CAM FOLLOWER Polish_6D140-3 | CAM FOLLOWER Polish_6D170-3  | CAM FOLLOWER Polish_6D170-2 | CAM FOLLOWER Polish_6D140-2 | CAM FOLLOWER Polish_6D140-1 | CAM FOLLOWER Polish_6D140E-5 | CAM FOLLOWER Polish_6D170-1 | CAM FOLLOWER Polish_12V140-3 | CAM FOLLOWER Polish_6D125-2 | Sheet1
+  [DISASSY] COMPRESSOR
+       FILE: SUB ASSY\COMPRESSOR\DISSASSEMBLY\006_AIR COMPRESSOR Disassembly check sheet.xls
+       SHEETS: Air Comp. Dissaasy checksheet
+  [MEASURE] CROSSHEAD
+       FILE: SUB ASSY\CROSSHEAD\SALVAGE\Salvage surface grinding Cross Head ALL ENGINE (2).xlsx
+       SHEETS: Cross head Salvage | Cross head Salvage (REv) | Sheet2
+  [MEASURE] CROSSHEAD
+       FILE: SUB ASSY\CROSSHEAD\SALVAGE\Salvage surface grinding Cross Head ALL ENGINE.xlsx
+       SHEETS: Cross head Salvage | Cross head Salvage (REv) | Sheet2
+  [MEASURE] CYL HEAD
+       FILE: SUB ASSY\CYL HEAD\DELIVERY SALVAGING\006-01,02,03_cy_head_DELIVERY_REV04.xls
+       SHEETS: Cyl. Head (1)  | Con.Rod  (2) | Con.Rod  (3) | Sheet2
+  [MEASURE] CYL HEAD
+       FILE: SUB ASSY\CYL HEAD\DELIVERY SALVAGING\delivery cyl head.xls
+       SHEETS: cyl head 6D170-5 | Sheet2
+  [MEASURE] CYL HEAD
+       FILE: SUB ASSY\CYL HEAD\DELIVERY SALVAGING\delivery&Receiving SALVAGING(NEW REVISI).xlsx
+       SHEETS: Crankshaft12V140-1 Salvage | Crankshaft 6D140 Series | Crankshaft 6D170E-2 Series | Crankshaft 6D170E-3 Series (2) | Con-Rod 12V140, 6D170 | Idler Gear & Shaft 12V140-1 | Idler Gear & Shaft 12V140-1 (2) | Idler Gear & Shaft 6d140-3 | Idler Gear & Shaft 6D170E - 3 | Cylinder head  Salvage  (REV) | Sheet2
+  [MEASURE] CYL HEAD
+       FILE: SUB ASSY\CYL HEAD\DELIVERY SALVAGING\Salvage surface grinding CYLINDER HEAD ALL ENGINE.xlsx
+       SHEETS: Cylinder head  Salvage  | Sheet2
+  [DISASSY] CYL HEAD
+       FILE: SUB ASSY\CYL HEAD\DISSASSEMBLY\001.CYL. HEAD_disassembly check sheet REV 4..xls
+       SHEETS: Cyl.Head(Old_230409) | Cyl.Head(REV. NEW) (2) | Cyl.Head(REV. NEW) (3) | Cyl.Head
+  [DISASSY] CYL HEAD
+       FILE: SUB ASSY\CYL HEAD\DISSASSEMBLY\001.CYL. HEAD_disassembly check sheet REV 4.ALL ENGINE.xls
+       SHEETS: Cyl.Head(Old_230409) | Cyl.Head(REV. NEW) (2) | Cyl.Head(REV. NEW) (3) | Cyl.Head
+  [MEASURE] CYL HEAD
+       FILE: SUB ASSY\CYL HEAD\MEASUREMENT\New Rev_ CYL. HEAD measurement _6d140-2(new revisi).xls
+       SHEETS: Cyl.Head12V140 measurement | CYL HEAD 6D170-5 | Cyl.Head 6D140-3 measurement. | Cyl.Head 6D170-3measurement. | Cyl.Head 6D170-2measurement (2) | Cyl.Head 6D140-2 measuremen | Cyl.Head 6D140-1measurement. | Cyl.Head 6D140-5 measuremen | Cyl.Head 6D170-1measurement  | Cyl.Head 6D155-4 measuremeN | Cyl.Head 6D125E-2 measuremen | Cyl.Head12V140 measurement (2) | Sheet1
+  [MEASURE] CYL HEAD
+       FILE: SUB ASSY\CYL HEAD\MEASUREMENT\New Rev_ CYL. HEAD measurement _6d140-2(new revisi)BEFORE MACHINING.xls
+       SHEETS: Cyl.Head12V140 measurement | CYL HEAD 6D170-5 | Cyl.Head 6D140-3 measurement. | Cyl.Head 6D170-3measurement. | Cyl.Head 6D170-2measurement (2) | Cyl.Head 6D140-2 measuremen | Cyl.Head 6D140-1measurement. | Cyl.Head 6D140-5 measuremen | Cyl.Head 6D170-1measurement  | Cyl.Head 6D155-4 measuremeN | Cyl.Head 6D125E-2 measuremen | Cyl.Head12V140 measurement (2) | Sheet1
+  [MEASURE] CYL HEAD
+       FILE: SUB ASSY\CYL HEAD\MEASUREMENT\New Rev_ CYL. HEAD measurement _ALL ENGINE.xls
+       SHEETS: Cyl.Head12V140 measurement | CYL HEAD 6D170-5 | Cyl.Head 6D140-3 measurement. | Cyl.Head 6D170-3measurement. | Cyl.Head 6D170-2measurement (2) | Cyl.Head 6D140-2 measuremen | Cyl.Head 6D140-1measurement. | Cyl.Head 6D140-5 measuremen | Cyl.Head 6D170-1measurement  | Cyl.Head 6D155-4 measuremeN | Cyl.Head 6D125E-2 measuremen | Cyl.Head12V140 measurement (2) | Sheet1
+  [MEASURE] CYL HEAD
+       FILE: SUB ASSY\CYL HEAD\MEASUREMENT\Salvage surface grinding CYLINDER HEAD ALL ENGINE.xlsx
+       SHEETS: Cylinder head  Salvage  | Sheet2
+  [MEASURE] ROCKER ARM
+       FILE: SUB ASSY\ROCKER ARM\MEASUREMENT\Proses & Measuring ROCKER ARM_and_ SHAFT ALL ENGINE.xlsx
+       SHEETS: Rocker Arm Shaft (6D140E-5) | Rocker Arm Shaft Polish (Rev) | Rocker Arm Polish_12V140 | Rocker Arm Polish_6D140E-3 | Rocker Arm Polish_6D170E-3 | Rocker Arm Polish_6D170E-2 | Rocker Arm Polish_6D170E-1 | Rocker Arm Polish_6D140E-2 | Rocker Arm Polish_6D140-01 | Rocker Arm Polish_6D140E-5 | Rocker Arm Polish_12V140 -3 | Rocker Arm Polish_6D125-2 | Rocker Arm Polish_6D155-4 | Sheet1
+  [MEASURE] TIMING GEAR
+       FILE: SUB ASSY\TIMING GEAR\MEASUREMENT\process IDLER GEAR AND SHAFT Process Checksheet.ALL ENGINE.xlsx
+       SHEETS: Idler Gear & Shaft 6D170-2 | Idler Gear&Shaft 6D170-1(HD465) | Idler Gear&Shaft 6D170-1(OTHER) | Idler Gear & Shaft 6D170E-3 | Idler Gear & Shaft 12V140-1E | Idler Gear & Shaft 12V140-1M  | Sheet2
+  [DISASSY] TURBOCHARGER
+       FILE: SUB ASSY\TURBOCHARGER\DISSASSEMBLY\003.TURBO CHARGER_Disassembly check sheet REV 4.xls
+       SHEETS: Turbocharger Dissaasy
+
+========== SAA12V140E-3 ==========
+  [MEASURE] CAM FOLLOWER
+       FILE: SUB ASSY\CAM FOLLOWER\MEASURING\Proses & Measuring CAM FOLLOWER ALL ENGINE.xlsx
+       SHEETS: CAM FOLLOWER Polish_12V140-1 | CAM FOLLOWER Polish_6D140-3 | CAM FOLLOWER Polish_6D170-3  | CAM FOLLOWER Polish_6D170-2 | CAM FOLLOWER Polish_6D140-2 | CAM FOLLOWER Polish_6D140-1 | CAM FOLLOWER Polish_6D140E-5 | CAM FOLLOWER Polish_6D170-1 | CAM FOLLOWER Polish_12V140-3 | CAM FOLLOWER Polish_6D125-2 | Sheet1
+  [MEASURE] CAM FOLLOWER
+       FILE: SUB ASSY\CAM FOLLOWER\MEASURING\Proses & Measuring CAM FOLLOWER AND PUSH ROD.xlsx
+       SHEETS: Cam Follower 6D140-5 | Cam Follower 6D170-2 | Cam Follower 6D140 | Cam Follower 6D170-3 | Cam Follower 12V140 | Cam Follower 6D125-2 | Cam Follower 6D155-4 | Sheet1
+  [MEASURE] CAM FOLLOWER
+       FILE: SUB ASSY\CAM FOLLOWER\MEASURING\Proses & Measuring CAM FOLLOWER_12V140-3.xls
+       SHEETS: CAM FOLLOWER Polish_12V140-1 | CAM FOLLOWER Polish_6D140-3 | CAM FOLLOWER Polish_6D170-3  | CAM FOLLOWER Polish_6D170-2 | CAM FOLLOWER Polish_6D140-2 | CAM FOLLOWER Polish_6D140-1 | CAM FOLLOWER Polish_6D140E-5 | CAM FOLLOWER Polish_6D170-1 | CAM FOLLOWER Polish_12V140-3 | CAM FOLLOWER Polish_6D125-2 | Sheet1
+  [MEASURE] CROSSHEAD
+       FILE: SUB ASSY\CROSSHEAD\salvaging\Salvage surface grinding Cross Head ALL ENGINE.xlsx
+       SHEETS: Cross head Salvage | Cross head Salvage (REv) | Sheet2
+  [DISASSY] CYL HEAD
+       FILE: SUB ASSY\CYL HEAD\dissasembly\001.CYL. HEAD_disassembly check sheet REV 4..xls
+       SHEETS: Cyl.Head(REV. NEW) | Cyl.Head
+  [DISASSY] CYL HEAD
+       FILE: SUB ASSY\CYL HEAD\dissasembly\001.CYL. HEAD_disassembly check sheet REV 4.ALL ENGINE.xls
+       SHEETS: Cyl.Head(Old_230409) | Cyl.Head(REV. NEW) (2) | Cyl.Head(REV. NEW) (3) | Cyl.Head
+  [MEASURE] CYL HEAD
+       FILE: SUB ASSY\CYL HEAD\measuring\CYL HEAD MEASUREMENT NEW REVISI(12V-1&3).xls
+       SHEETS: Cyl.Head12V140-3(REV2)before ma | Cyl.Head12V140-3(REV2)after mac | Cyl.Head12V140-1(REV 4) | Cyl.Head12V140-1(REV 5) | Sheet1
+  [MEASURE] CYL HEAD
+       FILE: SUB ASSY\CYL HEAD\measuring\CYL. HEAD measurement _(mentahan).xls
+       SHEETS: Cyl.Head12V140 measurement | Cyl.Head 6D140-3 measurement. | Cyl.Head 6D170-3measurement. | Cyl.Head 6D170-2measurement (2) | Cyl.Head 6D140-2 measuremen | Cyl.Head 6D140-1measurement. | Cyl.Head 6D140-5 measuremen | Cyl.Head 6D125E-2 measuremen | Sheet1
+  [MEASURE] ROCKER ARM
+       FILE: SUB ASSY\ROCKER ARM\MEASURING\Polishing_ ROCKER ARM_and_ SHAFT_12V140-3.xls
+       SHEETS: Rocker Arm Shaft (6D140E-5) | Rocker Arm Shaft Polish (Rev) | Rocker Arm Polish_12V140 | Rocker Arm Polish_6D140E-3 | Rocker Arm Polish_6D170E-3 | Rocker Arm Polish_6D170E-2 | Rocker Arm Polish_6D170E-1 | Rocker Arm Polish_6D140E-2 | Rocker Arm Polish_6D140-01 | Rocker Arm Polish_6D140E-5 | Rocker Arm Polish_6D155-4 | Rocker Arm Polish_6D125-2 | Rocker Arm Polish_12V140 -3 | Sheet1
+  [MEASURE] ROCKER ARM
+       FILE: SUB ASSY\ROCKER ARM\MEASURING\Proses & Measuring ROCKER ARM SHAFT_6D125_2.xlsx
+       SHEETS: Rocker Arm Shaft (6D140E-5) | Rocker Arm Shaft Polish (Rev) | Rocker Arm Shaft (6D125E-2)
+  [MEASURE] ROCKER ARM
+       FILE: SUB ASSY\ROCKER ARM\MEASURING\ROCKER ARM SHAFT_12V140-3.xls
+       SHEETS: Rocker Arm Shaft (12V140-1) | Rocker Arm Shaft 6D140-3 | Rocker Arm Shaft 6D170-3 | Rocker Arm Shaft 6D170-2) | Rocker Arm Shaft 6D140-2 | Rocker Arm Shaft (12V140-1) (3) | Rocker Arm Shaft (6D140E-5) | Rocker Arm Shaft 6D170-1 | Rocker Arm Shaft (6D125E-2) | Rocker Arm Shaft (12V140-3
+  [DISASSY] SUPLLY PUMP
+       FILE: SUB ASSY\SUPLLY PUMP\DISSASEMBLY\Disassy CRI.xls
+       SHEETS: Dis assy CRI
+  [MEASURE] SUPLLY PUMP
+       FILE: SUB ASSY\SUPLLY PUMP\MEASUREMENT\Supply Pump CRI.xls
+       SHEETS: Fuel Supply Test (140E-5) | Fuel Supply Test
+  [MEASURE] TIMING GEAR
+       FILE: SUB ASSY\TIMING GEAR\MEASURING\IDLER GEAR AND SHAFT_12v140-3..xls
+       SHEETS: Idler Gear & Shaft 12V140-3 | Idler Gear & Shaft 6D155-4 | Idler Gear & Shaft 6D125-2 | Idler Gear & Shaft 6D170-2 | Idler Gear & Shaft 6D170E-3 | Idler Gear & Shaft 12V140-1E | Idler Gear & Shaft 12V140-1M  | Idler Gear & Shaft 6D170E-5 | Sheet2
+  [MEASURE] TIMING GEAR
+       FILE: SUB ASSY\TIMING GEAR\MEASURING\Lever Shaft ALL ENGINE.xlsx
+       SHEETS: FAN PULLEY (1) | FAN PULLEY (2) | FAN PULLEY (3) | Sheet3
+  [DISASSY] TURBOCHARGER
+       FILE: SUB ASSY\TURBOCHARGER\DISSASEMBLY\003.TURBO CHARGER_Disassembly check sheet REV 4.xls
+       SHEETS: Turbocharger Dissaasy
+  [MEASURE] WATERPUMP
+       FILE: SUB ASSY\WATERPUMP\measuring\Water Pump Shaft12V-3.xls
+       SHEETS: WATER PUMP SHAFT 1 | WATER PUMP SHAFT 2 | Sheet3
+  [MEASURE] WATERPUMP
+       FILE: SUB ASSY\WATERPUMP\measuring\WaterPumpShaft_3.xls
+       SHEETS: WATER PUMP SHAFT 2 | Sheet3
+
+========== SAA6D140E-5 ==========
+  [MEASURE] CAM FOLLOWER
+       FILE: SUB ASSY\CAM FOLLOWER\MEASURING\002_CAM FOLLOWER AND PUSH ROD_REV05(6D140-5).xls
+       SHEETS: Cam Follower (Rev) | Sheet1
+  [MEASURE] CAM FOLLOWER
+       FILE: SUB ASSY\CAM FOLLOWER\MEASURING\002_CAM FOLLOWER AND PUSH ROD_REV05.xls
+       SHEETS: Cam Follower (Rev) | Sheet1
+  [MEASURE] CAM FOLLOWER
+       FILE: SUB ASSY\CAM FOLLOWER\MEASURING\Proses & Measuring CAM FOLLOWER ALL ENGINE.xlsx
+       SHEETS: CAM FOLLOWER Polish_12V140-1 | CAM FOLLOWER Polish_6D140-3 | CAM FOLLOWER Polish_6D170-3  | CAM FOLLOWER Polish_6D170-2 | CAM FOLLOWER Polish_6D140-2 | CAM FOLLOWER Polish_6D140-1 | CAM FOLLOWER Polish_6D140E-5 | CAM FOLLOWER Polish_6D170-1 | CAM FOLLOWER Polish_12V140-3 | CAM FOLLOWER Polish_6D125-2 | Sheet1
+  [MEASURE] CAM FOLLOWER
+       FILE: SUB ASSY\CAM FOLLOWER\MEASURING\Proses & Measuring CAM FOLLOWER_6D140-5.xls
+       SHEETS: CAM FOLLOWER Polish_12V140-1 | CAM FOLLOWER Polish_6D140-3 | CAM FOLLOWER Polish_6D170-3  | CAM FOLLOWER Polish_6D170-2 | CAM FOLLOWER Polish_6D140-2 | CAM FOLLOWER Polish_6D140-1 | CAM FOLLOWER Polish_6D140E-5 | CAM FOLLOWER Polish_6D170-1 | CAM FOLLOWER Polish_12V140-3 | CAM FOLLOWER Polish_6D125-2 | Sheet1
+  [MEASURE] CROSSHEAD
+       FILE: SUB ASSY\CROSSHEAD\SALVAGING\Salvage surface grinding Cross Head ALL ENGINE.xlsx
+       SHEETS: Cross head Salvage | Cross head Salvage (REv) | Sheet2
+  [MEASURE] CYL HEAD
+       FILE: SUB ASSY\CYL HEAD\DELIVERY SALVAGING\006-01,02,03_cy_head_DELIVERY_REV04.xls
+       SHEETS: Cyl. Head (1)  | Con.Rod  (2) | Con.Rod  (3) | Sheet2
+  [MEASURE] CYL HEAD
+       FILE: SUB ASSY\CYL HEAD\DELIVERY SALVAGING\delivery cyl head.xls
+       SHEETS: cyl head 12v140-3 | Sheet2
+  [MEASURE] CYL HEAD
+       FILE: SUB ASSY\CYL HEAD\DELIVERY SALVAGING\DELIVERY NEW REVISI.xls
+       SHEETS: cyl head 12v140-3 | Sheet2
+  [MEASURE] CYL HEAD
+       FILE: SUB ASSY\CYL HEAD\DELIVERY SALVAGING\delivery&Receiving SALVAGING(NEW REVISI).xlsx
+       SHEETS: Crankshaft12V140-1 Salvage | Crankshaft 6D140 Series | Crankshaft 6D170E-2 Series | Crankshaft 6D170E-3 Series (2) | Con-Rod 12V140, 6D170 | Idler Gear & Shaft 12V140-1 | Idler Gear & Shaft 12V140-1 (2) | Idler Gear & Shaft 6d140-3 | Idler Gear & Shaft 6D170E - 3 | Cylinder head  Salvage  (REV) | Sheet2
+  [MEASURE] CYL HEAD
+       FILE: SUB ASSY\CYL HEAD\DELIVERY SALVAGING\Salvage surface grinding CYLINDER HEAD ALL ENGINE.xlsx
+       SHEETS: Cylinder head  Salvage  | Sheet2
+  [DISASSY] CYL HEAD
+       FILE: SUB ASSY\CYL HEAD\DISSASSEMBLY\001.CYL. HEAD_disassembly check sheet REV 4..xls
+       SHEETS: Cyl.Head(Old_230409) | Cyl.Head(REV. NEW) (2) | Cyl.Head(REV. NEW) (3) | Cyl.Head
+  [DISASSY] CYL HEAD
+       FILE: SUB ASSY\CYL HEAD\DISSASSEMBLY\001.CYL. HEAD_disassembly check sheet REV 4.ALL ENGINE.xls
+       SHEETS: Cyl.Head(Old_230409) | Cyl.Head(REV. NEW) (2) | Cyl.Head(REV. NEW) (3) | Cyl.Head
+  [MEASURE] CYL HEAD
+       FILE: SUB ASSY\CYL HEAD\MEASURING\001_ CYL. HEAD measurement _REV04.xls
+       SHEETS: Cyl.Head12V140 measurement | Cyl.Head 6D140-3 measurement. | Cyl.Head 6D170-3measurement. | Cyl.Head 6D170-2measurement (2) | Cyl.Head 6D140-2 measuremen | Cyl.Head 6D140-1measurement. | Cyl.Head 6D140-5 measuremen | Cyl.Head 6D170-1measurement  | Cyl.Head 6D155-4 measuremeN | Cyl.Head 6D125E-2 measuremen | Sheet1
+  [MEASURE] CYL HEAD
+       FILE: SUB ASSY\CYL HEAD\MEASURING\001_ CYL. HEAD measurement _REV140-5(NEW REVISION).xls
+       SHEETS: Cyl.Head12V140 measurement | Cyl.Head 6D140-3 measurement. | Cyl.Head 6D170-3measurement. | Cyl.Head 6D170-2measurement (2) | Cyl.Head 6D140-2 measuremen | Cyl.Head 6D140-1measurement. | Cyl.Head 6D140-5 measuremen | Cyl.Head 6D170-1measurement  | Cyl.Head 6D155-4 measuremeN | Cyl.Head 6D125E-2 measuremen | Sheet1
+  [MEASURE] CYL HEAD
+       FILE: SUB ASSY\CYL HEAD\MEASURING\New Rev_ CYL. HEAD measurement _ALL ENGINE6D140-5.xls
+       SHEETS: Cyl.Head12V140 measurement | CYL HEAD 6D170-5 | Cyl.Head 6D140-3 measurement. | Cyl.Head 6D170-3measurement. | Cyl.Head 6D170-2measurement (2) | Cyl.Head 6D140-2 measuremen | Cyl.Head 6D140-1measurement. | Cyl.Head 6D140-5 measuremen | Cyl.Head 6D170-1measurement  | Cyl.Head 6D155-4 measuremeN | Cyl.Head 6D125E-2 measuremen | Cyl.Head12V140 measurement (2) | Sheet1
+  [MEASURE] ROCKER ARM
+       FILE: SUB ASSY\ROCKER ARM\MEASUREMENT\Proses & Measuring ROCKER ARM_ ALL ENGINE.xlsx
+       SHEETS: Rocker Arm Shaft (6D140E-5) | Rocker Arm Shaft Polish (Rev) | Rocker Arm Polish_12V140 | Rocker Arm Polish_6D140E-3 | Rocker Arm Polish_6D170E-3 | Rocker Arm Polish_6D170E-2 | Rocker Arm Polish_6D170E-1 | Rocker Arm Polish_6D140E-2 | Rocker Arm Polish_6D140-01 | Rocker Arm Polish_6D140E-5 | Rocker Arm Polish_12V140 -3 | Rocker Arm Polish_6D125-2 | Rocker Arm Polish_6D155-4 | Sheet1
+  [MEASURE] ROCKER ARM
+       FILE: SUB ASSY\ROCKER ARM\MEASUREMENT\ROCKER ARM SHAFT_6D140-5.xls
+       SHEETS: Rocker Arm Shaft (6D140E-5) | Rocker Arm Shaft Polish (Rev) | Rocker Arm Shaft (6D125E-2)
+  [DISASSY] SUPPLY PUMP
+       FILE: SUB ASSY\SUPPLY PUMP\DISSASSEMBLY\Disassy CRI.xls
+       SHEETS: Dis assy CRI
+  [DISASSY] TURBOCHARGER
+       FILE: SUB ASSY\TURBOCHARGER\DISSASSEMBLY\003.TURBO CHARGER_Disassembly check sheet REV 4.xls
+       SHEETS: Turbocharger Dissaasy
+
+========== SAA6D170E-5 ==========
+  [MEASURE] ACC DRIVE
+       FILE: SUB ASSY\ACC DRIVE\MEASUREMENT\005_ACC. DRIVE HOUSING Measurement.xlsx
+       SHEETS: Acc Drive Housing measure | Acc Drive Housing measure (Rev) | Sheet1
+  [MEASURE] ACC DRIVE
+       FILE: SUB ASSY\ACC DRIVE\MEASUREMENT\005_ACC. DRIVE HOUSING Measurement6D170-3.xlsx
+       SHEETS: Acc Drive Housing measure | Acc Drive Housing measure (Rev) | Sheet1
+  [MEASURE] ACC DRIVE
+       FILE: SUB ASSY\ACC DRIVE\MEASUREMENT\007_ACC. DRIVE 6D170 Measurement.xlsx
+       SHEETS: Acc Drive Housing measure | Acc Drive Housing measure (Rev) | ALT Drive 6D170 measure ( (2) | Sheet1
+  [MEASURE] ACC DRIVE
+       FILE: SUB ASSY\ACC DRIVE\MEASUREMENT\007_ACC_DRIVE_SHAFT_AND_GEAR_6D170-3_Measurement.xls
+       SHEETS: Acc Drive Shaft 6D170 Measure | Acc Drive Shaft 6D170Measu(Rev) | Sheet1
+  [MEASURE] ACC DRIVE
+       FILE: SUB ASSY\ACC DRIVE\MEASUREMENT\007_ACC_DRIVE_SHAFT_AND_GEAR_6D170_3_Measurement.xls
+       SHEETS: Acc Drive Shaft 6D170 Measure | Acc Drive Shaft 6D170Measu(Rev) | Sheet1
+  [MEASURE] ACC DRIVE
+       FILE: SUB ASSY\ACC DRIVE\MEASUREMENT\007_ACC_DRIVE_SHAFT_AND_GEAR_6D170_Measurement.xls
+       SHEETS: Acc Drive Shaft 6D170 Measure | Acc Drive Shaft 6D170Measu(Rev) | Sheet1
+  [MEASURE] ACC DRIVE
+       FILE: SUB ASSY\ACC DRIVE\MEASUREMENT\007_Alternator Drive Shaft and Gear 6D170-3.xls
+       SHEETS: Alt.Drive Shaft & Gear 6D170 Ms | Alt.Drive Shaft&Gear 6D170(Rev) | Alt.Drive Shaft&Gear 6D170-2 | Sheet1
+  [MEASURE] ACC DRIVE
+       FILE: SUB ASSY\ACC DRIVE\MEASUREMENT\007_Alternator Drive Shaft and Gear 6D170.xls
+       SHEETS: Alt.Drive Shaft & Gear 6D170 Ms | Alt.Drive Shaft&Gear 6D170(Rev) | Alt.Drive Shaft&Gear 6D170-2 | Sheet1
+  [DISASSY] CAM FOLLOWER
+       FILE: SUB ASSY\CAM FOLLOWER\DISSASEMBLY\002_CAM FOLLOWER  AND PUSH ROD_REV04 DELIVERY AND RECEIVING ALL ENGINE.xlsx
+       SHEETS: Cam Follower | Sheet2
+  [DISASSY] COMPRESSOR
+       FILE: SUB ASSY\COMPRESSOR\DISSASSEMBLY\006_AIR COMPRESSOR Disassembly check sheet ALL ENGINE.xls
+       SHEETS: Air Comp. Dissaasy checksheet
+  [DISASSY] COMPRESSOR
+       FILE: SUB ASSY\COMPRESSOR\DISSASSEMBLY\006_AIR COMPRESSOR Disassembly check sheet.xls
+       SHEETS: Air Comp. Dissaasy checksheet
+  [MEASURE] CROSSHEAD
+       FILE: SUB ASSY\CROSSHEAD\MEASURING\Salvage surface grinding Cross Head ALL ENGINE (2).xlsx
+       SHEETS: Cross head Salvage | Cross head Salvage (REv) | Sheet2
+  [MEASURE] CROSSHEAD
+       FILE: SUB ASSY\CROSSHEAD\MEASURING\Salvage surface grinding Cross Head ALL ENGINE.xlsx
+       SHEETS: Cross head Salvage | Cross head Salvage (REv) | Sheet2
+  [MEASURE] CYL HEAD
+       FILE: SUB ASSY\CYL HEAD\DELIVERY SALVAGING\delivery cyl head.xls
+       SHEETS: cyl head 12v140-3 | Sheet2
+  [MEASURE] CYL HEAD
+       FILE: SUB ASSY\CYL HEAD\DELIVERY SALVAGING\delivery&Receiving SALVAGING 6D140&170 SERIES(NEW REVISI).xlsx
+       SHEETS: Crankshaft12V140-1 Salvage | Crankshaft 6D140 Series | Crankshaft 6D170E-2 Series | Crankshaft 6D170E-3 Series (2) | Con-Rod 12V140, 6D170 | Idler Gear & Shaft 12V140-1 | Idler Gear & Shaft 12V140-1 (2) | Idler Gear & Shaft 6d140-3 | Idler Gear & Shaft 6D170E - 3 | Cylinder head  Salvage  (REV) | Sheet2
+  [MEASURE] CYL HEAD
+       FILE: SUB ASSY\CYL HEAD\DELIVERY SALVAGING\delivery&Receiving SALVAGING(NEW REVISI).xlsx
+       SHEETS: Crankshaft12V140-1 Salvage | Crankshaft 6D140 Series | Crankshaft 6D170E-2 Series | Crankshaft 6D170E-3 Series (2) | Con-Rod 12V140, 6D170 | Idler Gear & Shaft 12V140-1 | Idler Gear & Shaft 12V140-1 (2) | Idler Gear & Shaft 6d140-3 | Idler Gear & Shaft 6D170E - 3 | Cylinder head  Salvage  (REV) | Sheet2
+  [DISASSY] CYL HEAD
+       FILE: SUB ASSY\CYL HEAD\DISSASSEMBLY\001.CYL. HEAD_disassembly check sheet REV 4..xls
+       SHEETS: Cyl.Head(Old_230409) | Cyl.Head(REV. NEW) (2) | Cyl.Head(REV. NEW) (3) | Cyl.Head
+  [DISASSY] CYL HEAD
+       FILE: SUB ASSY\CYL HEAD\DISSASSEMBLY\001.CYL. HEAD_disassembly check sheet REV 4.ALL ENGINE.xls
+       SHEETS: Cyl.Head(Old_230409) | Cyl.Head(REV. NEW) (2) | Cyl.Head(REV. NEW) (3) | Cyl.Head
+  [MEASURE] CYL HEAD
+       FILE: SUB ASSY\CYL HEAD\MEASUREMENT\001_ CYL. HEAD measurement _REV04.xls
+       SHEETS: 6D170-5 | Cyl.Head 6D170-3measurement. | Cyl.Head12V140 measurement | Cyl.Head 6D140-3 measurement. | Cyl.Head 6D170-2measurement (2) | Cyl.Head 6D140-2 measuremen | Cyl.Head 6D140-1measurement. | Cyl.Head 6D140-5 measuremen | Cyl.Head 6D170-1measurement  | Cyl.Head 6D155-4 measuremeN | Cyl.Head 6D125E-2 measuremen | Sheet1
+  [MEASURE] CYL HEAD
+       FILE: SUB ASSY\CYL HEAD\MEASUREMENT\Measuring cyl head SAA6D170E-5(HD 465-7R,PC1250-8,D375-6).xlsx
+       SHEETS: CYL HEAD 6D170-5
+  [MEASURE] CYL HEAD
+       FILE: SUB ASSY\CYL HEAD\MEASUREMENT\New Rev_ CYL. HEAD measurement _6d170-5 dan12v140-3.xls
+       SHEETS: CYL HEAD6D170-5(before mach) | CYL HEAD 6D170-5 | Cyl.Head12V140 measurement | Cyl.Head 6D140-3 measurement. | Cyl.Head 6D170-3measurement. | Cyl.Head 6D170-2measurement (2) | Cyl.Head 6D140-2 measuremen | Cyl.Head 6D140-1measurement. | Cyl.Head 6D140-5 measuremen | Cyl.Head 6D170-1measurement  | Cyl.Head 6D155-4 measuremeN | Cyl.Head 6D125E-2 measuremen | Cyl.Head12V140 measurement (2) | Sheet1
+  [MEASURE] CYL HEAD
+       FILE: SUB ASSY\CYL HEAD\MEASUREMENT\Salvage surface grinding CYLINDER HEAD ALL ENGINE.xlsx
+       SHEETS: Cylinder head  Salvage  | Sheet2
+  [MEASURE] ROCKER ARM
+       FILE: SUB ASSY\ROCKER ARM\MEASURING\Proses & Measuring ROCKER ARM SHAFT_6D140-5.xlsx
+       SHEETS: Rocker Arm Shaft (6D170E-5) | Rocker Arm Shaft Polish (Rev) | Rocker Arm Shaft (6D125E-2)
+  [DISASSY] SUPPLY PUMP
+       FILE: SUB ASSY\SUPPLY PUMP\DISSASEMBLY\Disassy CRI.xls
+       SHEETS: Dis assy CRI
+  [MEASURE] TIMING GEAR
+       FILE: SUB ASSY\TIMING GEAR\MEASURING\011-01,02,03_process IDLER GEAR AND SHAFT Process Checksheet..xlsx
+       SHEETS: Idler Gear & Shaft 6D170E-3 | Idler Gear & Shaft 6D170-2 | Idler Gear & Shaft 12V140-1E | Idler Gear & Shaft 12V140-1M  | Sheet2
+  [MEASURE] TIMING GEAR
+       FILE: SUB ASSY\TIMING GEAR\MEASURING\011-01,02,03_process IDLER GEAR AND SHAFT Process ChecksheetALL ENGINE..xlsx
+       SHEETS: Idler Gear & Shaft 6D170-2 | Idler Gear & Shaft 6D170E-3 | Idler Gear & Shaft 12V140-1E | Idler Gear & Shaft 12V140-1M  | Sheet2
+  [MEASURE] TIMING GEAR
+       FILE: SUB ASSY\TIMING GEAR\MEASURING\process IDLER GEAR AND SHAFT Process Checksheet.6D170-5.xlsx
+       SHEETS: Idler Gear & Shaft 6D170-2 | Idler Gear&Shaft 6D170-1(HD465) | Idler Gear&Shaft 6D170-1(OTHER) | Idler Gear & Shaft 6D170E-5 | Idler Gear & Shaft 12V140-1E | Idler Gear & Shaft 12V140-1M  | Sheet2
+  [MEASURE] TIMING GEAR
+       FILE: SUB ASSY\TIMING GEAR\MEASURING\process IDLER GEAR AND SHAFT Process Checksheet.ALL ENGINE.xlsx
+       SHEETS: Idler Gear & Shaft 6D170-2 | Idler Gear&Shaft 6D170-1(HD465) | Idler Gear&Shaft 6D170-1(OTHER) | Idler Gear & Shaft 6D170E-3 | Idler Gear & Shaft 12V140-1E | Idler Gear & Shaft 12V140-1M  | Sheet2
+  [DISASSY] TURBOCHARGER
+       FILE: SUB ASSY\TURBOCHARGER\DISSASEMBLY\003.TURBO CHARGER_Disassembly check sheet REV 4.xls
+       SHEETS: Turbocharger Dissaasy
+

@@ -52,4 +52,21 @@ return [
         'PC2000-8'  => '1fB7lNhIQDDUi-Kb3zqs3QJxzTDPsEqLyQGkP4ilGYqI', // SAA12V140E-3
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Template spreadsheet SUB ASSY inspection per EGI
+    |--------------------------------------------------------------------------
+    | 1 workbook multi-tab (DISASSY + MEASURE part). Isi ID setelah upload.
+    */
+    'subassy_templates' => [
+        'WA800-3'   => '', // SUBASSY INSPECTION ENGINE SA12V140E-1 (WA800-3).xlsx
+        'GD825A-2'  => '', // SUBASSY INSPECTION ENGINE SA6D140E-2 (GD825A).xlsx
+        'GD825A'    => '',
+        'D155-6'    => '', // SUBASSY INSPECTION ENGINE SAA6D140E-5 (D155).xlsx
+        'D155'      => '',
+        'D375-6'    => '', // SUBASSY INSPECTION ENGINE SAA6D170E-5 (D375-6 PC1250-8).xlsx
+        'PC1250-8'  => '',
+        'PC2000-8'  => '', // SUBASSY INSPECTION ENGINE SAA12V140E-3 (PC2000-8).xlsx
+    ],
+
 ];
