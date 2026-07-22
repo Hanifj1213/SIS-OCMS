@@ -320,11 +320,12 @@
     </div>
     @endif
     @php
-        // Spreadsheet tahap 2 milik komponen ini (hasil duplikasi template):
-        // disassembly + measurement. Komponen PC2000-8 lama yang belum punya
-        // salinan disassembly memakai sheet legacy.
+        // Spreadsheet tahap 2: mainline + sub-assy (disassembly & measurement).
+        // PC2000-8 lama tanpa salinan disassembly memakai sheet legacy.
         $gsheetEmbedUrl = null;
         $gsheetMeasurementEmbedUrl = null;
+        $gsheetSubassyDisassyEmbedUrl = null;
+        $gsheetSubassyMeasureEmbedUrl = null;
         if ($checksheetStage == 2) {
             $toEmbed = fn ($url) => $url . (str_contains($url, '?') ? '&' : '?') . 'rm=minimal';
 
@@ -336,27 +337,81 @@
             if ($comp->gsheet_measurement_url) {
                 $gsheetMeasurementEmbedUrl = $toEmbed($comp->gsheet_measurement_url);
             }
+            if ($comp->gsheet_subassy_disassembly_url) {
+                $gsheetSubassyDisassyEmbedUrl = $toEmbed($comp->gsheet_subassy_disassembly_url);
+            }
+            if ($comp->gsheet_subassy_measurement_url) {
+                $gsheetSubassyMeasureEmbedUrl = $toEmbed($comp->gsheet_subassy_measurement_url);
+            }
         }
+        $hasDisassyPanel = $gsheetEmbedUrl || $gsheetSubassyDisassyEmbedUrl;
+        $hasMeasurePanel = $gsheetMeasurementEmbedUrl || $gsheetSubassyMeasureEmbedUrl;
     @endphp
-    @if($gsheetEmbedUrl || $gsheetMeasurementEmbedUrl)
+    @if($hasDisassyPanel || $hasMeasurePanel)
+    <style>
+        .cs-scope-toggle {
+            display: inline-flex;
+            gap: 4px;
+            padding: 4px;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--glass-border-light);
+            margin: 0 0 12px;
+        }
+        .cs-scope-toggle button {
+            appearance: none;
+            border: 0;
+            cursor: pointer;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+            color: var(--text-secondary);
+            background: transparent;
+            transition: background .15s ease, color .15s ease;
+        }
+        .cs-scope-toggle button.active {
+            background: var(--accent-gold-dim);
+            color: var(--accent-gold);
+        }
+        .cs-scope-toggle button:hover:not(.active) {
+            color: var(--text-primary);
+            background: rgba(255,255,255,0.04);
+        }
+    </style>
     {{--
         Google Sheets mode edit tidak punya opsi resmi untuk menyembunyikan
         header baris/kolom dan bar tab sheet, jadi kita "crop": iframe dibuat
         lebih besar dari kotaknya lalu digeser sehingga strip header kiri/atas
         dan bar tab bawah terpotong di luar area terlihat.
     --}}
-    @if($gsheetEmbedUrl)
-    <div class="section" id="checksheet-review">
+    @if($hasDisassyPanel)
+    <div class="section" id="checksheet-review"
+         data-mainline-url="{{ $gsheetEmbedUrl }}"
+         data-subassy-url="{{ $gsheetSubassyDisassyEmbedUrl }}">
         <div class="section-title fade-up">🔧 Disassembly — Checksheet</div>
+        @if($gsheetEmbedUrl && $gsheetSubassyDisassyEmbedUrl)
+        <div class="cs-scope-toggle fade-up" data-scope-for="disassy" role="tablist" aria-label="Disassembly scope">
+            <button type="button" class="active" data-scope="mainline">Mainline</button>
+            <button type="button" data-scope="subassy">Sub Assy</button>
+        </div>
+        @elseif($gsheetSubassyDisassyEmbedUrl && !$gsheetEmbedUrl)
+        <div class="fade-up" style="margin-bottom:12px; color:var(--text-secondary); font-size:0.85rem;">Mode: Sub Assy</div>
+        @endif
         @php
-            // Sheet disassembly punya kolom A & B kosong, jadi crop kirinya lebar
-            $cropLeft = 120;  // kolom nomor baris (±46px) + kolom A & B
-            $cropTop = 25;    // tinggi baris huruf kolom (px)
-            $cropBottom = 37; // tinggi bar tab sheet di bawah (px)
+            // Mainline disassembly: crop kiri lebar (kolom A/B kosong) + sembunyikan tab.
+            // Sub Assy: multi-tab part → crop kiri tipis, tab bawah tetap terlihat.
+            $cropLeft = $gsheetEmbedUrl ? 120 : 46;
+            $cropTop = 25;
+            $cropBottom = $gsheetEmbedUrl ? 37 : 0;
+            $disassySrc = $gsheetEmbedUrl ?: $gsheetSubassyDisassyEmbedUrl;
         @endphp
         <div class="glass-card fade-up" style="padding: 0; overflow: hidden; height: 90vh; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); position: relative;">
             <iframe id="gsheet-iframe" class="gsheet-embed"
-                src="{{ $gsheetEmbedUrl }}"
+                src="{{ $disassySrc }}"
+                data-crop-mainline="120,25,37"
+                data-crop-subassy="46,25,0"
                 style="position: absolute; top: -{{ $cropTop }}px; left: -{{ $cropLeft }}px; width: calc(100% + {{ $cropLeft }}px); height: calc(100% + {{ $cropTop + $cropBottom }}px); border: none;"
                 allowfullscreen>
             </iframe>
@@ -364,22 +419,34 @@
     </div>
     @endif
 
-    @if($gsheetMeasurementEmbedUrl)
+    @if($hasMeasurePanel)
     {{--
         Measurement menggantikan Form Inspeksi Digital lama. Kontennya mulai
         dari kolom A, jadi crop kiri hanya selebar kolom nomor baris. Crop
-        bawah 0 supaya bar tab sheet (CRANKSHAFT, CAMSHAFT, dst.) tetap
-        terlihat untuk pindah antar part.
+        bawah 0 supaya bar tab sheet tetap terlihat.
     --}}
-    <div class="section">
+    <div class="section"
+         data-mainline-url="{{ $gsheetMeasurementEmbedUrl }}"
+         data-subassy-url="{{ $gsheetSubassyMeasureEmbedUrl }}">
         <div class="section-title fade-up">📐 Measurement & Inspection — Form Inspeksi</div>
+        @if($gsheetMeasurementEmbedUrl && $gsheetSubassyMeasureEmbedUrl)
+        <div class="cs-scope-toggle fade-up" data-scope-for="measure" role="tablist" aria-label="Measurement scope">
+            <button type="button" class="active" data-scope="mainline">Mainline</button>
+            <button type="button" data-scope="subassy">Sub Assy</button>
+        </div>
+        @elseif($gsheetSubassyMeasureEmbedUrl && !$gsheetMeasurementEmbedUrl)
+        <div class="fade-up" style="margin-bottom:12px; color:var(--text-secondary); font-size:0.85rem;">Mode: Sub Assy</div>
+        @endif
         @php
             $mCropLeft = 46;
             $mCropTop = 25;
+            $measureSrc = $gsheetMeasurementEmbedUrl ?: $gsheetSubassyMeasureEmbedUrl;
         @endphp
         <div class="glass-card fade-up" style="padding: 0; overflow: hidden; height: 90vh; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); position: relative;">
             <iframe id="gsheet-iframe-measure" class="gsheet-embed"
-                src="{{ $gsheetMeasurementEmbedUrl }}"
+                src="{{ $measureSrc }}"
+                data-crop-mainline="46,25,0"
+                data-crop-subassy="46,25,0"
                 style="position: absolute; top: -{{ $mCropTop }}px; left: -{{ $mCropLeft }}px; width: calc(100% + {{ $mCropLeft }}px); height: calc(100% + {{ $mCropTop }}px); border: none;"
                 allowfullscreen>
             </iframe>
@@ -388,16 +455,39 @@
     @endif
 
         <script>
+        // Toggle Mainline | Sub Assy: ganti src iframe + crop.
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.cs-scope-toggle').forEach(function(toggle) {
+                const section = toggle.closest('.section');
+                const iframe = section ? section.querySelector('iframe.gsheet-embed') : null;
+                if (!section || !iframe) return;
+
+                toggle.querySelectorAll('button[data-scope]').forEach(function(btn) {
+                    btn.addEventListener('click', function() {
+                        const scope = btn.getAttribute('data-scope');
+                        const url = section.getAttribute('data-' + scope + '-url');
+                        if (!url) return;
+
+                        toggle.querySelectorAll('button').forEach(function(b) { b.classList.remove('active'); });
+                        btn.classList.add('active');
+
+                        if (iframe.getAttribute('src') !== url) {
+                            iframe.setAttribute('src', url);
+                        }
+
+                        const cropKey = scope === 'subassy' ? 'data-crop-subassy' : 'data-crop-mainline';
+                        const parts = (iframe.getAttribute(cropKey) || '46,25,0').split(',').map(Number);
+                        const left = parts[0] || 0, top = parts[1] || 0, bottom = parts[2] || 0;
+                        iframe.style.top = '-' + top + 'px';
+                        iframe.style.left = '-' + left + 'px';
+                        iframe.style.width = 'calc(100% + ' + left + 'px)';
+                        iframe.style.height = 'calc(100% + ' + (top + bottom) + 'px)';
+                    });
+                });
+            });
+        });
+
         // Mencegah bug auto-scroll ke atas saat mengedit sel di iframe Google Sheets.
-        //
-        // Cara kerja:
-        // - Saat fokus berpindah ke iframe (window 'blur'), posisi scroll "dikunci".
-        //   Setiap kali browser mencoba auto-scroll (Google Sheets sering memanggil
-        //   focus() internal yang membuat parent scroll ke atas), posisi langsung
-        //   dikembalikan secara instant (mengabaikan scroll-behavior: smooth).
-        // - Interaksi APA PUN di luar iframe (wheel, sentuhan layar, klik) langsung
-        //   melepas fokus iframe dan membuka kunci, jadi scroll halaman tidak
-        //   pernah "ke-lock" — termasuk di touchscreen.
         document.addEventListener('DOMContentLoaded', function() {
             const iframes = Array.from(document.querySelectorAll('.gsheet-embed'));
             if (iframes.length === 0) return;
@@ -413,26 +503,20 @@
                     pinX = window.scrollX;
                     pinY = window.scrollY;
                 } else if (window.scrollX !== pinX || window.scrollY !== pinY) {
-                    // Auto-scroll dari iframe terdeteksi — kembalikan posisi semula
                     window.scrollTo({ left: pinX, top: pinY, behavior: 'instant' });
                 }
             }, { passive: true });
 
-            // Fokus masuk ke salah satu iframe → kunci posisi scroll saat ini
             window.addEventListener('blur', function() {
                 setTimeout(function() {
                     if (isEmbedFocused()) pinned = true;
                 }, 0);
             });
 
-            // Fokus kembali ke halaman → buka kunci
             window.addEventListener('focus', function() {
                 pinned = false;
             });
 
-            // Interaksi di luar iframe → lepas fokus iframe + buka kunci.
-            // Event ini tidak akan terpicu saat user berinteraksi DI DALAM
-            // iframe (event tertelan oleh dokumen iframe), jadi aman.
             function releaseIframeFocus() {
                 pinned = false;
                 if (isEmbedFocused()) {
@@ -447,7 +531,7 @@
         </script>
     @endif
 
-    @if($currentChecksheet && !$gsheetEmbedUrl)
+    @if($currentChecksheet && !$hasDisassyPanel)
     <div class="section" id="checksheet-review">
         <div class="section-title fade-up">Checksheet — {{ $stageNames[$checksheetStage] ?? '' }}</div>
         <div class="glass-card fade-up" id="csContainer">
@@ -1128,7 +1212,7 @@
 
                         {{-- Form inspeksi digital hanya untuk komponen yang TIDAK
                              memakai spreadsheet Measurement (spreadsheet menggantikannya) --}}
-                        @if($comp->current_stage == 2 && !$comp->gsheet_measurement_url)
+                        @if($comp->current_stage == 2 && !$comp->gsheet_measurement_url && !$comp->gsheet_subassy_measurement_url)
                         <div style="background: var(--accent-purple-dim); border: 1px solid rgba(167, 139, 250, 0.15); border-radius: 14px; padding: 28px; margin-bottom: 24px;">
                             <div class="section-title" style="color: var(--accent-purple); margin-bottom: 16px;">📐 Form Inspeksi Digital (Measurement & Inspection)</div>
                             <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 8px;">

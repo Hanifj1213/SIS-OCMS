@@ -54,19 +54,36 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Template spreadsheet SUB ASSY inspection per EGI
+    | Template SUB ASSY DISASSEMBLY per EGI (multi-tab part)
     |--------------------------------------------------------------------------
-    | 1 workbook multi-tab (DISASSY + MEASURE part). Isi ID setelah upload.
+    | File: SUBASSY DISASSEMBLY ENGINE ....xlsx — isi ID setelah upload.
     */
-    'subassy_templates' => [
-        'WA800-3'   => '', // SUBASSY INSPECTION ENGINE SA12V140E-1 (WA800-3).xlsx
-        'GD825A-2'  => '', // SUBASSY INSPECTION ENGINE SA6D140E-2 (GD825A).xlsx
-        'GD825A'    => '',
-        'D155-6'    => '', // SUBASSY INSPECTION ENGINE SAA6D140E-5 (D155).xlsx
-        'D155'      => '',
-        'D375-6'    => '', // SUBASSY INSPECTION ENGINE SAA6D170E-5 (D375-6 PC1250-8).xlsx
-        'PC1250-8'  => '',
-        'PC2000-8'  => '', // SUBASSY INSPECTION ENGINE SAA12V140E-3 (PC2000-8).xlsx
+    'subassy_disassembly_templates' => [
+        'WA800-3'   => '1a5KaeWzZtMVQXQVadDBKBOLc-KDhic-1mVXnJb93-34', // SA12V140E-1
+        'GD825A-2'  => '1RbE5UMcVKK3gKwisEIkFVzpCq6mmLwjCPQVSdBE8mLo', // SA6D140E-2
+        'GD825A'    => '1RbE5UMcVKK3gKwisEIkFVzpCq6mmLwjCPQVSdBE8mLo',
+        'D155-6'    => '1pTpQSLileQzBYoQ1BhO1hAH199-uP8EZ_f71j7M5rBQ', // SAA6D140E-5
+        'D155'      => '1pTpQSLileQzBYoQ1BhO1hAH199-uP8EZ_f71j7M5rBQ',
+        'D375-6'    => '1uHSrcdykBcn8TNOVMjcmPDyS7scA5bKfqVfmAaWZ_G0', // SAA6D170E-5
+        'PC1250-8'  => '1uHSrcdykBcn8TNOVMjcmPDyS7scA5bKfqVfmAaWZ_G0',
+        'PC2000-8'  => '1t4ylw-hZViirCqjbqHtTVwggoC5x2s6BAUib-pokVEY', // SAA12V140E-3
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Template SUB ASSY MEASUREMENT per EGI (multi-tab part)
+    |--------------------------------------------------------------------------
+    | File: SUBASSY MEASUREMENT ENGINE ....xlsx — isi ID setelah upload.
+    */
+    'subassy_measurement_templates' => [
+        'WA800-3'   => '16lGJ-wrqewzNlwtNVYcBU2B7tRi3UqcMzOXixP0I8do', // SA12V140E-1
+        'GD825A-2'  => '1JzQfh5yFWJekOiwZo7osMrfGUy_immS6CoMxPcMhLlc', // SA6D140E-2
+        'GD825A'    => '1JzQfh5yFWJekOiwZo7osMrfGUy_immS6CoMxPcMhLlc',
+        'D155-6'    => '17K64i-8cBtcFdkTMLK3VDsZRLxVipSUJFZd9_90rCSw', // SAA6D140E-5
+        'D155'      => '17K64i-8cBtcFdkTMLK3VDsZRLxVipSUJFZd9_90rCSw',
+        'D375-6'    => '13PkmzN45Hl--GFSkwYh4rxndAeJj8Zu9XAa0C2OYx5w', // SAA6D170E-5
+        'PC1250-8'  => '13PkmzN45Hl--GFSkwYh4rxndAeJj8Zu9XAa0C2OYx5w',
+        'PC2000-8'  => '1-3tBQhnbKSy0qy-GLhTcXRs9XBA1X0gvKrB_sNz-pM8', // SAA12V140E-3
     ],
 
 ];

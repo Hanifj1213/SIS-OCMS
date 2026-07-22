@@ -10,13 +10,32 @@ use Illuminate\Support\Facades\Log;
  * Menduplikasi template Google Sheets checksheet (per EGI) menjadi
  * spreadsheet milik satu komponen, via Apps Script Web App.
  *
- * Dua jenis checksheet tahap 2: 'disassembly' dan 'measurement'.
+ * Empat jenis checksheet tahap 2:
+ * mainline disassembly/measurement + sub-assy disassembly/measurement.
  */
 class ChecksheetGsheetService
 {
     private const KINDS = [
-        'disassembly' => ['config' => 'disassembly_templates', 'column' => 'gsheet_url', 'prefix' => 'DISASSY'],
-        'measurement' => ['config' => 'measurement_templates', 'column' => 'gsheet_measurement_url', 'prefix' => 'MEASUREMENT'],
+        'disassembly' => [
+            'config' => 'disassembly_templates',
+            'column' => 'gsheet_url',
+            'prefix' => 'DISASSY',
+        ],
+        'measurement' => [
+            'config' => 'measurement_templates',
+            'column' => 'gsheet_measurement_url',
+            'prefix' => 'MEASUREMENT',
+        ],
+        'subassy_disassembly' => [
+            'config' => 'subassy_disassembly_templates',
+            'column' => 'gsheet_subassy_disassembly_url',
+            'prefix' => 'SUBASSY DISASSY',
+        ],
+        'subassy_measurement' => [
+            'config' => 'subassy_measurement_templates',
+            'column' => 'gsheet_subassy_measurement_url',
+            'prefix' => 'SUBASSY MEASUREMENT',
+        ],
     ];
 
     /**

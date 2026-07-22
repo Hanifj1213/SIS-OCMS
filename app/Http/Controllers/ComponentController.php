@@ -284,7 +284,7 @@ class ComponentController extends Controller
         // === TAHAP 2: DIS Assembling (termasuk Measurement & Inspection) ===
         // Form inspeksi digital digantikan spreadsheet Measurement bila ada,
         // jadi validasi parts hanya berlaku untuk komponen tanpa spreadsheet.
-        if ($currentStage == 2 && !$component->gsheet_measurement_url) {
+        if ($currentStage == 2 && !$component->gsheet_measurement_url && !$component->gsheet_subassy_measurement_url) {
             $request->validate([
                 'parts' => 'required|array|min:1',
                 'parts.*.name' => 'required|string',

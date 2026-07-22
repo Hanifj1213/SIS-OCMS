@@ -34,6 +34,8 @@ class Component extends Model
         'qr_code_path',
         'gsheet_url',
         'gsheet_measurement_url',
+        'gsheet_subassy_disassembly_url',
+        'gsheet_subassy_measurement_url',
         'status',
     ];
 

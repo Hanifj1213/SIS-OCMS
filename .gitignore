@@ -22,3 +22,9 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
+
+# Excel lock / temp files
+**/~$*
+
+# Merged checksheet siap-upload (besar; sumber kebenaran di Google Sheets)
+CHECKSHEET FOR PROCESS DEVELOPMEN ROBBY/ENGINE/_SIAP_UPLOAD_GSHEET/
