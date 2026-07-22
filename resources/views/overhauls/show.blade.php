@@ -524,23 +524,25 @@
 
         // Mencegah bug auto-scroll ke atas saat mengedit sel di iframe Google Sheets.
         //
-        // Masalah versi lama: jump ke atas kadang terjadi SEBELUM event 'blur'
-        // sempat diproses, jadi posisi yang "dikunci" sudah keburu berubah jadi 0.
-        // Solusi: simpan riwayat posisi scroll; saat fokus pindah ke iframe,
-        // kunci ke posisi ~150ms sebelum fokus pindah (sebelum jump terjadi)
-        // lalu langsung kembalikan.
+        // Strategi: BUKAN membalas scroll (itu bikin halaman "kedutan" karena
+        // tarik-menarik dengan Sheets), tapi mengunci body sepenuhnya
+        // (position: fixed) begitu fokus masuk ke iframe. Selama terkunci,
+        // browser tidak PUNYA scroll untuk digeser, jadi Sheets tidak bisa
+        // menarik halaman ke atas sama sekali. Interaksi apa pun di luar
+        // iframe langsung membuka kunci dan mengembalikan posisi semula.
         document.addEventListener('DOMContentLoaded', function() {
             const iframes = Array.from(document.querySelectorAll('.gsheet-embed'));
             if (iframes.length === 0) return;
 
             const isEmbedFocused = () => iframes.includes(document.activeElement);
 
-            // Riwayat posisi scroll ±800ms terakhir
+            // Riwayat posisi scroll: dipakai untuk memulihkan posisi kalau
+            // jump sempat terjadi SEBELUM event blur diproses browser.
             let history = [{ t: performance.now(), x: window.scrollX, y: window.scrollY }];
-            let pinned = false;
-            let pinX = 0, pinY = 0;
+            const lock = { active: false, x: 0, y: 0 };
 
             function recordPos() {
+                if (lock.active) return;
                 const now = performance.now();
                 history.push({ t: now, x: window.scrollX, y: window.scrollY });
                 while (history.length > 1 && now - history[0].t > 800) history.shift();
@@ -555,53 +557,59 @@
                 return history[0];
             }
 
-            function restorePin() {
-                if (window.scrollX !== pinX || window.scrollY !== pinY) {
-                    window.scrollTo({ left: pinX, top: pinY, behavior: 'instant' });
-                }
+            function lockScroll() {
+                if (lock.active) return;
+                const p = stablePosBefore(150);
+                lock.active = true;
+                lock.x = p.x;
+                lock.y = p.y;
+
+                // Kompensasi lebar scrollbar supaya layout tidak bergeser
+                const sw = window.innerWidth - document.documentElement.clientWidth;
+                const b = document.body;
+                b.style.position = 'fixed';
+                b.style.top = (-p.y) + 'px';
+                b.style.left = (-p.x) + 'px';
+                b.style.right = '0';
+                b.style.width = '100%';
+                b.style.overflow = 'hidden';
+                if (sw > 0) b.style.paddingRight = sw + 'px';
             }
 
-            window.addEventListener('scroll', function() {
-                if (pinned) {
-                    restorePin();
-                } else {
-                    recordPos();
-                }
-            }, { passive: true });
+            function unlockScroll() {
+                if (!lock.active) return;
+                lock.active = false;
+                const b = document.body;
+                b.style.position = '';
+                b.style.top = '';
+                b.style.left = '';
+                b.style.right = '';
+                b.style.width = '';
+                b.style.overflow = '';
+                b.style.paddingRight = '';
+                window.scrollTo({ left: lock.x, top: lock.y, behavior: 'instant' });
+            }
 
-            // Fokus masuk ke iframe → kunci ke posisi sebelum jump
+            window.addEventListener('scroll', recordPos, { passive: true });
+
+            // Fokus masuk ke iframe → kunci halaman di posisi sebelum jump
             window.addEventListener('blur', function() {
                 setTimeout(function() {
-                    if (!isEmbedFocused()) return;
-                    const p = stablePosBefore(150);
-                    pinX = p.x;
-                    pinY = p.y;
-                    pinned = true;
-                    restorePin();
-                    // Google Sheets bisa memicu beberapa kali auto-scroll
-                    // beruntun; jaga posisi selama ~400ms pertama.
-                    const until = performance.now() + 400;
-                    (function guard() {
-                        if (!pinned || performance.now() > until) return;
-                        restorePin();
-                        requestAnimationFrame(guard);
-                    })();
+                    if (isEmbedFocused()) lockScroll();
                 }, 0);
             });
 
             // Fokus kembali ke halaman → buka kunci
-            window.addEventListener('focus', function() {
-                pinned = false;
-                recordPos();
-            });
+            window.addEventListener('focus', unlockScroll);
 
-            // Interaksi di luar iframe → lepas fokus iframe + buka kunci
+            // Interaksi di luar iframe → lepas fokus iframe + buka kunci.
+            // Event ini tidak terpicu saat user berinteraksi DI DALAM iframe.
             function releaseIframeFocus() {
-                pinned = false;
                 if (isEmbedFocused()) {
                     document.activeElement.blur();
                     window.focus();
                 }
+                unlockScroll();
             }
             ['wheel', 'touchstart', 'mousedown'].forEach(function(evt) {
                 document.addEventListener(evt, releaseIframeFocus, { passive: true });
