@@ -339,68 +339,53 @@
         }
     @endphp
     @if($gsheetEmbedUrl || $gsheetMeasurementEmbedUrl)
+    {{--
+        Google Sheets mode edit tidak punya opsi resmi untuk menyembunyikan
+        header baris/kolom dan bar tab sheet, jadi kita "crop": iframe dibuat
+        lebih besar dari kotaknya lalu digeser sehingga strip header kiri/atas
+        dan bar tab bawah terpotong di luar area terlihat.
+    --}}
+    @if($gsheetEmbedUrl)
     <div class="section" id="checksheet-review">
-        {{--
-            Google Sheets mode edit tidak punya opsi resmi untuk menyembunyikan
-            header baris/kolom dan bar tab sheet, jadi kita "crop": iframe dibuat
-            lebih besar dari kotaknya lalu digeser sehingga strip header kiri/atas
-            dan bar tab bawah terpotong di luar area terlihat.
-            Measurement sengaja TIDAK di-crop bawah karena bar tab sheet-nya
-            dipakai untuk pindah antar bagian (CRANKSHAFT, CAMSHAFT, dst.).
-        --}}
+        <div class="section-title fade-up">🔧 Disassembly — Checksheet</div>
         @php
-            $cropLeft = 120;  // kolom nomor baris (±46px) + kolom A & B agar dokumen pas di kiri
+            // Sheet disassembly punya kolom A & B kosong, jadi crop kirinya lebar
+            $cropLeft = 120;  // kolom nomor baris (±46px) + kolom A & B
             $cropTop = 25;    // tinggi baris huruf kolom (px)
             $cropBottom = 37; // tinggi bar tab sheet di bawah (px)
         @endphp
-
-        @if($gsheetEmbedUrl && $gsheetMeasurementEmbedUrl)
-        <style>
-            .gs-tab-btn {
-                padding: 10px 20px; border-radius: 10px; border: 1px solid var(--glass-border);
-                background: rgba(255,255,255,0.03); color: var(--text-muted); font-family: 'Inter', sans-serif;
-                font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s;
-            }
-            .gs-tab-btn:hover { background: rgba(255,255,255,0.06); color: var(--text-secondary); }
-            .gs-tab-btn.gs-tab-active { background: var(--accent-cyan-dim); color: var(--accent-cyan); border-color: rgba(72,202,228,0.3); }
-        </style>
-        <div class="fade-up" style="display: flex; gap: 6px; margin-bottom: 12px;">
-            <button type="button" id="gsTabDisassy" class="gs-tab-btn gs-tab-active" onclick="gsSwitchPanel('disassy')">🔧 Disassembly</button>
-            <button type="button" id="gsTabMeasure" class="gs-tab-btn" onclick="gsSwitchPanel('measure')">📐 Measurement</button>
-        </div>
-        @endif
-
-        @if($gsheetEmbedUrl)
-        <div id="gsPanelDisassy" class="glass-card fade-up" style="padding: 0; overflow: hidden; height: 90vh; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); position: relative;">
+        <div class="glass-card fade-up" style="padding: 0; overflow: hidden; height: 90vh; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); position: relative;">
             <iframe id="gsheet-iframe" class="gsheet-embed"
                 src="{{ $gsheetEmbedUrl }}"
                 style="position: absolute; top: -{{ $cropTop }}px; left: -{{ $cropLeft }}px; width: calc(100% + {{ $cropLeft }}px); height: calc(100% + {{ $cropTop + $cropBottom }}px); border: none;"
                 allowfullscreen>
             </iframe>
         </div>
-        @endif
+    </div>
+    @endif
 
-        @if($gsheetMeasurementEmbedUrl)
-        {{-- Crop bawah 0: bar tab sheet dibiarkan terlihat untuk navigasi antar part --}}
-        <div id="gsPanelMeasure" class="glass-card fade-up" style="padding: 0; overflow: hidden; height: 90vh; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); position: relative; {{ $gsheetEmbedUrl ? 'display: none;' : '' }}">
+    @if($gsheetMeasurementEmbedUrl)
+    {{--
+        Measurement menggantikan Form Inspeksi Digital lama. Kontennya mulai
+        dari kolom A, jadi crop kiri hanya selebar kolom nomor baris. Crop
+        bawah 0 supaya bar tab sheet (CRANKSHAFT, CAMSHAFT, dst.) tetap
+        terlihat untuk pindah antar part.
+    --}}
+    <div class="section">
+        <div class="section-title fade-up">📐 Measurement & Inspection — Form Inspeksi</div>
+        @php
+            $mCropLeft = 46;
+            $mCropTop = 25;
+        @endphp
+        <div class="glass-card fade-up" style="padding: 0; overflow: hidden; height: 90vh; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); position: relative;">
             <iframe id="gsheet-iframe-measure" class="gsheet-embed"
                 src="{{ $gsheetMeasurementEmbedUrl }}"
-                style="position: absolute; top: -{{ $cropTop }}px; left: -{{ $cropLeft }}px; width: calc(100% + {{ $cropLeft }}px); height: calc(100% + {{ $cropTop }}px); border: none;"
+                style="position: absolute; top: -{{ $mCropTop }}px; left: -{{ $mCropLeft }}px; width: calc(100% + {{ $mCropLeft }}px); height: calc(100% + {{ $mCropTop }}px); border: none;"
                 allowfullscreen>
             </iframe>
         </div>
-        @endif
-
-        @if($gsheetEmbedUrl && $gsheetMeasurementEmbedUrl)
-        <script>
-        function gsSwitchPanel(which) {
-            document.getElementById('gsPanelDisassy').style.display = which === 'disassy' ? '' : 'none';
-            document.getElementById('gsPanelMeasure').style.display = which === 'measure' ? '' : 'none';
-            document.getElementById('gsTabDisassy').classList.toggle('gs-tab-active', which === 'disassy');
-            document.getElementById('gsTabMeasure').classList.toggle('gs-tab-active', which === 'measure');
-        }
-        </script>
-        @endif
+    </div>
+    @endif
 
         <script>
         // Mencegah bug auto-scroll ke atas saat mengedit sel di iframe Google Sheets.
@@ -460,7 +445,6 @@
             });
         });
         </script>
-    </div>
     @endif
 
     @if($currentChecksheet && !$gsheetEmbedUrl)
@@ -1142,7 +1126,9 @@
                     <form action="{{ route('components.updateStage', $comp->comp_id) }}" method="POST">
                         @csrf
 
-                        @if($comp->current_stage == 2)
+                        {{-- Form inspeksi digital hanya untuk komponen yang TIDAK
+                             memakai spreadsheet Measurement (spreadsheet menggantikannya) --}}
+                        @if($comp->current_stage == 2 && !$comp->gsheet_measurement_url)
                         <div style="background: var(--accent-purple-dim); border: 1px solid rgba(167, 139, 250, 0.15); border-radius: 14px; padding: 28px; margin-bottom: 24px;">
                             <div class="section-title" style="color: var(--accent-purple); margin-bottom: 16px;">📐 Form Inspeksi Digital (Measurement & Inspection)</div>
                             <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 8px;">
