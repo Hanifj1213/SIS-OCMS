@@ -409,7 +409,7 @@
         @endphp
         <div class="glass-card fade-up" style="padding: 0; overflow: hidden; height: 90vh; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); position: relative;">
             <iframe id="gsheet-iframe" class="gsheet-embed"
-                src="{{ $disassySrc }}"
+                data-src="{{ $disassySrc }}"
                 data-crop-mainline="120,25,37"
                 data-crop-subassy="46,25,0"
                 style="position: absolute; top: -{{ $cropTop }}px; left: -{{ $cropLeft }}px; width: calc(100% + {{ $cropLeft }}px); height: calc(100% + {{ $cropTop + $cropBottom }}px); border: none;"
@@ -444,7 +444,7 @@
         @endphp
         <div class="glass-card fade-up" style="padding: 0; overflow: hidden; height: 90vh; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); position: relative;">
             <iframe id="gsheet-iframe-measure" class="gsheet-embed"
-                src="{{ $measureSrc }}"
+                data-src="{{ $measureSrc }}"
                 data-crop-mainline="46,25,0"
                 data-crop-subassy="46,25,0"
                 style="position: absolute; top: -{{ $mCropTop }}px; left: -{{ $mCropLeft }}px; width: calc(100% + {{ $mCropLeft }}px); height: calc(100% + {{ $mCropTop }}px); border: none;"
@@ -455,6 +455,38 @@
     @endif
 
         <script>
+        // Lazy-load iframe GSheet: src baru dipasang saat panel mendekati
+        // viewport, supaya buka halaman tidak langsung memuat aplikasi
+        // Google Sheets penuh (berat di tablet/PC lama).
+        document.addEventListener('DOMContentLoaded', function() {
+            const lazyIframes = Array.from(document.querySelectorAll('iframe.gsheet-embed[data-src]'));
+            if (lazyIframes.length === 0) return;
+
+            function loadIframe(iframe) {
+                const url = iframe.getAttribute('data-src');
+                if (url && !iframe.getAttribute('src')) {
+                    iframe.setAttribute('src', url);
+                }
+                iframe.removeAttribute('data-src');
+            }
+
+            if (!('IntersectionObserver' in window)) {
+                lazyIframes.forEach(loadIframe);
+                return;
+            }
+
+            const observer = new IntersectionObserver(function(entries) {
+                entries.forEach(function(entry) {
+                    if (entry.isIntersecting) {
+                        loadIframe(entry.target);
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { rootMargin: '300px 0px' }); // mulai load sedikit sebelum terlihat
+
+            lazyIframes.forEach(function(iframe) { observer.observe(iframe); });
+        });
+
         // Toggle Mainline | Sub Assy: ganti src iframe + crop.
         document.addEventListener('DOMContentLoaded', function() {
             document.querySelectorAll('.cs-scope-toggle').forEach(function(toggle) {
@@ -471,7 +503,10 @@
                         toggle.querySelectorAll('button').forEach(function(b) { b.classList.remove('active'); });
                         btn.classList.add('active');
 
-                        if (iframe.getAttribute('src') !== url) {
+                        // Kalau iframe belum sempat lazy-load, cukup ganti target-nya
+                        if (iframe.hasAttribute('data-src')) {
+                            iframe.setAttribute('data-src', url);
+                        } else if (iframe.getAttribute('src') !== url) {
                             iframe.setAttribute('src', url);
                         }
 
@@ -488,35 +523,79 @@
         });
 
         // Mencegah bug auto-scroll ke atas saat mengedit sel di iframe Google Sheets.
+        //
+        // Masalah versi lama: jump ke atas kadang terjadi SEBELUM event 'blur'
+        // sempat diproses, jadi posisi yang "dikunci" sudah keburu berubah jadi 0.
+        // Solusi: simpan riwayat posisi scroll; saat fokus pindah ke iframe,
+        // kunci ke posisi ~150ms sebelum fokus pindah (sebelum jump terjadi)
+        // lalu langsung kembalikan.
         document.addEventListener('DOMContentLoaded', function() {
             const iframes = Array.from(document.querySelectorAll('.gsheet-embed'));
             if (iframes.length === 0) return;
 
             const isEmbedFocused = () => iframes.includes(document.activeElement);
 
-            let pinX = window.scrollX;
-            let pinY = window.scrollY;
+            // Riwayat posisi scroll ±800ms terakhir
+            let history = [{ t: performance.now(), x: window.scrollX, y: window.scrollY }];
             let pinned = false;
+            let pinX = 0, pinY = 0;
+
+            function recordPos() {
+                const now = performance.now();
+                history.push({ t: now, x: window.scrollX, y: window.scrollY });
+                while (history.length > 1 && now - history[0].t > 800) history.shift();
+            }
+
+            // Posisi tercatat terakhir yang umurnya >= msAgo (sebelum jump)
+            function stablePosBefore(msAgo) {
+                const cutoff = performance.now() - msAgo;
+                for (let i = history.length - 1; i >= 0; i--) {
+                    if (history[i].t <= cutoff) return history[i];
+                }
+                return history[0];
+            }
+
+            function restorePin() {
+                if (window.scrollX !== pinX || window.scrollY !== pinY) {
+                    window.scrollTo({ left: pinX, top: pinY, behavior: 'instant' });
+                }
+            }
 
             window.addEventListener('scroll', function() {
-                if (!pinned) {
-                    pinX = window.scrollX;
-                    pinY = window.scrollY;
-                } else if (window.scrollX !== pinX || window.scrollY !== pinY) {
-                    window.scrollTo({ left: pinX, top: pinY, behavior: 'instant' });
+                if (pinned) {
+                    restorePin();
+                } else {
+                    recordPos();
                 }
             }, { passive: true });
 
+            // Fokus masuk ke iframe → kunci ke posisi sebelum jump
             window.addEventListener('blur', function() {
                 setTimeout(function() {
-                    if (isEmbedFocused()) pinned = true;
+                    if (!isEmbedFocused()) return;
+                    const p = stablePosBefore(150);
+                    pinX = p.x;
+                    pinY = p.y;
+                    pinned = true;
+                    restorePin();
+                    // Google Sheets bisa memicu beberapa kali auto-scroll
+                    // beruntun; jaga posisi selama ~400ms pertama.
+                    const until = performance.now() + 400;
+                    (function guard() {
+                        if (!pinned || performance.now() > until) return;
+                        restorePin();
+                        requestAnimationFrame(guard);
+                    })();
                 }, 0);
             });
 
+            // Fokus kembali ke halaman → buka kunci
             window.addEventListener('focus', function() {
                 pinned = false;
+                recordPos();
             });
 
+            // Interaksi di luar iframe → lepas fokus iframe + buka kunci
             function releaseIframeFocus() {
                 pinned = false;
                 if (isEmbedFocused()) {

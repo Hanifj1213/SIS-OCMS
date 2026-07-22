@@ -12,11 +12,9 @@
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 
-        <!-- Three.js -->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-
-        <!-- GSAP -->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+        <!-- Three.js + GSAP (self-host: cepat di LAN, tidak tergantung CDN) -->
+        <script src="{{ asset('vendor/three.min.js') }}"></script>
+        <script src="{{ asset('vendor/gsap.min.js') }}"></script>
 
         @vite(['resources/css/app.css', 'resources/js/app.js'])
 
@@ -342,9 +340,16 @@
         // === THREE.JS: Floating Gear Wireframe ===
         (function() {
             const canvas = document.getElementById('three-canvas-login');
+
+            // Skip animasi 3D di device lemah / user yang minta reduced motion
+            const lowEnd = (navigator.deviceMemory && navigator.deviceMemory < 4)
+                || (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 2)
+                || window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            if (lowEnd) { canvas.style.display = 'none'; return; }
+
             const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
 
             const scene = new THREE.Scene();
             const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
@@ -381,6 +386,9 @@
             });
 
             function animate() {
+                // Pause render saat tab tidak aktif (hemat CPU/baterai)
+                if (document.hidden) return;
+
                 requestAnimationFrame(animate);
 
                 // Smooth lerp towards mouse
@@ -397,6 +405,9 @@
 
                 renderer.render(scene, camera);
             }
+            document.addEventListener('visibilitychange', () => {
+                if (!document.hidden) animate();
+            });
             animate();
 
             window.addEventListener('resize', () => {

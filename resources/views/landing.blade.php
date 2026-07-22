@@ -12,10 +12,10 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 
-    <!-- Three.js + GSAP + ScrollTrigger -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <!-- Three.js + GSAP + ScrollTrigger (self-host: cepat di LAN, tidak tergantung CDN) -->
+    <script src="{{ asset('vendor/three.min.js') }}"></script>
+    <script src="{{ asset('vendor/gsap.min.js') }}"></script>
+    <script src="{{ asset('vendor/ScrollTrigger.min.js') }}"></script>
 
     <style>
         /* ====================================================
@@ -1030,9 +1030,15 @@
         const canvas = document.getElementById('hero-canvas');
         if (!canvas) return;
 
+        // Skip animasi 3D di device lemah / user yang minta reduced motion
+        const lowEnd = (navigator.deviceMemory && navigator.deviceMemory < 4)
+            || (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 2)
+            || window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (lowEnd) { canvas.style.display = 'none'; return; }
+
         const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
 
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
@@ -1087,6 +1093,9 @@
         });
 
         function animate() {
+            // Pause render saat tab tidak aktif (hemat CPU/baterai)
+            if (document.hidden) return;
+
             requestAnimationFrame(animate);
 
             // Smooth lerp
@@ -1110,6 +1119,9 @@
 
             renderer.render(scene, camera);
         }
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) animate();
+        });
         animate();
 
         window.addEventListener('resize', () => {
@@ -1201,7 +1213,7 @@
         });
     });
     </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollToPlugin.min.js"></script>
+    <script src="{{ asset('vendor/ScrollToPlugin.min.js') }}"></script>
 
 </body>
 </html>

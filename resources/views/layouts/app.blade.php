@@ -12,10 +12,12 @@
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 
-        <!-- Three.js + GSAP + ScrollTrigger -->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+        {{-- GSAP untuk animasi fade-up. Three.js sengaja TIDAK dimuat di
+             halaman kerja internal (berat di PC/tablet lama); background 3D
+             hanya ada di landing & login. Library di-self-host agar tetap
+             cepat di jaringan LAN. --}}
+        <script src="{{ asset('vendor/gsap.min.js') }}"></script>
+        <script src="{{ asset('vendor/ScrollTrigger.min.js') }}"></script>
 
         @vite(['resources/css/app.css', 'resources/js/app.js'])
 
@@ -665,8 +667,6 @@
     </head>
     <body class="ocms-body">
 
-        <!-- Background 3D Canvas -->
-        <canvas id="three-canvas-bg"></canvas>
         <div class="grid-overlay"></div>
 
         <!-- Navigation -->
@@ -724,71 +724,7 @@
             {{ $slot }}
         </main>
 
-        <!-- Three.js Background -->
         <script>
-        (function() {
-            const canvas = document.getElementById('three-canvas-bg');
-            if (!canvas) return;
-
-            const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
-
-            const scene = new THREE.Scene();
-            const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 100);
-            camera.position.z = 8;
-
-            // Floating particles
-            const particleCount = 60;
-            const particles = new THREE.BufferGeometry();
-            const positions = new Float32Array(particleCount * 3);
-
-            for (let i = 0; i < particleCount * 3; i++) {
-                positions[i] = (Math.random() - 0.5) * 20;
-            }
-            particles.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-
-            const particleMat = new THREE.PointsMaterial({
-                color: 0xD4AF37,
-                size: 0.03,
-                transparent: true,
-                opacity: 0.4
-            });
-            const particleSystem = new THREE.Points(particles, particleMat);
-            scene.add(particleSystem);
-
-            // Wireframe ring
-            const torusGeo = new THREE.TorusGeometry(3, 0.015, 16, 120);
-            const torusMat = new THREE.MeshBasicMaterial({ color: 0x48CAE4, transparent: true, opacity: 0.04 });
-            const torus = new THREE.Mesh(torusGeo, torusMat);
-            torus.rotation.x = Math.PI / 2.5;
-            torus.position.set(4, -2, -3);
-            scene.add(torus);
-
-            let mouseX = 0, mouseY = 0;
-            document.addEventListener('mousemove', (e) => {
-                mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
-                mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
-            });
-
-            function animate() {
-                requestAnimationFrame(animate);
-                particleSystem.rotation.y += 0.0003;
-                particleSystem.rotation.x += 0.0001;
-                torus.rotation.z += 0.001;
-                torus.rotation.x = Math.PI / 2.5 + mouseY * 0.03;
-                torus.rotation.y = mouseX * 0.03;
-                renderer.render(scene, camera);
-            }
-            animate();
-
-            window.addEventListener('resize', () => {
-                camera.aspect = window.innerWidth / window.innerHeight;
-                camera.updateProjectionMatrix();
-                renderer.setSize(window.innerWidth, window.innerHeight);
-            });
-        })();
-
         // === GSAP ScrollTrigger Animations ===
         gsap.registerPlugin(ScrollTrigger);
 
