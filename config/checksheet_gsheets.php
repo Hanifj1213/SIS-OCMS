@@ -42,14 +42,14 @@ return [
     | Kosong = fitur measurement belum aktif untuk EGI tsb.
     */
     'measurement_templates' => [
-        'WA800-3'   => '', // MEASUREMENT ENGINE SA12V140E-1 (WA800-3).xlsx
-        'GD825A-2'  => '', // MEASUREMENT ENGINE SA6D140E-2 (GD825A).xlsx
-        'GD825A'    => '',
-        'D155-6'    => '', // MEASUREMENT ENGINE SAA6D140E-5 (D155).xlsx
-        'D155'      => '',
-        'D375-6'    => '', // MEASUREMENT ENGINE SAA6D170E-5 (D375-6 PC1250-8).xlsx
-        'PC1250-8'  => '',
-        'PC2000-8'  => '', // MEASUREMENT ENGINE SAA12V140E-3 (PC2000-8).xlsx
+        'WA800-3'   => '16YMihLgPAjpcBZDlmd6DtxocNXJPsPrIpjspZVhduCI', // SA12V140E-1
+        'GD825A-2'  => '1Xnmcb6EmX5mCGRvuSfp15TxPNZJnxMfnmnczZkFWDlU', // SA6D140E-2
+        'GD825A'    => '1Xnmcb6EmX5mCGRvuSfp15TxPNZJnxMfnmnczZkFWDlU',
+        'D155-6'    => '1zRB8oc1KxJM7tbKr0ri6Rl1dAugwdazHh8ky6A27OZM', // SAA6D140E-5
+        'D155'      => '1zRB8oc1KxJM7tbKr0ri6Rl1dAugwdazHh8ky6A27OZM',
+        'D375-6'    => '1wIxlv5YAhJo90cnBGwSBHqfAMqDa77zgIwQqOeQ2a44', // SAA6D170E-5
+        'PC1250-8'  => '1wIxlv5YAhJo90cnBGwSBHqfAMqDa77zgIwQqOeQ2a44',
+        'PC2000-8'  => '1fB7lNhIQDDUi-Kb3zqs3QJxzTDPsEqLyQGkP4ilGYqI', // SAA12V140E-3
     ],
 
 ];
