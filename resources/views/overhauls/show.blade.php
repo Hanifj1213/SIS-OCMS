@@ -549,6 +549,25 @@
                 document.addEventListener(evt, function() { lastInputT = performance.now(); }, { passive: true, capture: true });
             });
 
+            // Posisi kursor terakhir — dipakai untuk membedakan klik beneran
+            // ke iframe vs Google Sheets MENCURI fokus sendiri saat selesai
+            // load (terjadi tiap ganti Mainline/Sub Assy karena iframe reload).
+            let lastMouse = null;
+            document.addEventListener('mousemove', function(e) {
+                lastMouse = { x: e.clientX, y: e.clientY };
+            }, { passive: true, capture: true });
+            document.addEventListener('mousedown', function(e) {
+                lastMouse = { x: e.clientX, y: e.clientY };
+            }, { passive: true, capture: true });
+
+            function pointerOverElement(el) {
+                if (!lastMouse) return false;
+                const r = el.getBoundingClientRect();
+                const pad = 40; // toleransi: mousemove terakhir bisa berhenti tepat di tepi iframe
+                return lastMouse.x >= r.left - pad && lastMouse.x <= r.right + pad
+                    && lastMouse.y >= r.top - pad && lastMouse.y <= r.bottom + pad;
+            }
+
             function recordPos() {
                 if (lock.active) return;
                 const now = performance.now();
@@ -615,10 +634,25 @@
                 recordPos();
             }, { passive: true });
 
-            // Fokus masuk ke iframe → kunci halaman di posisi sebelum jump
+            // Fokus masuk ke iframe:
+            // - Kalau kursor memang di area iframe itu (user beneran klik)
+            //   → kunci halaman di posisi sebelum jump.
+            // - Kalau kursor TIDAK di area iframe → fokus dicuri oleh Sheets
+            //   saat selesai load → rebut balik fokus + pulihkan scroll.
             window.addEventListener('blur', function() {
                 setTimeout(function() {
-                    if (isEmbedFocused()) lockScroll();
+                    if (!isEmbedFocused()) return;
+                    const iframe = document.activeElement;
+
+                    if (lastMouse && !pointerOverElement(iframe)) {
+                        iframe.blur();
+                        window.focus();
+                        const p = stablePosBefore(150);
+                        window.scrollTo({ left: p.x, top: p.y, behavior: 'instant' });
+                        return;
+                    }
+
+                    lockScroll();
                 }, 0);
             });
 
