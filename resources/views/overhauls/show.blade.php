@@ -541,6 +541,14 @@
             let history = [{ t: performance.now(), x: window.scrollX, y: window.scrollY }];
             const lock = { active: false, x: 0, y: 0 };
 
+            // Waktu input user terakhir — scroll yang terjadi TANPA input user
+            // (klik/wheel/sentuh/keyboard) dalam 250ms terakhir dipastikan
+            // programmatic, alias scroll-jack dari Google Sheets.
+            let lastInputT = 0;
+            ['wheel', 'touchstart', 'touchmove', 'mousedown', 'pointerdown', 'keydown'].forEach(function(evt) {
+                document.addEventListener(evt, function() { lastInputT = performance.now(); }, { passive: true, capture: true });
+            });
+
             function recordPos() {
                 if (lock.active) return;
                 const now = performance.now();
@@ -590,7 +598,22 @@
                 window.scrollTo({ left: lock.x, top: lock.y, behavior: 'instant' });
             }
 
-            window.addEventListener('scroll', recordPos, { passive: true });
+            window.addEventListener('scroll', function() {
+                if (lock.active) return;
+
+                // Deteksi scroll-jack: lompatan besar tanpa input user baru-baru
+                // ini (misal klik tombol menu/+ di bar tab Sheets memicu
+                // scrollIntoView sebelum event blur sempat mengunci halaman).
+                const last = history[history.length - 1];
+                const jumped = Math.abs(window.scrollY - last.y) > 100
+                    && performance.now() - lastInputT > 250;
+                if (jumped) {
+                    window.scrollTo({ left: last.x, top: last.y, behavior: 'instant' });
+                    return; // posisi hasil jump jangan direkam
+                }
+
+                recordPos();
+            }, { passive: true });
 
             // Fokus masuk ke iframe → kunci halaman di posisi sebelum jump
             window.addEventListener('blur', function() {
