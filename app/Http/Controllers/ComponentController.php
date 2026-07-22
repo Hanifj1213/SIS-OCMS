@@ -231,8 +231,11 @@ class ComponentController extends Controller
         $component->load('checksheets'); // Reload jika baru digenerate
 
         // Retry duplikasi GSheet untuk komponen lama / yang gagal saat daftar
-        if (!$component->gsheet_url && $component->current_stage >= 2) {
-            app(ChecksheetGsheetService::class)->duplicateForComponent($component);
+        if ($component->current_stage >= 2) {
+            $gsheetService = app(ChecksheetGsheetService::class);
+            if ($gsheetService->hasPendingDuplication($component)) {
+                $gsheetService->duplicateForComponent($component);
+            }
         }
 
         return view('overhauls.show', [

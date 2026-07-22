@@ -33,6 +33,7 @@ class Component extends Model
         'is_waiting_approval',
         'qr_code_path',
         'gsheet_url',
+        'gsheet_measurement_url',
         'status',
     ];
 

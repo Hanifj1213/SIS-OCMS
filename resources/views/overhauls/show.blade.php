@@ -320,38 +320,87 @@
     </div>
     @endif
     @php
-        // Spreadsheet disassembly milik komponen ini (hasil duplikasi template).
-        // Komponen PC2000-8 lama yang belum punya salinan memakai sheet legacy.
+        // Spreadsheet tahap 2 milik komponen ini (hasil duplikasi template):
+        // disassembly + measurement. Komponen PC2000-8 lama yang belum punya
+        // salinan disassembly memakai sheet legacy.
         $gsheetEmbedUrl = null;
+        $gsheetMeasurementEmbedUrl = null;
         if ($checksheetStage == 2) {
+            $toEmbed = fn ($url) => $url . (str_contains($url, '?') ? '&' : '?') . 'rm=minimal';
+
             $rawGsheet = $comp->gsheet_url
                 ?: ($comp->egi === 'PC2000-8' ? 'https://docs.google.com/spreadsheets/d/1kIjBP4R4MWPkpFzXIU7Smcwnyy2DoR2Pzj2oggmn3tY/edit?usp=sharing' : null);
             if ($rawGsheet) {
-                $gsheetEmbedUrl = $rawGsheet . (str_contains($rawGsheet, '?') ? '&' : '?') . 'rm=minimal';
+                $gsheetEmbedUrl = $toEmbed($rawGsheet);
+            }
+            if ($comp->gsheet_measurement_url) {
+                $gsheetMeasurementEmbedUrl = $toEmbed($comp->gsheet_measurement_url);
             }
         }
     @endphp
-    @if($gsheetEmbedUrl)
+    @if($gsheetEmbedUrl || $gsheetMeasurementEmbedUrl)
     <div class="section" id="checksheet-review">
         {{--
             Google Sheets mode edit tidak punya opsi resmi untuk menyembunyikan
             header baris/kolom dan bar tab sheet, jadi kita "crop": iframe dibuat
             lebih besar dari kotaknya lalu digeser sehingga strip header kiri/atas
             dan bar tab bawah terpotong di luar area terlihat.
-            Sesuaikan nilai variabel di bawah jika tampilan Google Sheets berubah.
+            Measurement sengaja TIDAK di-crop bawah karena bar tab sheet-nya
+            dipakai untuk pindah antar bagian (CRANKSHAFT, CAMSHAFT, dst.).
         --}}
         @php
             $cropLeft = 120;  // kolom nomor baris (±46px) + kolom A & B agar dokumen pas di kiri
             $cropTop = 25;    // tinggi baris huruf kolom (px)
             $cropBottom = 37; // tinggi bar tab sheet di bawah (px)
         @endphp
-        <div class="glass-card fade-up" style="padding: 0; overflow: hidden; height: 90vh; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); position: relative;">
-            <iframe id="gsheet-iframe"
+
+        @if($gsheetEmbedUrl && $gsheetMeasurementEmbedUrl)
+        <style>
+            .gs-tab-btn {
+                padding: 10px 20px; border-radius: 10px; border: 1px solid var(--glass-border);
+                background: rgba(255,255,255,0.03); color: var(--text-muted); font-family: 'Inter', sans-serif;
+                font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s;
+            }
+            .gs-tab-btn:hover { background: rgba(255,255,255,0.06); color: var(--text-secondary); }
+            .gs-tab-btn.gs-tab-active { background: var(--accent-cyan-dim); color: var(--accent-cyan); border-color: rgba(72,202,228,0.3); }
+        </style>
+        <div class="fade-up" style="display: flex; gap: 6px; margin-bottom: 12px;">
+            <button type="button" id="gsTabDisassy" class="gs-tab-btn gs-tab-active" onclick="gsSwitchPanel('disassy')">🔧 Disassembly</button>
+            <button type="button" id="gsTabMeasure" class="gs-tab-btn" onclick="gsSwitchPanel('measure')">📐 Measurement</button>
+        </div>
+        @endif
+
+        @if($gsheetEmbedUrl)
+        <div id="gsPanelDisassy" class="glass-card fade-up" style="padding: 0; overflow: hidden; height: 90vh; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); position: relative;">
+            <iframe id="gsheet-iframe" class="gsheet-embed"
                 src="{{ $gsheetEmbedUrl }}"
                 style="position: absolute; top: -{{ $cropTop }}px; left: -{{ $cropLeft }}px; width: calc(100% + {{ $cropLeft }}px); height: calc(100% + {{ $cropTop + $cropBottom }}px); border: none;"
                 allowfullscreen>
             </iframe>
         </div>
+        @endif
+
+        @if($gsheetMeasurementEmbedUrl)
+        {{-- Crop bawah 0: bar tab sheet dibiarkan terlihat untuk navigasi antar part --}}
+        <div id="gsPanelMeasure" class="glass-card fade-up" style="padding: 0; overflow: hidden; height: 90vh; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); position: relative; {{ $gsheetEmbedUrl ? 'display: none;' : '' }}">
+            <iframe id="gsheet-iframe-measure" class="gsheet-embed"
+                src="{{ $gsheetMeasurementEmbedUrl }}"
+                style="position: absolute; top: -{{ $cropTop }}px; left: -{{ $cropLeft }}px; width: calc(100% + {{ $cropLeft }}px); height: calc(100% + {{ $cropTop }}px); border: none;"
+                allowfullscreen>
+            </iframe>
+        </div>
+        @endif
+
+        @if($gsheetEmbedUrl && $gsheetMeasurementEmbedUrl)
+        <script>
+        function gsSwitchPanel(which) {
+            document.getElementById('gsPanelDisassy').style.display = which === 'disassy' ? '' : 'none';
+            document.getElementById('gsPanelMeasure').style.display = which === 'measure' ? '' : 'none';
+            document.getElementById('gsTabDisassy').classList.toggle('gs-tab-active', which === 'disassy');
+            document.getElementById('gsTabMeasure').classList.toggle('gs-tab-active', which === 'measure');
+        }
+        </script>
+        @endif
 
         <script>
         // Mencegah bug auto-scroll ke atas saat mengedit sel di iframe Google Sheets.
@@ -365,8 +414,10 @@
         //   melepas fokus iframe dan membuka kunci, jadi scroll halaman tidak
         //   pernah "ke-lock" — termasuk di touchscreen.
         document.addEventListener('DOMContentLoaded', function() {
-            const iframe = document.getElementById('gsheet-iframe');
-            if (!iframe) return;
+            const iframes = Array.from(document.querySelectorAll('.gsheet-embed'));
+            if (iframes.length === 0) return;
+
+            const isEmbedFocused = () => iframes.includes(document.activeElement);
 
             let pinX = window.scrollX;
             let pinY = window.scrollY;
@@ -382,10 +433,10 @@
                 }
             }, { passive: true });
 
-            // Fokus masuk ke iframe → kunci posisi scroll saat ini
+            // Fokus masuk ke salah satu iframe → kunci posisi scroll saat ini
             window.addEventListener('blur', function() {
                 setTimeout(function() {
-                    if (document.activeElement === iframe) pinned = true;
+                    if (isEmbedFocused()) pinned = true;
                 }, 0);
             });
 
@@ -399,8 +450,8 @@
             // iframe (event tertelan oleh dokumen iframe), jadi aman.
             function releaseIframeFocus() {
                 pinned = false;
-                if (document.activeElement === iframe) {
-                    iframe.blur();
+                if (isEmbedFocused()) {
+                    document.activeElement.blur();
                     window.focus();
                 }
             }

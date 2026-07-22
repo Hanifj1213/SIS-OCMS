@@ -23,7 +23,7 @@ return [
     | Engine model: SA12V140E-1=WA800-3, SAA6D170E-5=D375-6 & PC1250-8,
     | SAA6D140E-5=D155, SA6D140E-2=GD825A, SAA12V140E-3=PC2000-8.
     */
-    'templates' => [
+    'disassembly_templates' => [
         'WA800-3'   => '1zNdwCw65dVaO0zrdX7ttFmGetjWLXKZcApt55yl5iuY', // SA12V140E-1
         'GD825A-2'  => '1FE5c4TiOVPJYvScR_YykmEVvSeHwvB2EcpR0QvMjHrg', // SA6D140E-2
         'GD825A'    => '1FE5c4TiOVPJYvScR_YykmEVvSeHwvB2EcpR0QvMjHrg',
@@ -32,6 +32,24 @@ return [
         'D375-6'    => '1LVny6gUcwFpcxpzTJc4GR1kWqAwumE8a-AzBqNWN-9A', // SAA6D170E-5
         'PC1250-8'  => '1LVny6gUcwFpcxpzTJc4GR1kWqAwumE8a-AzBqNWN-9A', // SAA6D170E-5
         'PC2000-8'  => '1kIjBP4R4MWPkpFzXIU7Smcwnyy2DoR2Pzj2oggmn3tY', // SAA12V140E-3 (sheet lama yang sudah dipakai)
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Template spreadsheet MEASUREMENT per EGI (multi-tab: crankshaft dst.)
+    |--------------------------------------------------------------------------
+    | Isi ID-nya setelah file di _SIAP_UPLOAD_GSHEET diupload ke Google Sheets.
+    | Kosong = fitur measurement belum aktif untuk EGI tsb.
+    */
+    'measurement_templates' => [
+        'WA800-3'   => '', // MEASUREMENT ENGINE SA12V140E-1 (WA800-3).xlsx
+        'GD825A-2'  => '', // MEASUREMENT ENGINE SA6D140E-2 (GD825A).xlsx
+        'GD825A'    => '',
+        'D155-6'    => '', // MEASUREMENT ENGINE SAA6D140E-5 (D155).xlsx
+        'D155'      => '',
+        'D375-6'    => '', // MEASUREMENT ENGINE SAA6D170E-5 (D375-6 PC1250-8).xlsx
+        'PC1250-8'  => '',
+        'PC2000-8'  => '', // MEASUREMENT ENGINE SAA12V140E-3 (PC2000-8).xlsx
     ],
 
 ];
