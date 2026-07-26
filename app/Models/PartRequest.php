@@ -14,6 +14,7 @@ class PartRequest extends Model
     protected $fillable = [
         'comp_id',
         'part_name',
+        'section',
         'qty',
         'status',
     ];

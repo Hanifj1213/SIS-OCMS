@@ -1102,9 +1102,112 @@ class ChecksheetTemplateSeeder extends Seeder
                     'Bolt stand',
                 ],
             ],
+            // EGI Control Valve dari folder COMPLETED — item + group diisi
+            // dari database/data/control_valve_receiving_items.json (lihat bawah).
+            [
+                'category' => 'Control Valve',
+                'egi' => 'D155-6',
+                'name' => 'Control Valve Receiving Inspection',
+                'prefix' => 'CVL',
+                'labels' => [],
+                'from_json' => true,
+            ],
+            [
+                'category' => 'Control Valve',
+                'egi' => 'D375-6',
+                'name' => 'Control Valve Receiving Inspection',
+                'prefix' => 'CVL',
+                'labels' => [],
+                'from_json' => true,
+            ],
+            [
+                'category' => 'Control Valve',
+                'egi' => 'HD785-7',
+                'name' => 'Control Valve Receiving Inspection',
+                'prefix' => 'CVL',
+                'labels' => [],
+                'from_json' => true,
+            ],
+            [
+                'category' => 'Control Valve',
+                'egi' => 'GD825A-2',
+                'name' => 'Control Valve Receiving Inspection',
+                'prefix' => 'CVL',
+                'labels' => [],
+                'from_json' => true,
+            ],
+            [
+                'category' => 'Control Valve',
+                'egi' => 'WA800-3',
+                'name' => 'Control Valve Receiving Inspection',
+                'prefix' => 'CVL',
+                'labels' => [],
+                'from_json' => true,
+            ],
+            [
+                'category' => 'Hydraulic Cylinder',
+                'egi' => 'HD785-7',
+                'name' => 'Cylinder Hoist Receiving Inspection',
+                'prefix' => 'CYL',
+                'labels' => [
+                    'Cylinder Tube', 'Rod', 'Gland', 'Piston', 'Seal Kit condition',
+                    'Eye / Clevis', 'Name Plate', 'Painting condition', 'Packing / wraping', 'Stand',
+                ],
+            ],
+            [
+                'category' => 'Front Suspension',
+                'egi' => 'HD785-7',
+                'name' => 'Front Suspension Receiving Inspection',
+                'prefix' => 'FSP',
+                'labels' => [
+                    'Cylinder / Housing', 'Rod', 'Mounting', 'Seal condition',
+                    'Name Plate', 'Painting condition', 'Packing / wraping', 'Stand',
+                ],
+            ],
+            [
+                'category' => 'Rear Suspension',
+                'egi' => 'HD785-7',
+                'name' => 'Rear Suspension Receiving Inspection',
+                'prefix' => 'RSP',
+                'labels' => [
+                    'Cylinder / Housing', 'Rod', 'Mounting', 'Seal condition',
+                    'Name Plate', 'Painting condition', 'Packing / wraping', 'Stand',
+                ],
+            ],
         ];
 
+        $cvReceivingJsonPath = database_path('data/control_valve_receiving_items.json');
+        $cvReceivingByEgi = [];
+        if (is_file($cvReceivingJsonPath)) {
+            $cvReceivingByEgi = json_decode((string) file_get_contents($cvReceivingJsonPath), true) ?: [];
+        }
+
         foreach ($powertrainTemplates as $template) {
+            $items = $makePowertrainItems($template['prefix'], $template['labels']);
+
+            // Control Valve D155/D375/... : item + group + callout number
+            // dari sheet RECEIVING asli (mirip Engine view + nomor callout).
+            if (!empty($template['from_json'])) {
+                $jsonItems = $cvReceivingByEgi[$template['egi']] ?? [];
+                if ($jsonItems !== []) {
+                    $items = array_map(static function (array $row) use ($template): array {
+                        $item = [
+                            'id' => $row['id'] ?? sprintf('%s-%03d', $template['prefix'], 0),
+                            'group' => $row['group'] ?? 'Visual Inspection',
+                            'label' => $row['label'] ?? '',
+                        ];
+                        if (isset($row['number'])) {
+                            $item['number'] = (int) $row['number'];
+                        }
+                        return $item;
+                    }, $jsonItems);
+                }
+            }
+
+            if ($items === []) {
+                continue;
+            }
+
             ChecksheetTemplate::updateOrCreate(
                 [
                     'major_category' => $template['category'],
@@ -1113,7 +1216,7 @@ class ChecksheetTemplateSeeder extends Seeder
                 ],
                 [
                     'template_name' => $template['name'],
-                    'items' => $makePowertrainItems($template['prefix'], $template['labels']),
+                    'items' => $items,
                 ]
             );
         }

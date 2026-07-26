@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ChecksheetController;
 use App\Http\Controllers\ComponentController;
+use App\Http\Controllers\FabricationRequestController;
 use App\Http\Controllers\PartRequestController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StatusController;
@@ -59,6 +60,16 @@ Route::middleware(['auth'])->group(function () {
         ->name('components.approveStage');
     Route::post('components/{component}/reject-stage', [ComponentController::class, 'rejectStage'])
         ->name('components.rejectStage');
+
+    // Fabrication Request (FR) — Stage 2+
+    Route::get('components/{component}/fr', [FabricationRequestController::class, 'index'])
+        ->name('components.fr.index');
+    Route::post('components/{component}/fr/scan', [FabricationRequestController::class, 'scan'])
+        ->name('components.fr.scan');
+    Route::post('components/{component}/fr', [FabricationRequestController::class, 'store'])
+        ->name('components.fr.store');
+    Route::get('components/{component}/fr/{fr}/pdf', [FabricationRequestController::class, 'pdf'])
+        ->name('components.fr.pdf');
 
     // Resource route komponen (hanya action yang tersedia di controller)
     Route::resource('components', ComponentController::class)

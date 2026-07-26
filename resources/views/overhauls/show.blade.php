@@ -286,6 +286,91 @@
     </div>
     @endif
 
+    {{-- Fabrication Request (FR) — Stage 2+ --}}
+    @if($comp->current_stage >= 2)
+    <div class="section" id="fr-panel">
+        <div class="section-title fade-up">Fabrication Request (PLO/09/F-021)</div>
+        <div class="glass-card fade-up">
+            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 8px;">
+                @if($comp->major_category === 'Engine')
+                    Scan spreadsheet <strong>Disassembly</strong> (centang <strong>SALVAGE</strong> → FR, <strong>REPLACE</strong> → Part Request).
+                @else
+                    Scan spreadsheet <strong>Inspection</strong> (centang <strong>U/R</strong> → FR, <strong>R/N</strong> → Part Request).
+                @endif
+                Form internal: Repair → FR, Replace → PR.
+            </p>
+            <p id="fr-scan-profile" style="font-size: 0.7rem; color: var(--text-muted); margin-bottom: 16px;"></p>
+
+            @role('Mechanic|Supervisor|SuperAdmin')
+            <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px;">
+                <button type="button" id="fr-scan-btn" class="btn-primary">🔍 Scan Spreadsheet</button>
+                <span id="fr-scan-status" style="font-size: 0.75rem; color: var(--text-muted); align-self: center;"></span>
+            </div>
+
+            <div id="fr-candidates-wrap" style="display:none; margin-bottom: 20px;">
+                <div class="section-title" style="font-size: 0.85rem; margin-bottom: 10px;">Kandidat Fabrication Request</div>
+                <div id="fr-candidates-list"></div>
+                <div class="section-title" style="font-size: 0.85rem; margin: 16px 0 10px; display:none;" id="pr-candidates-title">Kandidat Part Request (Gudang)</div>
+                <div id="pr-candidates-list"></div>
+                <div style="margin-top: 12px;">
+                    <button type="button" id="fr-save-btn" class="btn-primary" disabled>💾 Simpan FR / PR Terpilih</button>
+                </div>
+            </div>
+            @endrole
+
+            <div id="fr-list-wrap">
+                @if($comp->fabricationRequests->count() > 0)
+                <div class="table-scroll" style="padding: 0;">
+                    <table class="ocms-table" id="fr-table">
+                        <thead>
+                            <tr>
+                                <th>No. FR</th>
+                                <th>Part</th>
+                                <th>Jenis</th>
+                                <th>Sumber</th>
+                                <th>Status</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($comp->fabricationRequests as $fr)
+                            <tr data-fr-id="{{ $fr->fr_id }}">
+                                <td class="mono" style="font-size: 0.75rem;">{{ $fr->fr_number }}</td>
+                                <td style="font-weight: 600;">
+                                    {{ $fr->part_name }}
+                                    @if($fr->section)
+                                        <span style="font-size:0.65rem; font-weight:600; padding:1px 6px; border-radius:6px; background:rgba(96,165,250,0.15); color:#93c5fd;">{{ $fr->section }}</span>
+                                    @endif
+                                </td>
+                                <td>{{ $fr->workTypeLabel() }}</td>
+                                <td><span class="badge badge-cyan">{{ strtoupper($fr->source) }}</span></td>
+                                <td>
+                                    @if($fr->status === 'done')
+                                        <span class="badge badge-green">Done</span>
+                                    @elseif($fr->status === 'printed')
+                                        <span class="badge badge-cyan">Printed</span>
+                                    @else
+                                        <span class="badge badge-gold">Draft</span>
+                                    @endif
+                                </td>
+                                <td>
+                                    <a href="{{ route('components.fr.pdf', [$comp->comp_id, $fr->fr_id]) }}" target="_blank" class="btn-secondary" style="padding: 4px 10px; font-size: 0.7rem;">🖨 PDF</a>
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+                @else
+                <p id="fr-empty-msg" style="color: var(--text-muted); font-size: 0.85rem; text-align: center; padding: 16px;">
+                    Belum ada Fabrication Request untuk komponen ini.
+                </p>
+                @endif
+            </div>
+        </div>
+    </div>
+    @endif
+
     {{-- Checksheet Section (Inline Interactive / Review) --}}
     @php
         $checksheetStage = $reviewStage ?? $comp->current_stage;
@@ -330,7 +415,11 @@
             $toEmbed = fn ($url) => $url . (str_contains($url, '?') ? '&' : '?') . 'rm=minimal';
 
             $rawGsheet = $comp->gsheet_url
-                ?: ($comp->egi === 'PC2000-8' ? 'https://docs.google.com/spreadsheets/d/1kIjBP4R4MWPkpFzXIU7Smcwnyy2DoR2Pzj2oggmn3tY/edit?usp=sharing' : null);
+                ?: (
+                    $comp->major_category === 'Engine' && $comp->egi === 'PC2000-8'
+                        ? 'https://docs.google.com/spreadsheets/d/1kIjBP4R4MWPkpFzXIU7Smcwnyy2DoR2Pzj2oggmn3tY/edit?usp=sharing'
+                        : null
+                );
             if ($rawGsheet) {
                 $gsheetEmbedUrl = $toEmbed($rawGsheet);
             }
@@ -863,6 +952,12 @@
         const COMP_ID = {{ $comp->comp_id }};
         const STAGE = {{ $checksheetStage }};
         const CAN_INTERACT = @json(!$isReviewMode && auth()->user()->hasAnyRole(['Mechanic', 'Supervisor', 'SuperAdmin']));
+        @php
+            $csEgiSlug = strtolower(trim((string) ($comp->egi ?? '')));
+            $csRefPath = public_path('images/inspection/'.$csEgiSlug.'/control-valve.png');
+            $csImgVer = is_file($csRefPath) ? filemtime($csRefPath) : time();
+        @endphp
+        const CS_IMG_VER = '{{ $csImgVer }}';
 
         let items = @json($currentChecksheet->items);
         let answers = @json($currentChecksheet->answers ?? (object)[]);
@@ -937,6 +1032,7 @@
                 return {
                     images: stageTwoImages,
                     label: item.group,
+                    tall: false,
                 };
             }
 
@@ -949,12 +1045,17 @@
                 ? item.group.toLowerCase().replace(/ /g, '-')
                 : majorCategory.toLowerCase().replace(/\//g, '-').replace(/ /g, '-');
 
+            const src = '/images/inspection/' + egi + '/' + slug + '.png'
+                + (majorCategory !== 'Engine' ? ('?v=' + CS_IMG_VER) : '');
+
             return {
                 images: [{
-                    src: '/images/inspection/' + egi + '/' + slug + '.png',
+                    src: src,
                     label: majorCategory === 'Engine' ? item.group : majorCategory + ' Reference',
                 }],
                 label: majorCategory === 'Engine' ? item.group : majorCategory + ' Reference',
+                // Powertrain receiving sheet = full A3 page → butuh preview lebih besar
+                tall: majorCategory !== 'Engine',
             };
         }
 
@@ -1000,6 +1101,10 @@
         }
 
         function csGetItemNumber(item, fallbackIndex) {
+            // Callout number dari sheet asli (Control Valve receiving, dll.)
+            if (item.number != null && item.number !== '') {
+                return Number(item.number);
+            }
             if (!item.custom) {
                 const sourceNumber = String(item.id || '').match(/^[A-Z]+-(\d{3})$/);
                 if (sourceNumber) return parseInt(sourceNumber[1], 10);
@@ -1068,8 +1173,9 @@
             let refHtml = '';
             if (refImg) {
                 const multiplePages = refImg.images.length > 1;
-                const pageWidth = multiplePages ? 'min(30vw, 220px)' : '470px';
-                const pageHeight = multiplePages ? '250px' : '340px';
+                const tall = !!refImg.tall;
+                const pageWidth = multiplePages ? 'min(30vw, 220px)' : (tall ? 'min(92vw, 680px)' : '470px');
+                const pageHeight = multiplePages ? '250px' : (tall ? 'min(58vh, 560px)' : '340px');
                 const imageHtml = refImg.images.map(image => `
                     <div style="text-align:center; min-width:0;">
                         <img src="${image.src}" alt="${image.label}" style="width:${pageWidth}; max-width:100%; height:${pageHeight}; object-fit:contain; border-radius:10px; border:1px solid rgba(212,175,55,0.3); cursor:zoom-in; opacity:0.9; transition:all 0.25s; background:rgba(255,255,255,0.02);" onclick="csOpenLightbox('${image.src}', '${image.label}')" title="📷 ${image.label}" onerror="this.parentElement.style.display='none'" onmouseover="this.style.opacity=1;this.style.borderColor='var(--accent-gold)'" onmouseout="this.style.opacity=0.9;this.style.borderColor='rgba(212,175,55,0.3)'">
@@ -1077,7 +1183,7 @@
                     </div>
                 `).join('');
 
-                refHtml = `<div style="margin-bottom:14px; display:flex; gap:8px; justify-content:center; align-items:flex-start; flex-wrap:wrap; max-width:760px;">
+                refHtml = `<div style="margin-bottom:14px; display:flex; gap:8px; justify-content:center; align-items:flex-start; flex-wrap:wrap; max-width:${tall ? '720px' : '760px'};">
                     ${imageHtml}
                 </div>`;
             }
@@ -1104,17 +1210,53 @@
             document.getElementById('csBtnPrev').disabled = currentIndex === 0;
         }
 
+        // Antrian simpan: php artisan serve single-thread + SQLite mudah bentrok
+        // kalau banyak POST /answer paralel (klik cepat / keyboard).
+        const csSaveQueue = [];
+        let csSaveBusy = false;
+
+        async function csFlushSaves() {
+            if (csSaveBusy) return;
+            csSaveBusy = true;
+            while (csSaveQueue.length) {
+                const job = csSaveQueue.shift();
+                let saved = false;
+                for (let attempt = 0; attempt < 3 && !saved; attempt++) {
+                    try {
+                        const r = await fetch(`/components/${COMP_ID}/checksheet/${STAGE}/answer`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF, 'Accept': 'application/json' },
+                            body: JSON.stringify({ item_id: job.item_id, answer: job.answer })
+                        });
+                        const data = await r.json().catch(() => ({}));
+                        if (!r.ok) {
+                            throw new Error(data.message || data.error || ('HTTP ' + r.status));
+                        }
+                        csToast('✓ Tersimpan');
+                        saved = true;
+                    } catch (e) {
+                        if (attempt < 2) {
+                            await new Promise(res => setTimeout(res, 250 * (attempt + 1)));
+                            continue;
+                        }
+                        csToast('⚠ Gagal: ' + (e.message || 'jaringan'));
+                    }
+                }
+            }
+            csSaveBusy = false;
+        }
+
         window.csAnswer = function(val) {
             if (!CAN_INTERACT) return;
             const item = items[currentIndex];
             answers[item.id] = val;
             updateProgress();
 
-            fetch(`/components/${COMP_ID}/checksheet/${STAGE}/answer`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF, 'Accept': 'application/json' },
-                body: JSON.stringify({ item_id: item.id, answer: val })
-            }).then(r => r.json()).then(() => csToast('✓ Tersimpan')).catch(() => csToast('⚠ Gagal'));
+            // Gabungkan job untuk item yang sama (klik ulang sebelum flush selesai)
+            const existing = csSaveQueue.findIndex(j => j.item_id === item.id);
+            if (existing >= 0) csSaveQueue.splice(existing, 1);
+            csSaveQueue.push({ item_id: item.id, answer: val });
+            csFlushSaves();
 
             setTimeout(() => { currentIndex++; renderSlide(); }, 300);
         };
@@ -1380,7 +1522,7 @@
                                 </select>
                             </div>
                             @endforeach
-                            <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 12px;">*Jika ada keputusan "Replace", sistem Smart Inventory akan otomatis membuat Part Request (PR) ke Gudang.</p>
+                            <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 12px;">*Jika ada keputusan "Replace", sistem Smart Inventory akan otomatis membuat Part Request (PR) ke Gudang. Keputusan "Repair" akan otomatis membuat draft Fabrication Request (FR).</p>
                         </div>
                         @endif
 
@@ -1419,6 +1561,226 @@
             @endif
         </div>
     </div>
+    @endif
+
+    @if($comp->current_stage >= 2)
+    @role('Mechanic|Supervisor|SuperAdmin')
+    <script>
+    (function() {
+        const compId = @json($comp->comp_id);
+        const csrf = @json(csrf_token());
+        const scanUrl = @json(route('components.fr.scan', $comp->comp_id));
+        const storeUrl = @json(route('components.fr.store', $comp->comp_id));
+        const pdfBase = @json(url('components/' . $comp->comp_id . '/fr'));
+
+        const scanBtn = document.getElementById('fr-scan-btn');
+        const scanStatus = document.getElementById('fr-scan-status');
+        const scanProfile = document.getElementById('fr-scan-profile');
+        const wrap = document.getElementById('fr-candidates-wrap');
+        const list = document.getElementById('fr-candidates-list');
+        const prList = document.getElementById('pr-candidates-list');
+        const prTitle = document.getElementById('pr-candidates-title');
+        const saveBtn = document.getElementById('fr-save-btn');
+
+        if (!scanBtn) return;
+
+        let candidates = [];
+        let prCandidates = [];
+
+        // Nama part datang dari sel spreadsheet — jangan pernah masuk innerHTML mentah.
+        function esc(value) {
+            if (value === null || value === undefined) return '';
+            return String(value)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function sectionBadge(section) {
+            if (!section) return '';
+            return ` <span style="font-size:0.65rem; font-weight:600; padding:1px 6px; border-radius:6px; background:rgba(96,165,250,0.15); color:#93c5fd;">${esc(section)}</span>`;
+        }
+
+        function workTypeSelect(name, value) {
+            const opts = [
+                ['repair', 'Repair'],
+                ['fabrikasi', 'Fabrikasi'],
+                ['modifikasi', 'Modifikasi'],
+            ];
+            let html = `<select name="${name}" class="ocms-select fr-work-type" style="font-size:0.75rem;">`;
+            opts.forEach(([v, label]) => {
+                html += `<option value="${v}" ${v === value ? 'selected' : ''}>${label}</option>`;
+            });
+            html += '</select>';
+            return html;
+        }
+
+        function renderCandidates() {
+            const hasFr = candidates.length > 0;
+            const hasPr = prCandidates.length > 0;
+
+            if (!hasFr && !hasPr) {
+                wrap.style.display = 'none';
+                saveBtn.disabled = true;
+                return;
+            }
+
+            wrap.style.display = 'block';
+
+            if (hasFr) {
+                list.innerHTML = candidates.map((c, i) => `
+                    <div class="fr-candidate-row" data-index="${i}" style="display:grid; grid-template-columns: 28px 1fr 120px 1fr; gap:10px; align-items:start; padding:12px; margin-bottom:8px; border:1px solid rgba(255,255,255,0.06); border-radius:10px; background:rgba(0,0,0,0.15);">
+                        <input type="checkbox" class="fr-pick" data-index="${i}" checked style="margin-top:8px;">
+                        <div>
+                            <div style="font-weight:600; font-size:0.85rem;">${esc(c.part_name)}${sectionBadge(c.section)}</div>
+                            <div style="font-size:0.7rem; color:var(--text-muted);">P/N: ${esc(c.part_number) || '-'} | Sumber: ${esc(c.source).toUpperCase()}</div>
+                            <textarea class="ocms-input fr-instruction" data-index="${i}" placeholder="Instruksi kerja (opsional)" style="width:100%; min-height:48px; margin-top:6px; font-size:0.75rem;">${esc(c.instruction)}</textarea>
+                        </div>
+                        <div>${workTypeSelect('work_type_' + i, c.work_type || 'repair')}</div>
+                        <div style="font-size:0.7rem; color:var(--text-muted);">Qty: ${c.qty || 1}</div>
+                    </div>
+                `).join('');
+            } else {
+                list.innerHTML = '<p style="font-size:0.75rem;color:var(--text-muted);">Tidak ada kandidat FR baru.</p>';
+            }
+
+            if (hasPr) {
+                prTitle.style.display = 'block';
+                prList.innerHTML = prCandidates.map((c, i) => `
+                    <div class="pr-candidate-row" data-index="${i}" style="display:grid; grid-template-columns: 28px 1fr; gap:10px; align-items:center; padding:10px; margin-bottom:8px; border:1px solid rgba(248,113,113,0.15); border-radius:10px; background:rgba(248,113,113,0.05);">
+                        <input type="checkbox" class="pr-pick" data-index="${i}" checked>
+                        <div>
+                            <div style="font-weight:600; font-size:0.85rem;">${esc(c.part_name)}${sectionBadge(c.section)}</div>
+                            <div style="font-size:0.7rem; color:var(--text-muted);">P/N: ${esc(c.part_number) || '-'} | Qty: ${c.qty || 1} | Sumber: ${esc(c.source).toUpperCase()}</div>
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                prTitle.style.display = 'none';
+                prList.innerHTML = '';
+            }
+
+            list.querySelectorAll('.fr-pick').forEach(cb => cb.addEventListener('change', updateSaveState));
+            prList.querySelectorAll('.pr-pick').forEach(cb => cb.addEventListener('change', updateSaveState));
+            updateSaveState();
+        }
+
+        function updateSaveState() {
+            const anyFr = list.querySelectorAll('.fr-pick:checked').length > 0;
+            const anyPr = prList.querySelectorAll('.pr-pick:checked').length > 0;
+            saveBtn.disabled = !(anyFr || anyPr);
+        }
+
+        scanBtn.addEventListener('click', async function() {
+            scanBtn.disabled = true;
+            scanStatus.textContent = 'Memindai…';
+            try {
+                const res = await fetch(scanUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrf,
+                    },
+                    body: JSON.stringify({}),
+                });
+                const data = await res.json();
+                if (!data.ok) throw new Error(data.message || 'Scan gagal');
+
+                candidates = data.candidates || [];
+                prCandidates = data.part_request_candidates || [];
+                if (scanProfile && data.scan_profile_label) {
+                    scanProfile.textContent = 'Profil scan: ' + data.scan_profile_label;
+                }
+                renderCandidates();
+
+                let msg = `${candidates.length} FR + ${prCandidates.length} PR kandidat`;
+                if (candidates.length === 0 && prCandidates.length === 0) {
+                    msg = 'Tidak ada kandidat baru';
+                }
+                if (data.gsheet_error) {
+                    msg += ` (GSheet: ${data.gsheet_error})`;
+                } else if (data.gsheet_sheet) {
+                    msg += ` — sheet: ${data.gsheet_sheet}`;
+                }
+                if ((data.skipped || []).length) {
+                    msg += `, ${data.skipped.length} dilewati (sudah ada)`;
+                }
+                scanStatus.textContent = msg;
+            } catch (e) {
+                scanStatus.textContent = '⚠ ' + (e.message || 'Gagal scan');
+            } finally {
+                scanBtn.disabled = false;
+            }
+        });
+
+        saveBtn.addEventListener('click', async function() {
+            const picks = [];
+            list.querySelectorAll('.fr-pick:checked').forEach(cb => {
+                const i = parseInt(cb.dataset.index, 10);
+                const c = candidates[i];
+                if (!c) return;
+                const row = list.querySelector(`.fr-candidate-row[data-index="${i}"]`);
+                const workType = row?.querySelector('.fr-work-type')?.value || 'repair';
+                const instruction = row?.querySelector('.fr-instruction')?.value || '';
+                picks.push({
+                    part_name: c.part_name,
+                    part_number: c.part_number || '',
+                    section: c.section || '',
+                    qty: c.qty || 1,
+                    work_type: workType,
+                    instruction: instruction,
+                    source: c.source || 'manual',
+                });
+            });
+
+            const prPicks = [];
+            prList.querySelectorAll('.pr-pick:checked').forEach(cb => {
+                const i = parseInt(cb.dataset.index, 10);
+                const c = prCandidates[i];
+                if (!c) return;
+                prPicks.push({
+                    part_name: c.part_name,
+                    section: c.section || '',
+                    qty: c.qty || 1,
+                });
+            });
+
+            if (!picks.length && !prPicks.length) return;
+
+            saveBtn.disabled = true;
+            scanStatus.textContent = 'Menyimpan…';
+            try {
+                const res = await fetch(storeUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrf,
+                    },
+                    body: JSON.stringify({
+                        items: picks.length ? picks : undefined,
+                        part_request_items: prPicks.length ? prPicks : undefined,
+                    }),
+                });
+                const data = await res.json();
+                if (!data.ok) throw new Error(data.message || 'Simpan gagal');
+
+                scanStatus.textContent = '✅ ' + data.message;
+                candidates = [];
+                prCandidates = [];
+                wrap.style.display = 'none';
+                location.reload();
+            } catch (e) {
+                scanStatus.textContent = '⚠ ' + (e.message || 'Gagal simpan');
+                saveBtn.disabled = false;
+            }
+        });
+    })();
+    </script>
+    @endrole
     @endif
 
 </x-app-layout>

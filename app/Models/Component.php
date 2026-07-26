@@ -72,6 +72,11 @@ class Component extends Model
         return $this->hasMany(PartRequest::class, 'comp_id', 'comp_id');
     }
 
+    public function fabricationRequests()
+    {
+        return $this->hasMany(FabricationRequest::class, 'comp_id', 'comp_id');
+    }
+
     public function checksheets()
     {
         return $this->hasMany(ComponentChecksheet::class, 'comp_id', 'comp_id');

@@ -7,6 +7,7 @@ use App\Models\Component;
 use App\Models\ComponentChecksheet;
 use App\Models\PartRequest;
 use App\Services\ChecksheetGsheetService;
+use App\Services\FabricationRequestService;
 use Illuminate\Http\Request;
 use Endroid\QrCode\QrCode;
 use Endroid\QrCode\Writer\PngWriter;
@@ -96,6 +97,8 @@ class ComponentController extends Controller
             'Swing Motor',
             'Swing Machinery',
             'Hydraulic Cylinder',
+            'Front Suspension',
+            'Rear Suspension',
         ];
 
         $validStatusOvh = ['SCHEDULE', 'UNSCHEDULE'];
@@ -211,7 +214,7 @@ class ComponentController extends Controller
     public function show(Request $request, Component $component)
     {
         // Eager load semua relasi untuk menghindari N+1 query
-        $component->load(['overhaulLogs.mechanic', 'inspectionDetails', 'partRequests', 'checksheets']);
+        $component->load(['overhaulLogs.mechanic', 'inspectionDetails', 'partRequests', 'checksheets', 'fabricationRequests']);
 
         $stageNames = self::STAGE_NAMES;
         $requestedReviewStage = $request->integer('review_stage');
@@ -270,9 +273,16 @@ class ComponentController extends Controller
         // Dikecualikan bila tahap ini memakai checksheet Google Sheets
         // (spreadsheet menggantikan checksheet internal, progressnya tidak
         // terlacak di database).
+        // Stage 2 memakai spreadsheet bila komponen punya gsheet_url
+        // (Engine mainline / Powertrain Control Valve dkk.).
         $usesGsheetChecksheet = $currentStage == 2
-            && $component->major_category === 'Engine'
-            && ($component->gsheet_url || strtoupper(trim((string) $component->egi)) === 'PC2000-8');
+            && (
+                (bool) $component->gsheet_url
+                || (
+                    $component->major_category === 'Engine'
+                    && strtoupper(trim((string) $component->egi)) === 'PC2000-8'
+                )
+            );
 
         $checksheet = $component->checksheets()->where('stage_number', $currentStage)->first();
         if (!$usesGsheetChecksheet && $checksheet && !$checksheet->is_complete) {
@@ -308,6 +318,12 @@ class ComponentController extends Controller
                     ]);
                 }
             }
+
+            // Auto-draft FR untuk part ber-decision Repair (form internal)
+            app(FabricationRequestService::class)->createFromInspectionDetails(
+                $component->fresh(['inspectionDetails', 'fabricationRequests']),
+                auth()->id()
+            );
         }
 
         // === TAHAP 5: Quality Gate (Test Performance) ===

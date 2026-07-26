@@ -1,0 +1,1856 @@
+{
+  "ENGINE": [
+    {
+      "file": "DISASSEMBLY ENGINE SA12V140E-1 (WA800-3).xlsx",
+      "stage": "Disassembly",
+      "sheets": [
+        {
+          "name": "Engine Disassy  12V140 (WA800)",
+          "size": "567x79",
+          "decision_profile": "REUSE|SALVAGE|REPLACE",
+          "has_part_list": true
+        }
+      ],
+      "decision_profile": "REUSE|SALVAGE|REPLACE",
+      "part_list_profile": "yes",
+      "issues": [],
+      "size_mb": 3.89,
+      "sheet_count": 1,
+      "sheet_names": [
+        "Engine Disassy  12V140 (WA800)"
+      ]
+    },
+    {
+      "file": "DISASSEMBLY ENGINE SA6D140E-2 (GD825A).xlsx",
+      "stage": "Disassembly",
+      "sheets": [],
+      "decision_profile": null,
+      "part_list_profile": null,
+      "issues": [
+        "File besar (9.6 MB) — scan header saja"
+      ],
+      "size_mb": 9.62
+    },
+    {
+      "file": "DISASSEMBLY ENGINE SAA12V140E-3 (PC2000-8).xlsx",
+      "stage": "Disassembly",
+      "sheets": [],
+      "decision_profile": null,
+      "part_list_profile": null,
+      "issues": [
+        "File besar (9.9 MB) — scan header saja"
+      ],
+      "size_mb": 9.87
+    },
+    {
+      "file": "DISASSEMBLY ENGINE SAA6D140E-5 (D155).xlsx",
+      "stage": "Disassembly",
+      "sheets": [],
+      "decision_profile": null,
+      "part_list_profile": null,
+      "issues": [
+        "File besar (10.6 MB) — scan header saja"
+      ],
+      "size_mb": 10.55
+    },
+    {
+      "file": "DISASSEMBLY ENGINE SAA6D170E-5 (D375-6 PC1250-8).xlsx",
+      "stage": "Disassembly",
+      "sheets": [],
+      "decision_profile": null,
+      "part_list_profile": null,
+      "issues": [
+        "File besar (14.0 MB) — scan header saja"
+      ],
+      "size_mb": 13.96
+    },
+    {
+      "file": "MEASUREMENT ENGINE SA12V140E-1 (WA800-3).xlsx",
+      "stage": "Inspection/Measurement",
+      "sheets": [
+        {
+          "name": "CRANKSHAFT",
+          "size": "94x46",
+          "decision_profile": "REUSE|SALVAGE|REPLACE",
+          "has_part_list": true
+        },
+        {
+          "name": "CAMSHAFT RH",
+          "size": "65x37",
+          "decision_profile": "GOOD|NO GOOD",
+          "has_part_list": true
+        },
+        {
+          "name": "CAMSHAFT LH",
+          "size": "65x37",
+          "decision_profile": "GOOD|NO GOOD",
+          "has_part_list": true
+        },
+        {
+          "name": "CON ROD",
+          "size": "224x72",
+          "decision_profile": "REUSE|SALVAGE|REPLACE",
+          "has_part_list": true
+        },
+        {
+          "name": "CYL BLOCK",
+          "size": "237x42",
+          "decision_profile": "GOOD|NO GOOD",
+          "has_part_list": false
+        }
+      ],
+      "decision_profile": "GOOD|NO GOOD",
+      "part_list_profile": "yes",
+      "issues": [
+        "Multi-tab measurement dengan format campur: {'REUSE|SALVAGE|REPLACE': 2, 'GOOD|NO GOOD': 3, 'none': 1}"
+      ],
+      "size_mb": 1.71,
+      "sheet_count": 6,
+      "sheet_names": [
+        "CRANKSHAFT",
+        "CAMSHAFT RH",
+        "CAMSHAFT LH",
+        "CON ROD",
+        "CYL BLOCK",
+        "PIN PISTON"
+      ],
+      "decision_profiles_mixed": {
+        "REUSE|SALVAGE|REPLACE": 2,
+        "GOOD|NO GOOD": 3,
+        "none": 1
+      }
+    },
+    {
+      "file": "MEASUREMENT ENGINE SA6D140E-2 (GD825A).xlsx",
+      "stage": "Inspection/Measurement",
+      "sheets": [
+        {
+          "name": "CRANKSHAFT",
+          "size": "164x46",
+          "decision_profile": "REUSE|SALVAGE|REPLACE",
+          "has_part_list": true
+        },
+        {
+          "name": "CAMSHAFT",
+          "size": "60x37",
+          "decision_profile": "GOOD|NO GOOD",
+          "has_part_list": true
+        },
+        {
+          "name": "CON ROD",
+          "size": "169x72",
+          "decision_profile": "REUSE|SALVAGE|REPLACE",
+          "has_part_list": true
+        },
+        {
+          "name": "CYL BLOCK",
+          "size": "171x41",
+          "decision_profile": "REUSE|SALVAGE|REPLACE",
+          "has_part_list": true
+        }
+      ],
+      "decision_profile": "REUSE|SALVAGE|REPLACE",
+      "part_list_profile": "yes",
+      "issues": [
+        "Multi-tab measurement dengan format campur: {'REUSE|SALVAGE|REPLACE': 3, 'GOOD|NO GOOD': 1, 'none': 1}"
+      ],
+      "size_mb": 0.29,
+      "sheet_count": 5,
+      "sheet_names": [
+        "CRANKSHAFT",
+        "CAMSHAFT",
+        "CON ROD",
+        "CYL BLOCK",
+        "PIN PISTON"
+      ],
+      "decision_profiles_mixed": {
+        "REUSE|SALVAGE|REPLACE": 3,
+        "GOOD|NO GOOD": 1,
+        "none": 1
+      }
+    },
+    {
+      "file": "MEASUREMENT ENGINE SAA12V140E-3 (PC2000-8).xlsx",
+      "stage": "Inspection/Measurement",
+      "sheets": [
+        {
+          "name": "CRANKSHAFT",
+          "size": "100x46",
+          "decision_profile": "REUSE|SALVAGE|REPLACE",
+          "has_part_list": true
+        },
+        {
+          "name": "CAMSHAFT RH",
+          "size": "65x37",
+          "decision_profile": "GOOD|NO GOOD",
+          "has_part_list": true
+        },
+        {
+          "name": "CAMSHAFT LH",
+          "size": "65x37",
+          "decision_profile": "GOOD|NO GOOD",
+          "has_part_list": true
+        },
+        {
+          "name": "CON ROD",
+          "size": "109x72",
+          "decision_profile": "REUSE|SALVAGE|REPLACE",
+          "has_part_list": true
+        },
+        {
+          "name": "CYL BLOCK",
+          "size": "237x41",
+          "decision_profile": "GOOD|NO GOOD",
+          "has_part_list": false
+        },
+        {
+          "name": "CYL LINER",
+          "size": "129x52",
+          "decision_profile": "REUSE|SALVAGE|REPLACE",
+          "has_part_list": true
+        }
+      ],
+      "decision_profile": "REUSE|SALVAGE|REPLACE",
+      "part_list_profile": "yes",
+      "issues": [
+        "Multi-tab measurement dengan format campur: {'REUSE|SALVAGE|REPLACE': 3, 'GOOD|NO GOOD': 3, 'none': 1}"
+      ],
+      "size_mb": 1.19,
+      "sheet_count": 7,
+      "sheet_names": [
+        "CRANKSHAFT",
+        "CAMSHAFT RH",
+        "CAMSHAFT LH",
+        "CON ROD",
+        "CYL BLOCK",
+        "CYL LINER",
+        "PIN PISTON"
+      ],
+      "decision_profiles_mixed": {
+        "REUSE|SALVAGE|REPLACE": 3,
+        "GOOD|NO GOOD": 3,
+        "none": 1
+      }
+    },
+    {
+      "file": "MEASUREMENT ENGINE SAA6D140E-5 (D155).xlsx",
+      "stage": "Inspection/Measurement",
+      "sheets": [
+        {
+          "name": "CRANKSHAFT",
+          "size": "157x46",
+          "decision_profile": "REUSE|SALVAGE|REPLACE",
+          "has_part_list": true
+        },
+        {
+          "name": "CAMSHAFT",
+          "size": "60x37",
+          "decision_profile": "GOOD|NO GOOD",
+          "has_part_list": true
+        },
+        {
+          "name": "CON ROD",
+          "size": "115x72",
+          "decision_profile": "REUSE|SALVAGE|REPLACE",
+          "has_part_list": true
+        },
+        {
+          "name": "CYL BLOCK",
+          "size": "124x41",
+          "decision_profile": "GOOD|NO GOOD",
+          "has_part_list": true
+        }
+      ],
+      "decision_profile": "REUSE|SALVAGE|REPLACE",
+      "part_list_profile": "yes",
+      "issues": [
+        "Multi-tab measurement dengan format campur: {'REUSE|SALVAGE|REPLACE': 2, 'GOOD|NO GOOD': 2, 'none': 1}"
+      ],
+      "size_mb": 0.28,
+      "sheet_count": 5,
+      "sheet_names": [
+        "CRANKSHAFT",
+        "CAMSHAFT",
+        "CON ROD",
+        "CYL BLOCK",
+        "PIN PISTON"
+      ],
+      "decision_profiles_mixed": {
+        "REUSE|SALVAGE|REPLACE": 2,
+        "GOOD|NO GOOD": 2,
+        "none": 1
+      }
+    },
+    {
+      "file": "MEASUREMENT ENGINE SAA6D170E-5 (D375-6 PC1250-8).xlsx",
+      "stage": "Inspection/Measurement",
+      "sheets": [
+        {
+          "name": "CRANKSHAFT",
+          "size": "114x46",
+          "decision_profile": "GOOD|NO GOOD",
+          "has_part_list": true
+        },
+        {
+          "name": "CAMSHAFT",
+          "size": "60x37",
+          "decision_profile": "GOOD|NO GOOD",
+          "has_part_list": true
+        },
+        {
+          "name": "CON ROD",
+          "size": "169x72",
+          "decision_profile": "REUSE|SALVAGE|REPLACE",
+          "has_part_list": true
+        },
+        {
+          "name": "CYL BLOCK",
+          "size": "161x41",
+          "decision_profile": "REUSE|SALVAGE|REPLACE",
+          "has_part_list": false
+        },
+        {
+          "name": "CYL LINER",
+          "size": "128x52",
+          "decision_profile": "REUSE|SALVAGE|REPLACE",
+          "has_part_list": true
+        }
+      ],
+      "decision_profile": "REUSE|SALVAGE|REPLACE",
+      "part_list_profile": "yes",
+      "issues": [
+        "Multi-tab measurement dengan format campur: {'GOOD|NO GOOD': 2, 'REUSE|SALVAGE|REPLACE': 3, 'none': 1}"
+      ],
+      "size_mb": 1.07,
+      "sheet_count": 6,
+      "sheet_names": [
+        "CRANKSHAFT",
+        "CAMSHAFT",
+        "CON ROD",
+        "CYL BLOCK",
+        "CYL LINER",
+        "PIN PISTON"
+      ],
+      "decision_profiles_mixed": {
+        "GOOD|NO GOOD": 2,
+        "REUSE|SALVAGE|REPLACE": 3,
+        "none": 1
+      }
+    },
+    {
+      "file": "SUBASSY DISASSEMBLY ENGINE SA12V140E-1 (WA800-3).xlsx",
+      "stage": "Disassembly",
+      "sheets": [],
+      "decision_profile": null,
+      "part_list_profile": null,
+      "issues": [
+        "File besar (9.2 MB) — scan header saja"
+      ],
+      "size_mb": 9.22
+    },
+    {
+      "file": "SUBASSY DISASSEMBLY ENGINE SA6D140E-2 (GD825A).xlsx",
+      "stage": "Disassembly",
+      "sheets": [],
+      "decision_profile": null,
+      "part_list_profile": null,
+      "issues": [
+        "File besar (9.2 MB) — scan header saja"
+      ],
+      "size_mb": 9.21
+    },
+    {
+      "file": "SUBASSY DISASSEMBLY ENGINE SAA12V140E-3 (PC2000-8).xlsx",
+      "stage": "Disassembly",
+      "sheets": [],
+      "decision_profile": null,
+      "part_list_profile": null,
+      "issues": [
+        "File besar (10.0 MB) — scan header saja"
+      ],
+      "size_mb": 9.98
+    },
+    {
+      "file": "SUBASSY DISASSEMBLY ENGINE SAA6D140E-5 (D155).xlsx",
+      "stage": "Disassembly",
+      "sheets": [],
+      "decision_profile": null,
+      "part_list_profile": null,
+      "issues": [
+        "File besar (10.1 MB) — scan header saja"
+      ],
+      "size_mb": 10.13
+    },
+    {
+      "file": "SUBASSY DISASSEMBLY ENGINE SAA6D170E-5 (D375-6 PC1250-8).xlsx",
+      "stage": "Disassembly",
+      "sheets": [],
+      "decision_profile": null,
+      "part_list_profile": null,
+      "issues": [
+        "File besar (10.3 MB) — scan header saja"
+      ],
+      "size_mb": 10.34
+    },
+    {
+      "file": "SUBASSY MEASUREMENT ENGINE SA12V140E-1 (WA800-3).xlsx",
+      "stage": "Inspection/Measurement",
+      "sheets": [
+        {
+          "name": "ACC DRIVE MEASURE",
+          "size": "67x31",
+          "decision_profile": "REUSE|SALVAGE|REPLACE",
+          "has_part_list": true
+        },
+        {
+          "name": "CAM FOLLOWER MEASURE",
+          "size": "104x33",
+          "decision_profile": "REUSE|SALVAGE|REPLACE",
+          "has_part_list": true
+        },
+        {
+          "name": "CROSSHEAD MEASURE",
+          "size": "60x47",
+          "decision_profile": "REUSE|SALVAGE|REPLACE",
+          "has_part_list": true
+        },
+        {
+          "name": "CYL HEAD MEASURE",
+          "size": "224x69",
+          "decision_profile": "NEW|REUSED|REPLACE NEW",
+          "has_part_list": true
+        },
+        {
+          "name": "CYL HEAD SALVAGE",
+          "size": "75x47",
+          "decision_profile": "REUSE|SALVAGE|REPLACE",
+          "has_part_list": false
+        },
+        {
+          "name": "ROCKER ARM MEASURE",
+          "size": "70x33",
+          "decision_profile": "REUSE|SALVAGE|REPLACE",
+          "has_part_list": true
+        },
+        {
+          "name": "TIMING GEAR MEASURE",
+          "size": "79x51",
+          "decision_profile": "REUSE|SALVAGE|REPLACE",
+          "has_part_list": true
+        }
+      ],
+      "decision_profile": "REUSE|SALVAGE|REPLACE",
+      "part_list_profile": "yes",
+      "issues": [
+        "Multi-tab measurement dengan format campur: {'REUSE|SALVAGE|REPLACE': 6, 'NEW|REUSED|REPLACE NEW': 1, 'none': 1}"
+      ],
+      "size_mb": 0.72,
+      "sheet_count": 8,
+      "sheet_names": [
+        "ACC DRIVE MEASURE",
+        "CAM FOLLOWER MEASURE",
+        "CROSSHEAD MEASURE",
+        "CYL HEAD MEASURE",
+        "CYL HEAD SALVAGE",
+        "ROCKER ARM MEASURE",
+        "TIMING GEAR MEASURE",
+        "WATERPUMP MEASURE"
+      ],
+      "decision_profiles_mixed": {
+        "REUSE|SALVAGE|REPLACE": 6,
+        "NEW|REUSED|REPLACE NEW": 1,
+        "none": 1
+      }
+    },
+    {
+      "file": "SUBASSY MEASUREMENT ENGINE SA6D140E-2 (GD825A).xlsx",
+      "stage": "Inspection/Measurement",
+      "sheets": [
+        {
+          "name": "CAM FOLLOWER MEASURE",
+          "size": "71x33",
+          "decision_profile": "REUSE|SALVAGE|REPLACE",
+          "has_part_list": true
+        },
+        {
+          "name": "CROSSHEAD MEASURE",
+          "size": "60x47",
+          "decision_profile": "REUSE|SALVAGE|REPLACE",
+          "has_part_list": true
+        },
+        {
+          "name": "CYL HEAD MEASURE",
+          "size": "172x44",
+          "decision_profile": "REUSE|SALVAGE|REPLACE",
+          "has_part_list": true
+        },
+        {
+          "name": "CYL HEAD SALVAGE",
+          "size": "75x47",
+          "decision_profile": "REUSE|SALVAGE|REPLACE",
+          "has_part_list": false
+        },
+        {
+          "name": "ROCKER ARM MEASURE",
+          "size": "61x33",
+          "decision_profile": "REUSE|SALVAGE|REPLACE",
+          "has_part_list": true
+        }
+      ],
+      "decision_profile": "REUSE|SALVAGE|REPLACE",
+      "part_list_profile": "yes",
+      "issues": [],
+      "size_mb": 0.74,
+      "sheet_count": 5,
+      "sheet_names": [
+        "CAM FOLLOWER MEASURE",
+        "CROSSHEAD MEASURE",
+        "CYL HEAD MEASURE",
+        "CYL HEAD SALVAGE",
+        "ROCKER ARM MEASURE"
+      ]
+    },
+    {
+      "file": "SUBASSY MEASUREMENT ENGINE SAA12V140E-3 (PC2000-8).xlsx",
+      "stage": "Inspection/Measurement",
+      "sheets": [
+        {
+          "name": "CAM FOLLOWER MEASURE",
+          "size": "104x33",
+          "decision_profile": "REUSE|SALVAGE|REPLACE",
+          "has_part_list": true
+        },
+        {
+          "name": "CROSSHEAD MEASURE",
+          "size": "60x42",
+          "decision_profile": "REUSE|SALVAGE|REPLACE",
+          "has_part_list": true
+        },
+        {
+          "name": "CYL HEAD MEASURE",
+          "size": "225x72",
+          "decision_profile": "REUSE|SALVAGE|REPLACE",
+          "has_part_list": true
+        },
+        {
+          "name": "ROCKER ARM MEASURE",
+          "size": "70x33",
+          "decision_profile": "REUSE|SALVAGE|REPLACE",
+          "has_part_list": true
+        },
+        {
+          "name": "TIMING GEAR MEASURE",
+          "size": "79x51",
+          "decision_profile": "REUSE|SALVAGE|REPLACE",
+          "has_part_list": true
+        }
+      ],
+      "decision_profile": "REUSE|SALVAGE|REPLACE",
+      "part_list_profile": "yes",
+      "issues": [
+        "Multi-tab measurement dengan format campur: {'REUSE|SALVAGE|REPLACE': 5, 'none': 2}"
+      ],
+      "size_mb": 1.06,
+      "sheet_count": 7,
+      "sheet_names": [
+        "CAM FOLLOWER MEASURE",
+        "CROSSHEAD MEASURE",
+        "CYL HEAD MEASURE",
+        "ROCKER ARM MEASURE",
+        "ROCKER SHAFT MEASURE",
+        "TIMING GEAR MEASURE",
+        "WATERPUMP MEASURE"
+      ],
+      "decision_profiles_mixed": {
+        "REUSE|SALVAGE|REPLACE": 5,
+        "none": 2
+      }
+    },
+    {
+      "file": "SUBASSY MEASUREMENT ENGINE SAA6D140E-5 (D155).xlsx",
+      "stage": "Inspection/Measurement",
+      "sheets": [
+        {
+          "name": "CAM FOLLOWER MEASURE",
+          "size": "133x37",
+          "decision_profile": "REUSE|SALVAGE|REPLACE",
+          "has_part_list": true
+        },
+        {
+          "name": "CAM FOLLOWER POLISH",
+          "size": "71x33",
+          "decision_profile": "REUSE|SALVAGE|REPLACE",
+          "has_part_list": true
+        },
+        {
+          "name": "CROSSHEAD MEASURE",
+          "size": "60x47",
+          "decision_profile": "REUSE|SALVAGE|REPLACE",
+          "has_part_list": true
+        },
+        {
+          "name": "CYL HEAD MEASURE",
+          "size": "166x44",
+          "decision_profile": "REUSE|SALVAGE|REPLACE",
+          "has_part_list": true
+        },
+        {
+          "name": "CYL HEAD SALVAGE",
+          "size": "75x47",
+          "decision_profile": "REUSE|SALVAGE|REPLACE",
+          "has_part_list": false
+        },
+        {
+          "name": "ROCKER ARM MEASURE",
+          "size": "61x33",
+          "decision_profile": "REUSE|SALVAGE|REPLACE",
+          "has_part_list": true
+        }
+      ],
+      "decision_profile": "REUSE|SALVAGE|REPLACE",
+      "part_list_profile": "yes",
+      "issues": [
+        "Multi-tab measurement dengan format campur: {'REUSE|SALVAGE|REPLACE': 6, 'none': 1}"
+      ],
+      "size_mb": 0.91,
+      "sheet_count": 7,
+      "sheet_names": [
+        "CAM FOLLOWER MEASURE",
+        "CAM FOLLOWER POLISH",
+        "CROSSHEAD MEASURE",
+        "CYL HEAD MEASURE",
+        "CYL HEAD SALVAGE",
+        "ROCKER SHAFT MEASURE",
+        "ROCKER ARM MEASURE"
+      ],
+      "decision_profiles_mixed": {
+        "REUSE|SALVAGE|REPLACE": 6,
+        "none": 1
+      }
+    },
+    {
+      "file": "SUBASSY MEASUREMENT ENGINE SAA6D170E-5 (D375-6 PC1250-8).xlsx",
+      "stage": "Inspection/Measurement",
+      "sheets": [
+        {
+          "name": "ACC DRIVE MEASURE",
+          "size": "53x32",
+          "decision_profile": "REUSE|SALVAGE|REPLACE",
+          "has_part_list": true
+        },
+        {
+          "name": "ACC HOUSING MEASURE",
+          "size": "116x37",
+          "decision_profile": "REUSE|SALVAGE|REPLACE",
+          "has_part_list": false
+        },
+        {
+          "name": "CROSSHEAD MEASURE",
+          "size": "60x47",
+          "decision_profile": "REUSE|SALVAGE|REPLACE",
+          "has_part_list": true
+        },
+        {
+          "name": "CYL HEAD MEASURE",
+          "size": "171x70",
+          "decision_profile": "REUSE|SALVAGE|REPLACE",
+          "has_part_list": true
+        },
+        {
+          "name": "CYL HEAD SALVAGE",
+          "size": "75x47",
+          "decision_profile": "REUSE|SALVAGE|REPLACE",
+          "has_part_list": false
+        },
+        {
+          "name": "TIMING GEAR MEASURE",
+          "size": "81x51",
+          "decision_profile": "REUSE|SALVAGE|REPLACE",
+          "has_part_list": true
+        }
+      ],
+      "decision_profile": "REUSE|SALVAGE|REPLACE",
+      "part_list_profile": "yes",
+      "issues": [
+        "Multi-tab measurement dengan format campur: {'REUSE|SALVAGE|REPLACE': 6, 'none': 1}"
+      ],
+      "size_mb": 0.83,
+      "sheet_count": 7,
+      "sheet_names": [
+        "ACC DRIVE MEASURE",
+        "ACC HOUSING MEASURE",
+        "CROSSHEAD MEASURE",
+        "CYL HEAD MEASURE",
+        "CYL HEAD SALVAGE",
+        "ROCKER SHAFT MEASURE",
+        "TIMING GEAR MEASURE"
+      ],
+      "decision_profiles_mixed": {
+        "REUSE|SALVAGE|REPLACE": 6,
+        "none": 1
+      }
+    }
+  ],
+  "POWERTRAIN": [
+    {
+      "file": "Control Valve/D155-6/ASSEMBLY Control Valve D155-6.xlsx",
+      "stage": "Assembly",
+      "sheets": [
+        {
+          "name": "ASEMBLY",
+          "size": "153x21",
+          "decision_profile": "none",
+          "has_part_list": true
+        }
+      ],
+      "decision_profile": "none",
+      "part_list_profile": "yes",
+      "issues": [],
+      "size_mb": 0.22,
+      "sheet_count": 1,
+      "sheet_names": [
+        "ASEMBLY"
+      ]
+    },
+    {
+      "file": "Control Valve/D155-6/DELIVERY Control Valve D155-6.xlsx",
+      "stage": "Delivery",
+      "sheets": [
+        {
+          "name": "DELIVERY",
+          "size": "94x22",
+          "decision_profile": "REUSE|SALVAGE|REPLACE",
+          "has_part_list": true
+        }
+      ],
+      "decision_profile": "REUSE|SALVAGE|REPLACE",
+      "part_list_profile": "yes",
+      "issues": [],
+      "size_mb": 0.25,
+      "sheet_count": 1,
+      "sheet_names": [
+        "DELIVERY"
+      ]
+    },
+    {
+      "file": "Control Valve/D155-6/DISASSEMBLY Control Valve D155-6.xlsx",
+      "stage": "Disassembly",
+      "sheets": [
+        {
+          "name": "DISASSY",
+          "size": "132x23",
+          "decision_profile": "REUSE|SALVAGE|REPLACE",
+          "has_part_list": true
+        }
+      ],
+      "decision_profile": "REUSE|SALVAGE|REPLACE",
+      "part_list_profile": "yes",
+      "issues": [],
+      "size_mb": 0.22,
+      "sheet_count": 1,
+      "sheet_names": [
+        "DISASSY"
+      ]
+    },
+    {
+      "file": "Control Valve/D155-6/INSPECTION Control Valve D155-6.xlsx",
+      "stage": "Inspection/Measurement",
+      "sheets": [
+        {
+          "name": "inspeksi",
+          "size": "145x22",
+          "decision_profile": "U/A|U/R|R/N",
+          "has_part_list": true
+        }
+      ],
+      "decision_profile": "U/A|U/R|R/N",
+      "part_list_profile": "yes",
+      "issues": [],
+      "size_mb": 0.2,
+      "sheet_count": 1,
+      "sheet_names": [
+        "inspeksi"
+      ]
+    },
+    {
+      "file": "Control Valve/D155-6/RECEIVING Control Valve D155-6.xlsx",
+      "stage": "Receiving",
+      "sheets": [
+        {
+          "name": "receiving",
+          "size": "94x22",
+          "decision_profile": "GOOD|NO GOOD",
+          "has_part_list": true
+        }
+      ],
+      "decision_profile": "GOOD|NO GOOD",
+      "part_list_profile": "yes",
+      "issues": [],
+      "size_mb": 0.25,
+      "sheet_count": 1,
+      "sheet_names": [
+        "receiving"
+      ]
+    },
+    {
+      "file": "Control Valve/D375-6/ASSEMBLY Control Valve D375-6.xlsx",
+      "stage": "Assembly",
+      "sheets": [
+        {
+          "name": "ASSEMBLY",
+          "size": "169x25",
+          "decision_profile": "GOOD|NO GOOD",
+          "has_part_list": true
+        }
+      ],
+      "decision_profile": "GOOD|NO GOOD",
+      "part_list_profile": "yes",
+      "issues": [],
+      "size_mb": 0.48,
+      "sheet_count": 1,
+      "sheet_names": [
+        "ASSEMBLY"
+      ]
+    },
+    {
+      "file": "Control Valve/D375-6/DELIVERY Control Valve D375-6.xlsx",
+      "stage": "Delivery",
+      "sheets": [
+        {
+          "name": "DELIVERY",
+          "size": "149x22",
+          "decision_profile": "REUSE|SALVAGE|REPLACE",
+          "has_part_list": true
+        }
+      ],
+      "decision_profile": "REUSE|SALVAGE|REPLACE",
+      "part_list_profile": "yes",
+      "issues": [],
+      "size_mb": 0.27,
+      "sheet_count": 1,
+      "sheet_names": [
+        "DELIVERY"
+      ]
+    },
+    {
+      "file": "Control Valve/D375-6/DISASSEMBLY Control Valve D375-6.xlsx",
+      "stage": "Disassembly",
+      "sheets": [
+        {
+          "name": "DISASSY",
+          "size": "133x23",
+          "decision_profile": "none",
+          "has_part_list": true
+        }
+      ],
+      "decision_profile": "none",
+      "part_list_profile": "yes",
+      "issues": [
+        "Disassembly tanpa REUSE/SALVAGE/REPLACE konsisten"
+      ],
+      "size_mb": 0.48,
+      "sheet_count": 1,
+      "sheet_names": [
+        "DISASSY"
+      ]
+    },
+    {
+      "file": "Control Valve/D375-6/INSPECTION Control Valve D375-6.xlsx",
+      "stage": "Inspection/Measurement",
+      "sheets": [
+        {
+          "name": "inspeksi",
+          "size": "214x24",
+          "decision_profile": "U/A|U/R|R/N",
+          "has_part_list": true
+        }
+      ],
+      "decision_profile": "U/A|U/R|R/N",
+      "part_list_profile": "yes",
+      "issues": [],
+      "size_mb": 0.33,
+      "sheet_count": 1,
+      "sheet_names": [
+        "inspeksi"
+      ]
+    },
+    {
+      "file": "Control Valve/D375-6/RECEIVING Control Valve D375-6.xlsx",
+      "stage": "Receiving",
+      "sheets": [
+        {
+          "name": "receiving",
+          "size": "149x22",
+          "decision_profile": "GOOD|NO GOOD",
+          "has_part_list": true
+        }
+      ],
+      "decision_profile": "GOOD|NO GOOD",
+      "part_list_profile": "yes",
+      "issues": [],
+      "size_mb": 0.27,
+      "sheet_count": 1,
+      "sheet_names": [
+        "receiving"
+      ]
+    },
+    {
+      "file": "Control Valve/GD825A-2/ASSEMBLY Control Valve GD825A-2.xlsx",
+      "stage": "Assembly",
+      "sheets": [
+        {
+          "name": "ASSEMBLY",
+          "size": "183x21",
+          "decision_profile": "none",
+          "has_part_list": true
+        }
+      ],
+      "decision_profile": "none",
+      "part_list_profile": "yes",
+      "issues": [],
+      "size_mb": 0.38,
+      "sheet_count": 1,
+      "sheet_names": [
+        "ASSEMBLY"
+      ]
+    },
+    {
+      "file": "Control Valve/GD825A-2/DELIVERY Control Valve GD825A-2.xlsx",
+      "stage": "Delivery",
+      "sheets": [
+        {
+          "name": "DELIVERY",
+          "size": "111x22",
+          "decision_profile": "REUSE|SALVAGE|REPLACE",
+          "has_part_list": true
+        }
+      ],
+      "decision_profile": "REUSE|SALVAGE|REPLACE",
+      "part_list_profile": "yes",
+      "issues": [],
+      "size_mb": 0.27,
+      "sheet_count": 1,
+      "sheet_names": [
+        "DELIVERY"
+      ]
+    },
+    {
+      "file": "Control Valve/GD825A-2/DISASSEMBLY Control Valve GD825A-2.xlsx",
+      "stage": "Disassembly",
+      "sheets": [
+        {
+          "name": "DISSASSY",
+          "size": "172x25",
+          "decision_profile": "REUSE|SALVAGE|REPLACE",
+          "has_part_list": true
+        }
+      ],
+      "decision_profile": "REUSE|SALVAGE|REPLACE",
+      "part_list_profile": "yes",
+      "issues": [],
+      "size_mb": 0.36,
+      "sheet_count": 1,
+      "sheet_names": [
+        "DISSASSY"
+      ]
+    },
+    {
+      "file": "Control Valve/GD825A-2/INSPECTION Control Valve GD825A-2.xlsx",
+      "stage": "Inspection/Measurement",
+      "sheets": [
+        {
+          "name": "inspeksi",
+          "size": "154x22",
+          "decision_profile": "U/A|U/R|R/N",
+          "has_part_list": true
+        }
+      ],
+      "decision_profile": "U/A|U/R|R/N",
+      "part_list_profile": "yes",
+      "issues": [],
+      "size_mb": 0.26,
+      "sheet_count": 1,
+      "sheet_names": [
+        "inspeksi"
+      ]
+    },
+    {
+      "file": "Control Valve/GD825A-2/RECEIVING Control Valve GD825A-2.xlsx",
+      "stage": "Receiving",
+      "sheets": [
+        {
+          "name": "RECEIVING",
+          "size": "111x22",
+          "decision_profile": "GOOD|NO GOOD",
+          "has_part_list": true
+        }
+      ],
+      "decision_profile": "GOOD|NO GOOD",
+      "part_list_profile": "yes",
+      "issues": [],
+      "size_mb": 0.27,
+      "sheet_count": 1,
+      "sheet_names": [
+        "RECEIVING"
+      ]
+    },
+    {
+      "file": "Control Valve/HD785-7/ASSEMBLY Control Valve HD785-7.xlsx",
+      "stage": "Assembly",
+      "sheets": [
+        {
+          "name": "ASSEMBLY",
+          "size": "121x22",
+          "decision_profile": "none",
+          "has_part_list": true
+        }
+      ],
+      "decision_profile": "none",
+      "part_list_profile": "yes",
+      "issues": [],
+      "size_mb": 0.59,
+      "sheet_count": 1,
+      "sheet_names": [
+        "ASSEMBLY"
+      ]
+    },
+    {
+      "file": "Control Valve/HD785-7/DELIVERY Control Valve HD785-7.xlsx",
+      "stage": "Delivery",
+      "sheets": [
+        {
+          "name": "DELIVERY",
+          "size": "112x22",
+          "decision_profile": "REUSE|SALVAGE|REPLACE",
+          "has_part_list": true
+        }
+      ],
+      "decision_profile": "REUSE|SALVAGE|REPLACE",
+      "part_list_profile": "yes",
+      "issues": [],
+      "size_mb": 0.23,
+      "sheet_count": 1,
+      "sheet_names": [
+        "DELIVERY"
+      ]
+    },
+    {
+      "file": "Control Valve/HD785-7/DISASSEMBLY Control Valve HD785-7.xlsx",
+      "stage": "Disassembly",
+      "sheets": [
+        {
+          "name": "DISASSY",
+          "size": "80x24",
+          "decision_profile": "none",
+          "has_part_list": true
+        }
+      ],
+      "decision_profile": "none",
+      "part_list_profile": "yes",
+      "issues": [
+        "Disassembly tanpa REUSE/SALVAGE/REPLACE konsisten"
+      ],
+      "size_mb": 0.38,
+      "sheet_count": 1,
+      "sheet_names": [
+        "DISASSY"
+      ]
+    },
+    {
+      "file": "Control Valve/HD785-7/INSPECTION Control Valve HD785-7.xlsx",
+      "stage": "Inspection/Measurement",
+      "sheets": [
+        {
+          "name": "INSPEKSI",
+          "size": "137x22",
+          "decision_profile": "U/A|U/R|R/N",
+          "has_part_list": true
+        }
+      ],
+      "decision_profile": "U/A|U/R|R/N",
+      "part_list_profile": "yes",
+      "issues": [],
+      "size_mb": 0.28,
+      "sheet_count": 1,
+      "sheet_names": [
+        "INSPEKSI"
+      ]
+    },
+    {
+      "file": "Control Valve/HD785-7/RECEIVING Control Valve HD785-7.xlsx",
+      "stage": "Receiving",
+      "sheets": [
+        {
+          "name": "RECEIVING",
+          "size": "112x22",
+          "decision_profile": "GOOD|NO GOOD",
+          "has_part_list": true
+        }
+      ],
+      "decision_profile": "GOOD|NO GOOD",
+      "part_list_profile": "yes",
+      "issues": [],
+      "size_mb": 0.23,
+      "sheet_count": 1,
+      "sheet_names": [
+        "RECEIVING"
+      ]
+    },
+    {
+      "file": "Control Valve/PC1250-8/ASSEMBLY Control Valve PC1250-8.xlsx",
+      "stage": "Assembly",
+      "sheets": [
+        {
+          "name": "ASSEMBLY NO1",
+          "size": "85x20",
+          "decision_profile": "none",
+          "has_part_list": true
+        },
+        {
+          "name": "ASSEMBLY NO2",
+          "size": "112x21",
+          "decision_profile": "none",
+          "has_part_list": true
+        },
+        {
+          "name": "ASSEMBLY NO3",
+          "size": "112x21",
+          "decision_profile": "none",
+          "has_part_list": true
+        }
+      ],
+      "decision_profile": "none",
+      "part_list_profile": "yes",
+      "issues": [],
+      "size_mb": 1.92,
+      "sheet_count": 3,
+      "sheet_names": [
+        "ASSEMBLY NO1",
+        "ASSEMBLY NO2",
+        "ASSEMBLY NO3"
+      ]
+    },
+    {
+      "file": "Control Valve/PC1250-8/DELIVERY Control Valve PC1250-8.xlsx",
+      "stage": "Delivery",
+      "sheets": [
+        {
+          "name": "DELIVERY NO 1",
+          "size": "96x22",
+          "decision_profile": "REUSE|SALVAGE|REPLACE",
+          "has_part_list": true
+        },
+        {
+          "name": "DELIVERY NO 2",
+          "size": "115x22",
+          "decision_profile": "REUSE|SALVAGE|REPLACE",
+          "has_part_list": true
+        },
+        {
+          "name": "DELIVERY NO 3",
+          "size": "96x22",
+          "decision_profile": "REUSE|SALVAGE|REPLACE",
+          "has_part_list": true
+        }
+      ],
+      "decision_profile": "REUSE|SALVAGE|REPLACE",
+      "part_list_profile": "yes",
+      "issues": [],
+      "size_mb": 0.72,
+      "sheet_count": 3,
+      "sheet_names": [
+        "DELIVERY NO 1",
+        "DELIVERY NO 2",
+        "DELIVERY NO 3"
+      ]
+    },
+    {
+      "file": "Control Valve/PC1250-8/DISASSEMBLY Control Valve PC1250-8.xlsx",
+      "stage": "Disassembly",
+      "sheets": [
+        {
+          "name": "DISASSY NO1",
+          "size": "89x22",
+          "decision_profile": "REUSE|SALVAGE|REPLACE",
+          "has_part_list": true
+        },
+        {
+          "name": "DISASSY NO2",
+          "size": "104x23",
+          "decision_profile": "REUSE|SALVAGE|REPLACE",
+          "has_part_list": true
+        },
+        {
+          "name": "DISASSY NO3",
+          "size": "104x23",
+          "decision_profile": "REUSE|SALVAGE|REPLACE",
+          "has_part_list": true
+        }
+      ],
+      "decision_profile": "REUSE|SALVAGE|REPLACE",
+      "part_list_profile": "yes",
+      "issues": [],
+      "size_mb": 1.36,
+      "sheet_count": 3,
+      "sheet_names": [
+        "DISASSY NO1",
+        "DISASSY NO2",
+        "DISASSY NO3"
+      ]
+    },
+    {
+      "file": "Control Valve/PC1250-8/INSPECTION Control Valve PC1250-8.xlsx",
+      "stage": "Inspection/Measurement",
+      "sheets": [
+        {
+          "name": "INSPEKSI NO1",
+          "size": "134x22",
+          "decision_profile": "U/A|U/R|R/N",
+          "has_part_list": true
+        },
+        {
+          "name": "INSPEKSI NO2",
+          "size": "146x22",
+          "decision_profile": "U/A|U/R|R/N",
+          "has_part_list": true
+        },
+        {
+          "name": "INSPEKSI NO3",
+          "size": "146x22",
+          "decision_profile": "U/A|U/R|R/N",
+          "has_part_list": true
+        }
+      ],
+      "decision_profile": "U/A|U/R|R/N",
+      "part_list_profile": "yes",
+      "issues": [],
+      "size_mb": 0.49,
+      "sheet_count": 3,
+      "sheet_names": [
+        "INSPEKSI NO1",
+        "INSPEKSI NO2",
+        "INSPEKSI NO3"
+      ]
+    },
+    {
+      "file": "Control Valve/PC1250-8/RECEIVING Control Valve PC1250-8.xlsx",
+      "stage": "Receiving",
+      "sheets": [
+        {
+          "name": "RECEIVING NO 1",
+          "size": "93x22",
+          "decision_profile": "GOOD|NO GOOD",
+          "has_part_list": true
+        },
+        {
+          "name": "RECEIVING NO 2",
+          "size": "107x22",
+          "decision_profile": "GOOD|NO GOOD",
+          "has_part_list": true
+        },
+        {
+          "name": "RECEIVING NO 3",
+          "size": "96x22",
+          "decision_profile": "GOOD|NO GOOD",
+          "has_part_list": true
+        }
+      ],
+      "decision_profile": "GOOD|NO GOOD",
+      "part_list_profile": "yes",
+      "issues": [],
+      "size_mb": 0.76,
+      "sheet_count": 3,
+      "sheet_names": [
+        "RECEIVING NO 1",
+        "RECEIVING NO 2",
+        "RECEIVING NO 3"
+      ]
+    },
+    {
+      "file": "Control Valve/PC1250-8/TEST Control Valve PC1250-8.xlsx",
+      "stage": "Test",
+      "sheets": [
+        {
+          "name": "TESTBENCH NO 1",
+          "size": "163x21",
+          "decision_profile": "none",
+          "has_part_list": true
+        },
+        {
+          "name": "TESTBENCH NO 2",
+          "size": "160x21",
+          "decision_profile": "none",
+          "has_part_list": true
+        },
+        {
+          "name": "TESTBENCH NO 3",
+          "size": "153x21",
+          "decision_profile": "GOOD|NO GOOD",
+          "has_part_list": true
+        }
+      ],
+      "decision_profile": "none",
+      "part_list_profile": "yes",
+      "issues": [],
+      "size_mb": 3.53,
+      "sheet_count": 3,
+      "sheet_names": [
+        "TESTBENCH NO 1",
+        "TESTBENCH NO 2",
+        "TESTBENCH NO 3"
+      ],
+      "decision_profiles_mixed": {
+        "none": 2,
+        "GOOD|NO GOOD": 1
+      }
+    },
+    {
+      "file": "Control Valve/PC2000-8/ASSEMBLY Control Valve PC2000-8.xlsx",
+      "stage": "Assembly",
+      "sheets": [
+        {
+          "name": "assembly LH",
+          "size": "187x21",
+          "decision_profile": "none",
+          "has_part_list": true
+        },
+        {
+          "name": "ASEMBLY RH",
+          "size": "194x21",
+          "decision_profile": "none",
+          "has_part_list": true
+        }
+      ],
+      "decision_profile": "none",
+      "part_list_profile": "yes",
+      "issues": [],
+      "size_mb": 1.84,
+      "sheet_count": 2,
+      "sheet_names": [
+        "assembly LH",
+        "ASEMBLY RH"
+      ]
+    },
+    {
+      "file": "Control Valve/PC2000-8/DELIVERY Control Valve PC2000-8.xlsx",
+      "stage": "Delivery",
+      "sheets": [
+        {
+          "name": "DELIVERY LH",
+          "size": "109x23",
+          "decision_profile": "REUSE|SALVAGE|REPLACE",
+          "has_part_list": true
+        },
+        {
+          "name": "DELIVERY RH",
+          "size": "109x22",
+          "decision_profile": "REUSE|SALVAGE|REPLACE",
+          "has_part_list": true
+        }
+      ],
+      "decision_profile": "REUSE|SALVAGE|REPLACE",
+      "part_list_profile": "yes",
+      "issues": [],
+      "size_mb": 0.7,
+      "sheet_count": 2,
+      "sheet_names": [
+        "DELIVERY LH",
+        "DELIVERY RH"
+      ]
+    },
+    {
+      "file": "Control Valve/PC2000-8/DISASSEMBLY Control Valve PC2000-8.xlsx",
+      "stage": "Disassembly",
+      "sheets": [
+        {
+          "name": "DISSASSY LH",
+          "size": "162x23",
+          "decision_profile": "REUSE|SALVAGE|REPLACE",
+          "has_part_list": true
+        },
+        {
+          "name": "DISASSY RH",
+          "size": "166x23",
+          "decision_profile": "REUSE|SALVAGE|REPLACE",
+          "has_part_list": true
+        }
+      ],
+      "decision_profile": "REUSE|SALVAGE|REPLACE",
+      "part_list_profile": "yes",
+      "issues": [],
+      "size_mb": 1.87,
+      "sheet_count": 2,
+      "sheet_names": [
+        "DISSASSY LH",
+        "DISASSY RH"
+      ]
+    },
+    {
+      "file": "Control Valve/PC2000-8/INSPECTION Control Valve PC2000-8.xlsx",
+      "stage": "Inspection/Measurement",
+      "sheets": [
+        {
+          "name": "INSPEKSI LH",
+          "size": "161x22",
+          "decision_profile": "U/A|U/R|R/N",
+          "has_part_list": true
+        },
+        {
+          "name": "INSPEKSI RH",
+          "size": "161x22",
+          "decision_profile": "U/A|U/R|R/N",
+          "has_part_list": true
+        }
+      ],
+      "decision_profile": "U/A|U/R|R/N",
+      "part_list_profile": "yes",
+      "issues": [],
+      "size_mb": 0.52,
+      "sheet_count": 2,
+      "sheet_names": [
+        "INSPEKSI LH",
+        "INSPEKSI RH"
+      ]
+    },
+    {
+      "file": "Control Valve/PC2000-8/RECEIVING Control Valve PC2000-8.xlsx",
+      "stage": "Receiving",
+      "sheets": [
+        {
+          "name": "RECEIVING LH",
+          "size": "109x22",
+          "decision_profile": "GOOD|NO GOOD",
+          "has_part_list": true
+        },
+        {
+          "name": "RECEIVING RH",
+          "size": "109x22",
+          "decision_profile": "GOOD|NO GOOD",
+          "has_part_list": true
+        }
+      ],
+      "decision_profile": "GOOD|NO GOOD",
+      "part_list_profile": "yes",
+      "issues": [],
+      "size_mb": 0.7,
+      "sheet_count": 2,
+      "sheet_names": [
+        "RECEIVING LH",
+        "RECEIVING RH"
+      ]
+    },
+    {
+      "file": "Control Valve/PC2000-8/TEST Control Valve PC2000-8.xlsx",
+      "stage": "Test",
+      "sheets": [
+        {
+          "name": "TESTBENCH LH",
+          "size": "171x21",
+          "decision_profile": "none",
+          "has_part_list": true
+        },
+        {
+          "name": "TESTBENCH RH",
+          "size": "171x21",
+          "decision_profile": "none",
+          "has_part_list": true
+        }
+      ],
+      "decision_profile": "none",
+      "part_list_profile": "yes",
+      "issues": [],
+      "size_mb": 4.02,
+      "sheet_count": 2,
+      "sheet_names": [
+        "TESTBENCH LH",
+        "TESTBENCH RH"
+      ]
+    },
+    {
+      "file": "Control Valve/WA800-3/ASSEMBLY Control Valve WA800-3.xlsx",
+      "stage": "Assembly",
+      "sheets": [
+        {
+          "name": "assembly",
+          "size": "168x22",
+          "decision_profile": "none",
+          "has_part_list": true
+        }
+      ],
+      "decision_profile": "none",
+      "part_list_profile": "yes",
+      "issues": [],
+      "size_mb": 0.34,
+      "sheet_count": 1,
+      "sheet_names": [
+        "assembly"
+      ]
+    },
+    {
+      "file": "Control Valve/WA800-3/DELIVERY Control Valve WA800-3.xlsx",
+      "stage": "Delivery",
+      "sheets": [
+        {
+          "name": "DELIVERY",
+          "size": "101x22",
+          "decision_profile": "REUSE|SALVAGE|REPLACE",
+          "has_part_list": true
+        }
+      ],
+      "decision_profile": "REUSE|SALVAGE|REPLACE",
+      "part_list_profile": "yes",
+      "issues": [],
+      "size_mb": 0.21,
+      "sheet_count": 1,
+      "sheet_names": [
+        "DELIVERY"
+      ]
+    },
+    {
+      "file": "Control Valve/WA800-3/DISASSEMBLY Control Valve WA800-3.xlsx",
+      "stage": "Disassembly",
+      "sheets": [
+        {
+          "name": "dissassy",
+          "size": "138x23",
+          "decision_profile": "REUSE|SALVAGE|REPLACE",
+          "has_part_list": true
+        }
+      ],
+      "decision_profile": "REUSE|SALVAGE|REPLACE",
+      "part_list_profile": "yes",
+      "issues": [],
+      "size_mb": 0.3,
+      "sheet_count": 1,
+      "sheet_names": [
+        "dissassy"
+      ]
+    },
+    {
+      "file": "Control Valve/WA800-3/INSPECTION Control Valve WA800-3.xlsx",
+      "stage": "Inspection/Measurement",
+      "sheets": [
+        {
+          "name": "inspeksi",
+          "size": "169x24",
+          "decision_profile": "U/A|U/R|R/N",
+          "has_part_list": true
+        }
+      ],
+      "decision_profile": "U/A|U/R|R/N",
+      "part_list_profile": "yes",
+      "issues": [],
+      "size_mb": 0.51,
+      "sheet_count": 1,
+      "sheet_names": [
+        "inspeksi"
+      ]
+    },
+    {
+      "file": "Control Valve/WA800-3/RECEIVING Control Valve WA800-3.xlsx",
+      "stage": "Receiving",
+      "sheets": [
+        {
+          "name": "RECEIVING",
+          "size": "101x22",
+          "decision_profile": "GOOD|NO GOOD",
+          "has_part_list": true
+        }
+      ],
+      "decision_profile": "GOOD|NO GOOD",
+      "part_list_profile": "yes",
+      "issues": [],
+      "size_mb": 0.21,
+      "sheet_count": 1,
+      "sheet_names": [
+        "RECEIVING"
+      ]
+    },
+    {
+      "file": "Front Suspension/HD785-7/ASSEMBLY Front Suspension HD785-7.xlsx",
+      "stage": "Assembly",
+      "sheets": [],
+      "decision_profile": "none",
+      "part_list_profile": "no",
+      "issues": [],
+      "size_mb": 0.22,
+      "sheet_count": 1,
+      "sheet_names": [
+        "ASEMBLY"
+      ]
+    },
+    {
+      "file": "Front Suspension/HD785-7/DELIVERY Front Suspension HD785-7.xlsx",
+      "stage": "Delivery",
+      "sheets": [
+        {
+          "name": "DELIVERY",
+          "size": "59x22",
+          "decision_profile": "REUSE|SALVAGE|REPLACE",
+          "has_part_list": true
+        }
+      ],
+      "decision_profile": "REUSE|SALVAGE|REPLACE",
+      "part_list_profile": "yes",
+      "issues": [],
+      "size_mb": 0.07,
+      "sheet_count": 1,
+      "sheet_names": [
+        "DELIVERY"
+      ]
+    },
+    {
+      "file": "Front Suspension/HD785-7/DISASSEMBLY Front Suspension HD785-7.xlsx",
+      "stage": "Disassembly",
+      "sheets": [
+        {
+          "name": "DISASSY",
+          "size": "72x23",
+          "decision_profile": "REUSE|SALVAGE|REPLACE",
+          "has_part_list": true
+        }
+      ],
+      "decision_profile": "REUSE|SALVAGE|REPLACE",
+      "part_list_profile": "yes",
+      "issues": [],
+      "size_mb": 0.26,
+      "sheet_count": 1,
+      "sheet_names": [
+        "DISASSY"
+      ]
+    },
+    {
+      "file": "Front Suspension/HD785-7/INSPECTION Front Suspension HD785-7.xlsx",
+      "stage": "Inspection/Measurement",
+      "sheets": [
+        {
+          "name": "inspeksi",
+          "size": "139x26",
+          "decision_profile": "U/A|U/R|R/N",
+          "has_part_list": true
+        }
+      ],
+      "decision_profile": "U/A|U/R|R/N",
+      "part_list_profile": "yes",
+      "issues": [],
+      "size_mb": 0.1,
+      "sheet_count": 1,
+      "sheet_names": [
+        "inspeksi"
+      ]
+    },
+    {
+      "file": "Front Suspension/HD785-7/RECEIVING Front Suspension HD785-7.xlsx",
+      "stage": "Receiving",
+      "sheets": [
+        {
+          "name": "receiving",
+          "size": "57x22",
+          "decision_profile": "GOOD|NO GOOD",
+          "has_part_list": true
+        }
+      ],
+      "decision_profile": "GOOD|NO GOOD",
+      "part_list_profile": "yes",
+      "issues": [],
+      "size_mb": 0.07,
+      "sheet_count": 1,
+      "sheet_names": [
+        "receiving"
+      ]
+    },
+    {
+      "file": "Hydraulic Cylinder/HD785-7/ASSEMBLY Hydraulic Cylinder HD785-7.xlsx",
+      "stage": "Assembly",
+      "sheets": [
+        {
+          "name": "ASEMBLY",
+          "size": "87x21",
+          "decision_profile": "none",
+          "has_part_list": true
+        }
+      ],
+      "decision_profile": "none",
+      "part_list_profile": "yes",
+      "issues": [],
+      "size_mb": 0.26,
+      "sheet_count": 1,
+      "sheet_names": [
+        "ASEMBLY"
+      ]
+    },
+    {
+      "file": "Hydraulic Cylinder/HD785-7/DELIVERY Hydraulic Cylinder HD785-7.xlsx",
+      "stage": "Delivery",
+      "sheets": [
+        {
+          "name": "DELIVERY",
+          "size": "59x22",
+          "decision_profile": "REUSE|SALVAGE|REPLACE",
+          "has_part_list": true
+        }
+      ],
+      "decision_profile": "REUSE|SALVAGE|REPLACE",
+      "part_list_profile": "yes",
+      "issues": [],
+      "size_mb": 0.09,
+      "sheet_count": 1,
+      "sheet_names": [
+        "DELIVERY"
+      ]
+    },
+    {
+      "file": "Hydraulic Cylinder/HD785-7/DISASSEMBLY Hydraulic Cylinder HD785-7.xlsx",
+      "stage": "Disassembly",
+      "sheets": [
+        {
+          "name": "DISASSY",
+          "size": "86x23",
+          "decision_profile": "REUSE|SALVAGE|REPLACE",
+          "has_part_list": true
+        }
+      ],
+      "decision_profile": "REUSE|SALVAGE|REPLACE",
+      "part_list_profile": "yes",
+      "issues": [],
+      "size_mb": 0.26,
+      "sheet_count": 1,
+      "sheet_names": [
+        "DISASSY"
+      ]
+    },
+    {
+      "file": "Hydraulic Cylinder/HD785-7/INSPECTION Hydraulic Cylinder HD785-7.xlsx",
+      "stage": "Inspection/Measurement",
+      "sheets": [
+        {
+          "name": "inspeksi",
+          "size": "155x26",
+          "decision_profile": "U/A|U/R|R/N",
+          "has_part_list": true
+        }
+      ],
+      "decision_profile": "U/A|U/R|R/N",
+      "part_list_profile": "yes",
+      "issues": [],
+      "size_mb": 0.11,
+      "sheet_count": 1,
+      "sheet_names": [
+        "inspeksi"
+      ]
+    },
+    {
+      "file": "Hydraulic Cylinder/HD785-7/RECEIVING Hydraulic Cylinder HD785-7.xlsx",
+      "stage": "Receiving",
+      "sheets": [
+        {
+          "name": "receiving",
+          "size": "57x22",
+          "decision_profile": "GOOD|NO GOOD",
+          "has_part_list": true
+        }
+      ],
+      "decision_profile": "GOOD|NO GOOD",
+      "part_list_profile": "yes",
+      "issues": [],
+      "size_mb": 0.09,
+      "sheet_count": 1,
+      "sheet_names": [
+        "receiving"
+      ]
+    },
+    {
+      "file": "Rear Suspension/HD785-7/ASSEMBLY Rear Suspension HD785-7.xlsx",
+      "stage": "Assembly",
+      "sheets": [],
+      "decision_profile": "none",
+      "part_list_profile": "no",
+      "issues": [],
+      "size_mb": 0.17,
+      "sheet_count": 1,
+      "sheet_names": [
+        "ASEMBLY"
+      ]
+    },
+    {
+      "file": "Rear Suspension/HD785-7/DELIVERY Rear Suspension HD785-7.xlsx",
+      "stage": "Delivery",
+      "sheets": [
+        {
+          "name": "DELIVERY",
+          "size": "59x22",
+          "decision_profile": "REUSE|SALVAGE|REPLACE",
+          "has_part_list": true
+        }
+      ],
+      "decision_profile": "REUSE|SALVAGE|REPLACE",
+      "part_list_profile": "yes",
+      "issues": [],
+      "size_mb": 0.09,
+      "sheet_count": 1,
+      "sheet_names": [
+        "DELIVERY"
+      ]
+    },
+    {
+      "file": "Rear Suspension/HD785-7/DISASSEMBLY Rear Suspension HD785-7.xlsx",
+      "stage": "Disassembly",
+      "sheets": [
+        {
+          "name": "DISASSY",
+          "size": "72x23",
+          "decision_profile": "REUSE|SALVAGE|REPLACE",
+          "has_part_list": true
+        }
+      ],
+      "decision_profile": "REUSE|SALVAGE|REPLACE",
+      "part_list_profile": "yes",
+      "issues": [],
+      "size_mb": 0.19,
+      "sheet_count": 1,
+      "sheet_names": [
+        "DISASSY"
+      ]
+    },
+    {
+      "file": "Rear Suspension/HD785-7/INSPECTION Rear Suspension HD785-7.xlsx",
+      "stage": "Inspection/Measurement",
+      "sheets": [
+        {
+          "name": "inspeksi",
+          "size": "132x26",
+          "decision_profile": "U/A|U/R|R/N",
+          "has_part_list": true
+        }
+      ],
+      "decision_profile": "U/A|U/R|R/N",
+      "part_list_profile": "yes",
+      "issues": [],
+      "size_mb": 0.09,
+      "sheet_count": 1,
+      "sheet_names": [
+        "inspeksi"
+      ]
+    },
+    {
+      "file": "Rear Suspension/HD785-7/RECEIVING Rear Suspension HD785-7.xlsx",
+      "stage": "Receiving",
+      "sheets": [
+        {
+          "name": "receiving",
+          "size": "57x22",
+          "decision_profile": "GOOD|NO GOOD",
+          "has_part_list": true
+        }
+      ],
+      "decision_profile": "GOOD|NO GOOD",
+      "part_list_profile": "yes",
+      "issues": [],
+      "size_mb": 0.09,
+      "sheet_count": 1,
+      "sheet_names": [
+        "receiving"
+      ]
+    }
+  ]
+}

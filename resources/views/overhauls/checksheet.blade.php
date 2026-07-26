@@ -955,17 +955,21 @@
                     return { images: stageTwoImages, label: item.group };
                 }
 
-                const knownEgis = ['d375-6','hd785-7','d155-6','wa800-3','gd825a-2','hd465-7r','pc1250-8','pc2000-8'];
+                const knownEgis = ['d375-6','hd785-7','d155-6','wa800-3','gd825a-2','hd465-7r','pc1250-8','pc2000-8','hd1500-7'];
                 let egi = "{{ strtolower(trim($comp->egi ?? 'd375-6')) }}";
                 if (!knownEgis.includes(egi)) egi = 'd375-6';
-                const slug = item.group.toLowerCase().replace(/ /g, '-');
+
+                const majorCategory = "{{ $comp->major_category }}";
+                const slug = majorCategory === 'Engine'
+                    ? item.group.toLowerCase().replace(/ /g, '-')
+                    : majorCategory.toLowerCase().replace(/\//g, '-').replace(/ /g, '-');
 
                 return {
                     images: [{
                         src: '/images/inspection/' + egi + '/' + slug + '.png',
-                        label: item.group,
+                        label: majorCategory === 'Engine' ? item.group : majorCategory + ' Reference',
                     }],
-                    label: item.group,
+                    label: majorCategory === 'Engine' ? item.group : majorCategory + ' Reference',
                 };
             }
 
@@ -1148,24 +1152,53 @@
                 renderDaftar();
             };
 
+            const saveQueue = [];
+            let saveBusy = false;
+
+            async function flushSaves() {
+                if (saveBusy) return;
+                saveBusy = true;
+                while (saveQueue.length) {
+                    const job = saveQueue.shift();
+                    let saved = false;
+                    for (let attempt = 0; attempt < 3 && !saved; attempt++) {
+                        try {
+                            const r = await fetch(`/components/${COMP_ID}/checksheet/${STAGE}/answer`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': CSRF,
+                                    'Accept': 'application/json',
+                                },
+                                body: JSON.stringify({ item_id: job.item_id, answer: job.answer })
+                            });
+                            const data = await r.json().catch(() => ({}));
+                            if (!r.ok) {
+                                throw new Error(data.message || data.error || ('HTTP ' + r.status));
+                            }
+                            showToast('✓ Tersimpan');
+                            saved = true;
+                        } catch (e) {
+                            if (attempt < 2) {
+                                await new Promise(res => setTimeout(res, 250 * (attempt + 1)));
+                                continue;
+                            }
+                            showToast('⚠ Gagal: ' + (e.message || 'jaringan'));
+                        }
+                    }
+                }
+                saveBusy = false;
+            }
+
             window.answer = function (val) {
                 if (!canInteract) return;
                 const item = items[currentIndex];
                 answers[item.id] = val;
 
-                fetch(`/components/${COMP_ID}/checksheet/${STAGE}/answer`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': CSRF,
-                        'Accept': 'application/json',
-                    },
-                    body: JSON.stringify({ item_id: item.id, answer: val })
-                }).then(r => r.json()).then(data => {
-                    showToast('✓ Tersimpan');
-                }).catch(() => {
-                    showToast('⚠ Gagal menyimpan');
-                });
+                const existing = saveQueue.findIndex(j => j.item_id === item.id);
+                if (existing >= 0) saveQueue.splice(existing, 1);
+                saveQueue.push({ item_id: item.id, answer: val });
+                flushSaves();
 
                 setTimeout(() => {
                     currentIndex++;

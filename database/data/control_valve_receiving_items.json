@@ -1,0 +1,1140 @@
+{
+  "D155-6": [
+    {
+      "group": "Main Relief Valve",
+      "number": 1,
+      "label": "MAIN RELIEF VALVE HOUSING (1 PCS)",
+      "id": "CVL-001"
+    },
+    {
+      "group": "Main Relief Valve",
+      "number": 2,
+      "label": "PLUG TC RELIEF A (1 PCS)",
+      "id": "CVL-002"
+    },
+    {
+      "group": "Main Relief Valve",
+      "number": 3,
+      "label": "PLUG MAIN RELIEF A (1 PCS)",
+      "id": "CVL-003"
+    },
+    {
+      "group": "Main Relief Valve",
+      "number": 4,
+      "label": "PLUG MAIN RELIEF B (1 PCS)",
+      "id": "CVL-004"
+    },
+    {
+      "group": "Main Relief Valve",
+      "number": 5,
+      "label": "PLUG TC RELIEF B (1 PCS)",
+      "id": "CVL-005"
+    },
+    {
+      "group": "Ecmv Transmission Valve",
+      "number": 1,
+      "label": "UPPER VALVE HOUSING (1 PCS)",
+      "id": "CVL-006"
+    },
+    {
+      "group": "Ecmv Transmission Valve",
+      "number": 2,
+      "label": "FILL SWITCH (5 PCS)",
+      "id": "CVL-007"
+    },
+    {
+      "group": "Ecmv Transmission Valve",
+      "number": 3,
+      "label": "BRACKET PISAH (3 PCS)",
+      "id": "CVL-008"
+    },
+    {
+      "group": "Ecmv Transmission Valve",
+      "number": 4,
+      "label": "SLEEVE (5 PCS)",
+      "id": "CVL-009"
+    },
+    {
+      "group": "Ecmv Transmission Valve",
+      "number": 5,
+      "label": "HARNESS (1 PCS)",
+      "id": "CVL-010"
+    },
+    {
+      "group": "Ecmv Transmission Valve",
+      "number": 6,
+      "label": "SOLENOID (5 PCS)",
+      "id": "CVL-011"
+    },
+    {
+      "group": "Ecmv Transmission Valve",
+      "number": 7,
+      "label": "LOWER VALVE HOUSING (1 PCS)",
+      "id": "CVL-012"
+    },
+    {
+      "group": "Ecmv Transmission Valve",
+      "number": 8,
+      "label": "FILTER ASSY (1 PCS)",
+      "id": "CVL-013"
+    },
+    {
+      "group": "Ecmv Transmission Valve",
+      "number": 9,
+      "label": "BRACKET SAMBUNG (2 PCS)",
+      "id": "CVL-014"
+    },
+    {
+      "group": "Steering Brake Valve",
+      "number": 1,
+      "label": "STEERING BRAKE VALVE HOUSING (1 PCS)",
+      "id": "CVL-015"
+    },
+    {
+      "group": "Steering Brake Valve",
+      "number": 2,
+      "label": "PLUG BESAR (3 PCS)",
+      "id": "CVL-016"
+    },
+    {
+      "group": "Steering Brake Valve",
+      "number": 3,
+      "label": "SUDDEN STOP VALVE (1 PCS)",
+      "id": "CVL-017"
+    },
+    {
+      "group": "Steering Brake Valve",
+      "number": 4,
+      "label": "STEERING CLUTCH ECMV HOUSING R , L (2 PCS)",
+      "id": "CVL-018"
+    },
+    {
+      "group": "Steering Brake Valve",
+      "number": 5,
+      "label": "ELBOW (3 PCS)",
+      "id": "CVL-019"
+    },
+    {
+      "group": "Steering Brake Valve",
+      "number": 6,
+      "label": "PLATE (3 PCS)",
+      "id": "CVL-020"
+    },
+    {
+      "group": "Steering Brake Valve",
+      "number": 7,
+      "label": "PLUG KECIL (24 PCS)",
+      "id": "CVL-021"
+    },
+    {
+      "group": "Steering Brake Valve",
+      "number": 8,
+      "label": "FILTER ASSY (1 PCS)",
+      "id": "CVL-022"
+    },
+    {
+      "group": "Steering Brake Valve",
+      "number": 9,
+      "label": "STEERING BRAKE ECMV HOUSING R , L (2 PCS)",
+      "id": "CVL-023"
+    },
+    {
+      "group": "Steering Brake Valve",
+      "number": 10,
+      "label": "SOLENOID VALVE HOUSING (1 PCS)",
+      "id": "CVL-024"
+    },
+    {
+      "group": "Steering Brake Valve",
+      "number": 11,
+      "label": "BRACKET ECMV (4 PCS)",
+      "id": "CVL-025"
+    },
+    {
+      "group": "Steering Brake Valve",
+      "number": 12,
+      "label": "FILL SWITCH ECMV (4 PCS)",
+      "id": "CVL-026"
+    },
+    {
+      "group": "Steering Brake Valve",
+      "number": 13,
+      "label": "BLOCK ECMV (4 PCS)",
+      "id": "CVL-027"
+    },
+    {
+      "group": "Steering Brake Valve",
+      "number": 14,
+      "label": "SOLENOID ECMV (4 PCS)",
+      "id": "CVL-028"
+    },
+    {
+      "group": "Steering Brake Valve",
+      "number": 15,
+      "label": "PLUG ATAS/PRESSURE ECMV (4 PCS)",
+      "id": "CVL-029"
+    },
+    {
+      "group": "Steering Brake Valve",
+      "number": 16,
+      "label": "PLUG ORIFACE ECMV (4 PCS)",
+      "id": "CVL-030"
+    },
+    {
+      "group": "Steering Brake Valve",
+      "number": 17,
+      "label": "PAINTING CONDITION (ALL)",
+      "id": "CVL-031"
+    },
+    {
+      "group": "Steering Brake Valve",
+      "number": 18,
+      "label": "PACKING / WRAPING (ALL)",
+      "id": "CVL-032"
+    }
+  ],
+  "D375-6": [
+    {
+      "group": "Lubricating Valve",
+      "number": 1,
+      "label": "LUBRICATING VALVE HOUSING (1 PCS)",
+      "id": "CVL-001"
+    },
+    {
+      "group": "Lubricating Valve",
+      "number": 2,
+      "label": "PLUG / COVER (1 PCS)",
+      "id": "CVL-002"
+    },
+    {
+      "group": "Lubricating Valve",
+      "number": 3,
+      "label": "PLUG ATAS / PRESSURE (1 PCS)",
+      "id": "CVL-003"
+    },
+    {
+      "group": "Torq Converter Valve Assy",
+      "number": 1,
+      "label": "TORQ CONVERTER VALVE SEAT (1 PCS)",
+      "id": "CVL-004"
+    },
+    {
+      "group": "Torq Converter Valve Assy",
+      "number": 2,
+      "label": "MAIN RELIEF & TC RELIEF VALVE HOUSING (1 PCS)",
+      "id": "CVL-005"
+    },
+    {
+      "group": "Torq Converter Valve Assy",
+      "number": 3,
+      "label": "TC RELIEF VALVE COVER A (1 PCS)",
+      "id": "CVL-006"
+    },
+    {
+      "group": "Torq Converter Valve Assy",
+      "number": 4,
+      "label": "MAIN RELIEF VALVE COVER A (1 PCS)",
+      "id": "CVL-007"
+    },
+    {
+      "group": "Torq Converter Valve Assy",
+      "number": 5,
+      "label": "TC RELIEF VALVE COVER B (1 PCS)",
+      "id": "CVL-008"
+    },
+    {
+      "group": "Torq Converter Valve Assy",
+      "number": 6,
+      "label": "MAIN RELIEF VALVE COVER B (1 PCS)",
+      "id": "CVL-009"
+    },
+    {
+      "group": "Torq Converter Valve Assy",
+      "number": 7,
+      "label": "ELBOW (1 PCS)",
+      "id": "CVL-010"
+    },
+    {
+      "group": "Torq Converter Valve Assy",
+      "number": 8,
+      "label": "SENSOR (1 PCS)",
+      "id": "CVL-011"
+    },
+    {
+      "group": "Torq Converter Valve Assy",
+      "number": 9,
+      "label": "ECMV LOCK UP CLUTCH HOUSING (1 PCS)",
+      "id": "CVL-012"
+    },
+    {
+      "group": "Torq Converter Valve Assy",
+      "number": 10,
+      "label": "PLUG (5 PCS)",
+      "id": "CVL-013"
+    },
+    {
+      "group": "Torq Converter Valve Assy",
+      "number": 11,
+      "label": "ECMV STATOR CLUTCH HOUSING (1 PCS)",
+      "id": "CVL-014"
+    },
+    {
+      "group": "Stator & Lock-Up Ecmv",
+      "number": 12,
+      "label": "ELBOW FOR ECMV STATOR CLUTCH (1 PCS)",
+      "id": "CVL-015"
+    },
+    {
+      "group": "Stator & Lock-Up Ecmv",
+      "number": 13,
+      "label": "ELBOW FOR ECMV LOCK UP CLUTCH (1 PCS)",
+      "id": "CVL-016"
+    },
+    {
+      "group": "Stator & Lock-Up Ecmv",
+      "number": 14,
+      "label": "BRACKET ECMV (2 PCS)",
+      "id": "CVL-017"
+    },
+    {
+      "group": "Stator & Lock-Up Ecmv",
+      "number": 15,
+      "label": "PLATE ECMV (2 PCS)",
+      "id": "CVL-018"
+    },
+    {
+      "group": "Stator & Lock-Up Ecmv",
+      "number": 16,
+      "label": "PLUG ECMV STATOR (1 PCS)",
+      "id": "CVL-019"
+    },
+    {
+      "group": "Stator & Lock-Up Ecmv",
+      "number": 17,
+      "label": "PLUG ORIFACE ECMV (2 PCS)",
+      "id": "CVL-020"
+    },
+    {
+      "group": "Stator & Lock-Up Ecmv",
+      "number": 18,
+      "label": "SOLENOID ECMV (2 PCS)",
+      "id": "CVL-021"
+    },
+    {
+      "group": "Torq Converter Valve Filter",
+      "number": 19,
+      "label": "PLUG FILTER (1 PCS)",
+      "id": "CVL-022"
+    },
+    {
+      "group": "Torq Converter Valve Filter",
+      "number": 20,
+      "label": "FILTER HOUSING (1 PCS)",
+      "id": "CVL-023"
+    },
+    {
+      "group": "Torq Converter Valve Filter",
+      "number": 21,
+      "label": "FILTER SEAT (1 PCS)",
+      "id": "CVL-024"
+    },
+    {
+      "group": "Ecmv Transmission Valve",
+      "number": 1,
+      "label": "UPPER VALVE HOUSING (1 PCS)",
+      "id": "CVL-025"
+    },
+    {
+      "group": "Ecmv Transmission Valve",
+      "number": 2,
+      "label": "FILL SWITCH (5 PCS)",
+      "id": "CVL-026"
+    },
+    {
+      "group": "Ecmv Transmission Valve",
+      "number": 3,
+      "label": "BRACKET PISAH (3 PCS)",
+      "id": "CVL-027"
+    },
+    {
+      "group": "Ecmv Transmission Valve",
+      "number": 4,
+      "label": "SLEEVE (5 PCS)",
+      "id": "CVL-028"
+    },
+    {
+      "group": "Ecmv Transmission Valve",
+      "number": 5,
+      "label": "HARNESS (1 PCS)",
+      "id": "CVL-029"
+    },
+    {
+      "group": "Ecmv Transmission Valve",
+      "number": 6,
+      "label": "SOLENOID (5 PCS)",
+      "id": "CVL-030"
+    },
+    {
+      "group": "Ecmv Transmission Valve",
+      "number": 7,
+      "label": "LOWER VALVE HOUSING (1 PCS)",
+      "id": "CVL-031"
+    },
+    {
+      "group": "Ecmv Transmission Valve",
+      "number": 8,
+      "label": "BLOCK (1 PCS)",
+      "id": "CVL-032"
+    },
+    {
+      "group": "Ecmv Transmission Valve",
+      "number": 9,
+      "label": "BRACKET SAMBUNG (2 PCS)",
+      "id": "CVL-033"
+    },
+    {
+      "group": "Ecmv Transmission Valve",
+      "number": 10,
+      "label": "SLEEVE (1 PCS)",
+      "id": "CVL-034"
+    },
+    {
+      "group": "Ecmv Transmission Valve",
+      "number": 11,
+      "label": "BLOCK (1 PCS)",
+      "id": "CVL-035"
+    },
+    {
+      "group": "Steering Brake Valve",
+      "number": 1,
+      "label": "STEERING BRAKE VALVE HOUSING (1 PCS)",
+      "id": "CVL-036"
+    },
+    {
+      "group": "Steering Brake Valve",
+      "number": 2,
+      "label": "PLUG (6 PCS)",
+      "id": "CVL-037"
+    },
+    {
+      "group": "Steering Brake Valve",
+      "number": 3,
+      "label": "INCHING VALVE HOUSING (1 PCS)",
+      "id": "CVL-038"
+    },
+    {
+      "group": "Steering Brake Valve",
+      "number": 4,
+      "label": "STEERING CLUTCH ECMV HOUSING R , L (2 PCS)",
+      "id": "CVL-039"
+    },
+    {
+      "group": "Steering Brake Valve",
+      "number": 5,
+      "label": "ELBOW BESAR (1 PCS)",
+      "id": "CVL-040"
+    },
+    {
+      "group": "Steering Brake Valve",
+      "number": 6,
+      "label": "PLATE (1 PCS)",
+      "id": "CVL-041"
+    },
+    {
+      "group": "Steering Brake Valve",
+      "number": 7,
+      "label": "ELBOW KECIL (2 PCS)",
+      "id": "CVL-042"
+    },
+    {
+      "group": "Steering Brake Valve",
+      "number": 8,
+      "label": "FILTER ASSY (1 PCS)",
+      "id": "CVL-043"
+    },
+    {
+      "group": "Steering Brake Valve",
+      "number": 9,
+      "label": "STEERING BRAKE ECMV HOUSING R , L (2 PCS)",
+      "id": "CVL-044"
+    },
+    {
+      "group": "Steering Brake Valve",
+      "number": 10,
+      "label": "BRACKET ECMV (4 PCS)",
+      "id": "CVL-045"
+    },
+    {
+      "group": "Steering Brake Valve",
+      "number": 11,
+      "label": "FILL SWITCH ECMV (4 PCS)",
+      "id": "CVL-046"
+    },
+    {
+      "group": "Steering Brake Valve",
+      "number": 12,
+      "label": "BLOCK ECMV (4 PCS)",
+      "id": "CVL-047"
+    },
+    {
+      "group": "Steering Brake Valve",
+      "number": 13,
+      "label": "SOLENOID ECMV (4 PCS)",
+      "id": "CVL-048"
+    },
+    {
+      "group": "Steering Brake Valve",
+      "number": 14,
+      "label": "PLUG ATAS/PRESSURE ECMV (4 PCS)",
+      "id": "CVL-049"
+    },
+    {
+      "group": "Steering Brake Valve",
+      "number": 15,
+      "label": "PLUG ORIFACE ECMV (4 PCS)",
+      "id": "CVL-050"
+    },
+    {
+      "group": "Steering Brake Valve",
+      "number": 16,
+      "label": "SUDDEN STOP VALVE (1 PCS)",
+      "id": "CVL-051"
+    },
+    {
+      "group": "Steering Brake Valve",
+      "number": 17,
+      "label": "PAINTING CONDITION (ALL)",
+      "id": "CVL-052"
+    },
+    {
+      "group": "Steering Brake Valve",
+      "number": 18,
+      "label": "PACKING / WRAPING (ALL)",
+      "id": "CVL-053"
+    }
+  ],
+  "HD785-7": [
+    {
+      "group": "Torq Converter Valve Assy",
+      "number": 1,
+      "label": "TORQ CONVERTER HOUSING (1 PCS)",
+      "id": "CVL-001"
+    },
+    {
+      "group": "Torq Converter Valve Assy",
+      "number": 2,
+      "label": "ORIFACE (1 PCS)",
+      "id": "CVL-002"
+    },
+    {
+      "group": "Torq Converter Valve Assy",
+      "number": 3,
+      "label": "COVER TORQ CONVERTER RELEIF VALVE A (1 PCS)",
+      "id": "CVL-003"
+    },
+    {
+      "group": "Torq Converter Valve Assy",
+      "number": 4,
+      "label": "COVER MAIN RELIEF VALVE (1 PCS)",
+      "id": "CVL-004"
+    },
+    {
+      "group": "Torq Converter Valve Assy",
+      "number": 5,
+      "label": "PLUG COVER FLOW RATE SELECTOR VALVE (1 PCS)",
+      "id": "CVL-005"
+    },
+    {
+      "group": "Torq Converter Valve Assy",
+      "number": 6,
+      "label": "COVER FLOW RATE SELECTOR VALVE (1 PCS)",
+      "id": "CVL-006"
+    },
+    {
+      "group": "Torq Converter Valve Assy",
+      "number": 7,
+      "label": "PLUG SAMPING (1 PCS)",
+      "id": "CVL-007"
+    },
+    {
+      "group": "Torq Converter Valve Assy",
+      "number": 8,
+      "label": "SOLENOID (2 PCS)",
+      "id": "CVL-008"
+    },
+    {
+      "group": "Torq Converter Valve Assy",
+      "number": 9,
+      "label": "PRESSURE SENSOR (2 PCS)",
+      "id": "CVL-009"
+    },
+    {
+      "group": "Torq Converter Valve Assy",
+      "number": 10,
+      "label": "PLUG ATAS/PRESSURE (3 PCS)",
+      "id": "CVL-010"
+    },
+    {
+      "group": "Torq Converter Valve Assy",
+      "number": 11,
+      "label": "COVER PANJANG (1 PCS)",
+      "id": "CVL-011"
+    },
+    {
+      "group": "Torq Converter Valve Assy",
+      "number": 12,
+      "label": "COVER TORQ CONVERTER RELIEF VALVE B (1 PCS)",
+      "id": "CVL-012"
+    },
+    {
+      "group": "Torq Converter Valve Assy",
+      "number": 13,
+      "label": "ELBOW (1 PCS)",
+      "id": "CVL-013"
+    },
+    {
+      "group": "Lubricating Valve Assy",
+      "number": 1,
+      "label": "LUBRICATING VALVE HOUSING (1 PCS)",
+      "id": "CVL-014"
+    },
+    {
+      "group": "Lubricating Valve Assy",
+      "number": 2,
+      "label": "COVER A (1 PCS)",
+      "id": "CVL-015"
+    },
+    {
+      "group": "Lubricating Valve Assy",
+      "number": 3,
+      "label": "TEMPERATURE SENSOR (1 PCS)",
+      "id": "CVL-016"
+    },
+    {
+      "group": "Lubricating Valve Assy",
+      "number": 4,
+      "label": "ELBOW (1 PCS)",
+      "id": "CVL-017"
+    },
+    {
+      "group": "Lubricating Valve Assy",
+      "number": 5,
+      "label": "PLUG ATAS (2PCS) SAMPING (1 PCS)",
+      "id": "CVL-018"
+    },
+    {
+      "group": "Lubricating Valve Assy",
+      "number": 6,
+      "label": "SOLENOID (1 PCS)",
+      "id": "CVL-019"
+    },
+    {
+      "group": "Lubricating Valve Assy",
+      "number": 7,
+      "label": "COVER B (1 PCS)",
+      "id": "CVL-020"
+    },
+    {
+      "group": "Lubricating Valve Assy",
+      "number": 8,
+      "label": "PRESSURE SENSOR (1 PCS)",
+      "id": "CVL-021"
+    },
+    {
+      "group": "Lubricating Valve Assy",
+      "number": 9,
+      "label": "PLUG SAMPING/PRESSURE (1 PCS)",
+      "id": "CVL-022"
+    },
+    {
+      "group": "Lubricating Valve Assy",
+      "number": 1,
+      "label": "ELECTRONIC CONTROL MODULATING VALVE",
+      "id": "CVL-023"
+    },
+    {
+      "group": "Lubricating Valve Assy",
+      "number": 2,
+      "label": "SOLENOID (8 PCS)",
+      "id": "CVL-024"
+    },
+    {
+      "group": "Lubricating Valve Assy",
+      "number": 3,
+      "label": "BRACKET (8 PCS)",
+      "id": "CVL-025"
+    },
+    {
+      "group": "Lubricating Valve Assy",
+      "number": 4,
+      "label": "FILL SWITCH (7 PCS )",
+      "id": "CVL-026"
+    },
+    {
+      "group": "Lubricating Valve Assy",
+      "number": 5,
+      "label": "PLUG ATAS/PRESSURE (8 PCS)",
+      "id": "CVL-027"
+    },
+    {
+      "group": "Lubricating Valve Assy",
+      "number": 6,
+      "label": "PLUG BELAKANG (8 PCS )",
+      "id": "CVL-028"
+    },
+    {
+      "group": "Lubricating Valve Assy",
+      "number": 7,
+      "label": "PLUG ORIFACE (8 PCS)",
+      "id": "CVL-029"
+    },
+    {
+      "group": "Transmission Control Valve",
+      "number": 1,
+      "label": "TRANSMISSION CONTROL VALVE HOUSING (1 PCS)",
+      "id": "CVL-030"
+    },
+    {
+      "group": "Transmission Control Valve",
+      "number": 2,
+      "label": "ECMV HOUSING (8 PCS)",
+      "id": "CVL-031"
+    },
+    {
+      "group": "Transmission Control Valve",
+      "number": 3,
+      "label": "ELBOW TO LUBRICATING V (1 PCS)",
+      "id": "CVL-032"
+    },
+    {
+      "group": "Transmission Control Valve",
+      "number": 4,
+      "label": "PLUG SAMPING/DRAIN (9 PCS)",
+      "id": "CVL-033"
+    },
+    {
+      "group": "Transmission Control Valve",
+      "number": 5,
+      "label": "FILTER HOUSING (1 PCS) , HEAD FILTER (1 PCS)",
+      "id": "CVL-034"
+    },
+    {
+      "group": "Transmission Control Valve",
+      "number": 6,
+      "label": "PLUG FILTER (1 PCS)",
+      "id": "CVL-035"
+    },
+    {
+      "group": "Transmission Control Valve",
+      "number": 7,
+      "label": "ELBOW TO TORQ CONVERTER V (1 PCS)",
+      "id": "CVL-036"
+    },
+    {
+      "group": "Transmission Control Valve",
+      "number": 8,
+      "label": "PAINTING CONDITION (ALL)",
+      "id": "CVL-037"
+    },
+    {
+      "group": "Transmission Control Valve",
+      "number": 9,
+      "label": "PACKING / WRAPING (ALL)",
+      "id": "CVL-038"
+    }
+  ],
+  "GD825A-2": [
+    {
+      "group": "Lubricating Valve & Filter",
+      "number": 1,
+      "label": "LUBRICATING VALVE HOUSING (1 PCS)",
+      "id": "CVL-001"
+    },
+    {
+      "group": "Lubricating Valve & Filter",
+      "number": 2,
+      "label": "COVER ATAS (1 PCS)",
+      "id": "CVL-002"
+    },
+    {
+      "group": "Lubricating Valve & Filter",
+      "number": 3,
+      "label": "COVER SAMPING (1 PCS)",
+      "id": "CVL-003"
+    },
+    {
+      "group": "Lubricating Valve & Filter",
+      "number": 4,
+      "label": "FILTER ASSY (1 PCS)",
+      "id": "CVL-004"
+    },
+    {
+      "group": "Lubricating Valve & Filter",
+      "number": 1,
+      "label": "CONTROL VALVE SEAT (1 PCS)",
+      "id": "CVL-005"
+    },
+    {
+      "group": "Lubricating Valve & Filter",
+      "number": 2,
+      "label": "LOWER VALVE HOUSING (1 PCS)",
+      "id": "CVL-006"
+    },
+    {
+      "group": "Lubricating Valve & Filter",
+      "number": 3,
+      "label": "COVER LOWER VALVE (1 PCS)",
+      "id": "CVL-007"
+    },
+    {
+      "group": "Lubricating Valve & Filter",
+      "number": 4,
+      "label": "SOLENOID VALVE HOUSING (1 PCS)",
+      "id": "CVL-008"
+    },
+    {
+      "group": "Lubricating Valve & Filter",
+      "number": 5,
+      "label": "PIPING LOWER VALVE",
+      "id": "CVL-009"
+    },
+    {
+      "group": "Lubricating Valve & Filter",
+      "number": 1,
+      "label": "UPPER VALVE HOUSING (1 PCS)",
+      "id": "CVL-010"
+    },
+    {
+      "group": "Lubricating Valve & Filter",
+      "number": 2,
+      "label": "COVER INCHING & SPACER L (1 PCS )",
+      "id": "CVL-011"
+    },
+    {
+      "group": "Lubricating Valve & Filter",
+      "number": 3,
+      "label": "STOPPER QUICK RETURN",
+      "id": "CVL-012"
+    },
+    {
+      "group": "Lubricating Valve & Filter",
+      "number": 4,
+      "label": "COVER MOUDLATING & PRIORITY L (1 PCS)",
+      "id": "CVL-013"
+    },
+    {
+      "group": "Lubricating Valve & Filter",
+      "number": 5,
+      "label": "COVER MOUDLATING & PRIORITY R (1 PCS)",
+      "id": "CVL-014"
+    },
+    {
+      "group": "Lubricating Valve & Filter",
+      "number": 6,
+      "label": "BLOCK INCHING (1 PCS)",
+      "id": "CVL-015"
+    },
+    {
+      "group": "Lubricating Valve & Filter",
+      "number": 7,
+      "label": "NUT INCHING (1 PCS)",
+      "id": "CVL-016"
+    },
+    {
+      "group": "Lubricating Valve & Filter",
+      "number": 8,
+      "label": "YOKE INCHING (1 PCS)",
+      "id": "CVL-017"
+    },
+    {
+      "group": "Lubricating Valve & Filter",
+      "number": 9,
+      "label": "PIPING UPPER VALVE SET (3 PCS)",
+      "id": "CVL-018"
+    },
+    {
+      "group": "Lubricating Valve & Filter",
+      "number": 10,
+      "label": "PLUG SPACER (1 PCS)",
+      "id": "CVL-019"
+    },
+    {
+      "group": "Transmission Control Lever",
+      "number": 1,
+      "label": "LEVER (1 PCS)",
+      "id": "CVL-020"
+    },
+    {
+      "group": "Transmission Control Lever",
+      "number": 2,
+      "label": "BRACKET (1 PCS)",
+      "id": "CVL-021"
+    },
+    {
+      "group": "Transmission Control Lever",
+      "number": 3,
+      "label": "SENSOR POTENTIO (1 PCS)",
+      "id": "CVL-022"
+    },
+    {
+      "group": "Transmission Control Lever",
+      "number": 4,
+      "label": "BLOCK (1 PCS)",
+      "id": "CVL-023"
+    },
+    {
+      "group": "Transmission Control Lever",
+      "number": 5,
+      "label": "BREATHER (1 PCS)",
+      "id": "CVL-024"
+    },
+    {
+      "group": "Transmission Control Lever",
+      "number": 6,
+      "label": "PIPING CV SEAT TO BREATHER SET (1 PCS)",
+      "id": "CVL-025"
+    },
+    {
+      "group": "Transmission Control Lever",
+      "number": 7,
+      "label": "PLATE (1 PCS)",
+      "id": "CVL-026"
+    },
+    {
+      "group": "Transmission Control Lever",
+      "number": 8,
+      "label": "PLATE FOR BRACKET (1 PCS)",
+      "id": "CVL-027"
+    },
+    {
+      "group": "Transmission Control Lever",
+      "number": 1,
+      "label": "SOLENOID VALVE HOUSING (1 PCS)",
+      "id": "CVL-028"
+    },
+    {
+      "group": "Transmission Control Lever",
+      "number": 2,
+      "label": "SOLENOID (8 PCS)",
+      "id": "CVL-029"
+    },
+    {
+      "group": "Transmission Control Lever",
+      "number": 3,
+      "label": "PIPING SOLENOID VALVE SET (2 PCS)",
+      "id": "CVL-030"
+    },
+    {
+      "group": "Transmission Control Lever",
+      "number": 4,
+      "label": "COVER (2 PCS)",
+      "id": "CVL-031"
+    },
+    {
+      "group": "Transmission Control Lever",
+      "number": 5,
+      "label": "EMERGENCY SPOOL (8 PCS)",
+      "id": "CVL-032"
+    },
+    {
+      "group": "Transmission Control Lever",
+      "number": 6,
+      "label": "PLATE (3 PCS)",
+      "id": "CVL-033"
+    },
+    {
+      "group": "Transmission Control Lever",
+      "number": 7,
+      "label": "PAINTING CONDITION ALL",
+      "id": "CVL-034"
+    },
+    {
+      "group": "Transmission Control Lever",
+      "number": 8,
+      "label": "PACKING / WRAPING ALL",
+      "id": "CVL-035"
+    }
+  ],
+  "WA800-3": [
+    {
+      "group": "Torq Converter Regulator Valve",
+      "number": 1,
+      "label": "TC REGULATOR VALVE HOUSING (1 PCS)",
+      "id": "CVL-001"
+    },
+    {
+      "group": "Torq Converter Regulator Valve",
+      "number": 2,
+      "label": "COVER (2 PCS)",
+      "id": "CVL-002"
+    },
+    {
+      "group": "Main Relief & Torq Converter Valve",
+      "number": 1,
+      "label": "CONTROL VALVE SEAT (1 PCS)",
+      "id": "CVL-003"
+    },
+    {
+      "group": "Main Relief & Torq Converter Valve",
+      "number": 2,
+      "label": "BREATHER (1 PCS)",
+      "id": "CVL-004"
+    },
+    {
+      "group": "Main Relief & Torq Converter Valve",
+      "number": 3,
+      "label": "FILTER SEAT (1 PCS)",
+      "id": "CVL-005"
+    },
+    {
+      "group": "Main Relief & Torq Converter Valve",
+      "number": 4,
+      "label": "FILTER ASSY (1 PCS)",
+      "id": "CVL-006"
+    },
+    {
+      "group": "Main Relief & Torq Converter Valve",
+      "number": 5,
+      "label": "PLUG MAIN RELIEF , TC RELIEF (2 PCS)",
+      "id": "CVL-007"
+    },
+    {
+      "group": "Main Relief & Torq Converter Valve",
+      "number": 6,
+      "label": "MAIN RELIEF & TC RELIEF VALVE (1 PCS)",
+      "id": "CVL-008"
+    },
+    {
+      "group": "Main Relief & Torq Converter Valve",
+      "number": 7,
+      "label": "PLATE RELIEF & TC RELIEF V (2 PCS)",
+      "id": "CVL-009"
+    },
+    {
+      "group": "Main Relief & Torq Converter Valve",
+      "number": 8,
+      "label": "SEAT (1 PCS)",
+      "id": "CVL-010"
+    },
+    {
+      "group": "Main Relief & Torq Converter Valve",
+      "number": 1,
+      "label": "LOWER VALVE HOUSING (1 PCS)",
+      "id": "CVL-011"
+    },
+    {
+      "group": "Main Relief & Torq Converter Valve",
+      "number": 2,
+      "label": "PROTECTOR (1 PCS)",
+      "id": "CVL-012"
+    },
+    {
+      "group": "Main Relief & Torq Converter Valve",
+      "number": 3,
+      "label": "SOLENOID (5 PCS)",
+      "id": "CVL-013"
+    },
+    {
+      "group": "Main Relief & Torq Converter Valve",
+      "number": 4,
+      "label": "COVER (1 PCS)",
+      "id": "CVL-014"
+    },
+    {
+      "group": "Main Relief & Torq Converter Valve",
+      "number": 5,
+      "label": "EMERGENCY SPOOL (5 PCS)",
+      "id": "CVL-015"
+    },
+    {
+      "group": "Main Relief & Torq Converter Valve",
+      "number": 6,
+      "label": "PLATE (1 PCS)",
+      "id": "CVL-016"
+    },
+    {
+      "group": "Main Relief & Torq Converter Valve",
+      "number": 7,
+      "label": "WIRE ASSY (1 PCS)",
+      "id": "CVL-017"
+    },
+    {
+      "group": "Main Relief & Torq Converter Valve",
+      "number": 8,
+      "label": "TERMINAL (2 PCS)",
+      "id": "CVL-018"
+    },
+    {
+      "group": "Main Relief & Torq Converter Valve",
+      "number": 9,
+      "label": "STAND (2 PCS)",
+      "id": "CVL-019"
+    },
+    {
+      "group": "Main Relief & Torq Converter Valve",
+      "number": 10,
+      "label": "SOLENOID VALVE HOUSING (1 PCS)",
+      "id": "CVL-020"
+    },
+    {
+      "group": "Main Relief & Torq Converter Valve",
+      "number": 11,
+      "label": "PLATE LOWER VALVE (1 PCS)",
+      "id": "CVL-021"
+    },
+    {
+      "group": "Main Relief & Torq Converter Valve",
+      "number": 1,
+      "label": "PLUG LUBRICATING L (1 PCS)",
+      "id": "CVL-022"
+    },
+    {
+      "group": "Main Relief & Torq Converter Valve",
+      "number": 2,
+      "label": "COVER QUICK RETURN , MODULATING L (1 PCS)",
+      "id": "CVL-023"
+    },
+    {
+      "group": "Main Relief & Torq Converter Valve",
+      "number": 3,
+      "label": "COVER PRIORITY L (1 PCS)",
+      "id": "CVL-024"
+    },
+    {
+      "group": "Main Relief & Torq Converter Valve",
+      "number": 4,
+      "label": "UPPER VALVE HOUSING (1 PCS)",
+      "id": "CVL-025"
+    },
+    {
+      "group": "Main Relief & Torq Converter Valve",
+      "number": 5,
+      "label": "PLUG PILOT R (1 PCS)",
+      "id": "CVL-026"
+    },
+    {
+      "group": "Main Relief & Torq Converter Valve",
+      "number": 6,
+      "label": "COVER MODULATING R (1 PCS)",
+      "id": "CVL-027"
+    },
+    {
+      "group": "Main Relief & Torq Converter Valve",
+      "number": 7,
+      "label": "COVER LUBRICATING R (1 PCS)",
+      "id": "CVL-028"
+    },
+    {
+      "group": "Main Relief & Torq Converter Valve",
+      "number": 8,
+      "label": "PAINTING CONDITION ALL",
+      "id": "CVL-029"
+    },
+    {
+      "group": "Main Relief & Torq Converter Valve",
+      "number": 9,
+      "label": "PACKING / WRAPING ALL",
+      "id": "CVL-030"
+    }
+  ]
+}

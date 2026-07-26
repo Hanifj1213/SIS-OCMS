@@ -1,0 +1,529 @@
+POWERTRAIN CHECKSHEET INVENTORY - generated 2026-07-22 15:03
+
+========== CHECKSHEET CONTROL VALVE POWERTRAIN ALL UNIT PT 2026 ==========
+  [.]
+     FILE: cs CONTROL VALVE pc 1250-8(COMPLETED).xlsx
+     SHEETS: RECEIVING NO 1 | DISASSY NO1 | ASSEMBLY NO1 | INSPEKSI NO1 | TESTBENCH NO 1 | DELIVERY NO 1 | RECEIVING NO 2 | DISASSY NO2 | ASSEMBLY NO2 | INSPEKSI NO2 | TESTBENCH NO 2 | DELIVERY NO 2 | RECEIVING NO 3 | DISASSY NO3 | ASSEMBLY NO3 | INSPEKSI NO3 | TESTBENCH NO 3 | DELIVERY NO 3
+     FILE: CS CV PC 2000-8(COMPLETED).xlsx
+     SHEETS: RECEIVING LH | DISSASSY LH | INSPEKSI LH | assembly LH | TESTBENCH LH | DELIVERY LH | RECEIVING RH | DISASSY RH | INSPEKSI RH | ASEMBLY RH | TESTBENCH RH | DELIVERY RH
+     FILE: cs cv pm d155-6(COMPLETED).xlsx
+     SHEETS: receiving | DISASSY | ASEMBLY | inspeksi | DELIVERY
+     FILE: cs cv pm d375-6(COMPLETED).xlsx
+     SHEETS: receiving | DISASSY | ASSEMBLY | inspeksi | DELIVERY
+     FILE: cs cv tf hd785-7(COMPLETED).xlsx
+     SHEETS: DISASSY | ASSEMBLY | INSPEKSI | RECEIVING | DELIVERY
+     FILE: cs cv tm gd825-2(COMPLETED).xlsx
+     SHEETS: RECEIVING | DISSASSY | ASSEMBLY | inspeksi | DELIVERY
+     FILE: cs cv tm wa800-3(COMPLETED).xlsx
+     SHEETS: RECEIVING | dissassy | assembly | inspeksi | DELIVERY
+     FILE: CS CYL HOIST 785(COMPLETED).xlsx
+     SHEETS: receiving | DISASSY | ASEMBLY | inspeksi | DELIVERY
+     FILE: CS FSUSP HD785-7 (COMPLETED).xlsx
+     SHEETS: receiving | DISASSY | ASEMBLY | inspeksi | DELIVERY
+     FILE: CS REARSP HD785-7(COMPLETED) .xlsx
+     SHEETS: receiving | DISASSY | ASEMBLY | inspeksi | DELIVERY
+  [INK]
+     FILE: INK overhaul control valve D155A-6R 2026.xlsx
+     SHEETS: Sheet1
+     FILE: INK overhaul control valve D375A-6R 2026.xlsx
+     SHEETS: Sheet1
+     FILE: INK overhaul control valve GD825A-2 2026.xlsx
+     SHEETS: Sheet1
+     FILE: INK overhaul control valve HD785-7 2026.xlsx
+     SHEETS: Sheet1
+     FILE: INK overhaul control valve PC1250-8NO 1 2026.xlsx
+     SHEETS: Sheet1
+     FILE: INK overhaul control valve PC1250-8NO 2 2026.xlsx
+     SHEETS: Sheet1
+     FILE: INK overhaul control valve PC1250-8NO 3 2026.xlsx
+     SHEETS: Sheet1
+     FILE: INK overhaul control valve PC2000-8LH2026.xlsx
+     SHEETS: Sheet1
+     FILE: INK overhaul control valve PC2000-8RH 2026.xlsx
+     SHEETS: Sheet1
+     FILE: INK overhaul control valve WA800-3 2026.xlsx
+     SHEETS: Sheet1
+     FILE: INK overhaul cylinder hoist hd785-7.xlsx
+     SHEETS: Sheet1
+     FILE: INK overhaul front suspensi hd785-7.xlsx
+     SHEETS: Sheet1
+     FILE: INK overhaul rear suspensi hd785-7.xlsx
+     SHEETS: Sheet1
+
+========== D 155-6 ==========
+  [CONTROL VALVE]
+     FILE: CONTROL VALVE D155 -6.xlsx
+     SHEETS: Sheet1 | Sheet2 | Sheet3 | Sheet4 | Sheet5 | Sheet6 | Sheet7 | Sheet8 | Sheet9 | Sheet10
+     FILE: DISS,MESSUREMENT,ASSEMBLY,CONTROL VALVE D155 -6.xlsx
+     SHEETS: Sheet1 | Sheet2 | Sheet3 | Sheet4 | Sheet5 | Sheet6 | Sheet7 | Sheet8 | Sheet9 | Sheet10
+  [FINAL DRIVE]
+     FILE: ASSEMBLY FINAL DRIVE D155A-6.xls
+     SHEETS: FINAL DRIVE D155A-6
+     FILE: FINAL DEIVE LH RECIVING CHECK SHEET.xlsx
+     SHEETS: Sheet1
+     FILE: FINAL DRIVE LH DELIVERY CHECK SHHET.xlsx
+     SHEETS: Sheet1
+     FILE: FINAL DRIVE RH DELIVERY CHECK SHEET.xlsx
+     SHEETS: Sheet1
+     FILE: FINAL DRIVE RH RECIVING CHECK SHEET.xlsx
+     SHEETS: Sheet1
+     FILE: VISUAL MEASUREMENT FINAL DRIVE D155-6.xlsx
+     SHEETS: Sheet1
+  [POWER MODUL]
+     FILE: ASSEMBLY POWER MODUL D155A-6.xls
+     SHEETS: PM PTO D155A-6 | PM STEERING D155A-6 
+  [POWER MODUL\TRANSMISION]
+     FILE: ASSEMBLY POWER MODUL D155A-6.xls
+     SHEETS: PM PTO D155A-6 | PM STEERING D155A-6 
+     FILE: POWER MODUL D 155A - 5 (2).xlsx
+     SHEETS: Sheet1
+     FILE: POWER MODUL D 155A - 5.xlsx
+     SHEETS: PTO | TORQUECONVENTER | TRANSMISI | BEVELGEAR
+     FILE: POWER MODUL DELIVERY CHECK SHEET.xlsx
+     SHEETS: Sheet1
+     FILE: POWER MODUL RECIVING CHECK SHEET.xlsx
+     SHEETS: Sheet1
+     FILE: powermodule part transmisi d155-6.ods
+     SHEETS: TRANSMISI
+     FILE: Visual  Measurement PM D155 -6.xlsx
+     SHEETS: Sheet1
+
+========== DZ 375-5 ==========
+  [.]
+     FILE: ASSEMBLY SPEED SENSOR PM D375A-5.xls
+     SHEETS: PM D375A-5
+  [CONTROL VALVE]
+     FILE: CONTROL VALVE D 375 - 5.xlsx
+     SHEETS: Sheet1 | Sheet2 | Sheet3
+  [.]
+     FILE: D375-5test check sheet.xls
+     SHEETS: Sheet1 | Sheet2 | Sheet3
+  [FINAL DRIVE]
+     FILE: 027_FINAL DRIVE D375A-5.xls
+     SHEETS: Power Modul D3755-5 | Torque Convertor Assy D375A-5 | Final Drive Dozer | Sheet5 | Sheet1 | Sheet2 | Sheet3 | Sheet4 | Sheet6
+     FILE: 056_visual measurement FINAL DRIVE D375A-5.xls
+     SHEETS: PAGE 1 | PAGE 2
+  [POWER MODUL\DELIVERI RECEIVING]
+     FILE: 003_POWER MODUL D375A-5.xls
+     SHEETS: Power Modul D3755-5 | Power Modul D3755-5 (REV_01) | Sheet5
+     FILE: 01)RECEIVING PM D375A-5.xlsx
+     SHEETS: PM D375A-5  | OPD Power Module (PM)
+     FILE: 04) PM D375A-5.xlsx
+     SHEETS: PM D375A-5 
+  [POWER MODUL\TC]
+     FILE: 003_DISS TORQUE CONVERTER_D375A-5.xls
+     SHEETS: TC Disassy1 | TC Disassy2
+     FILE: 003A. TORQUE CONVERTER ASSY_D375A-5.xls
+     SHEETS: Torque Convertor Assy D375A-5 | Torque Convertor Assy D375A (R) | Transmission Assy D375A | Steering Assy D375A (2) | Sheet5
+
+========== DZ 375-6 ==========
+  [CONTROL VALVE]
+     FILE: CONTROL VALVE D 375 - 6.xlsx
+     SHEETS: Sheet1
+  [FINAL DRIVE]
+     FILE: CHECKSHEET RECEIVING FINAL DRIVE DZ 375-6.xlsx
+     SHEETS: Final Drive Dozer
+     FILE: FINAL DRIVE DZ 375-6.xlsx
+     SHEETS: Sheet1 | Sheet2
+  [POWER MODUL]
+     FILE: ASSEMBLY POWER MODUL D375A-6R.xls
+     SHEETS: PM D375A-6R | PM STEERING D155A-6 
+     FILE: Receiving PM D375A-6.xlsx
+     SHEETS: PM D375A-5  | OPD Power Module (PM)
+
+========== GD 705-4 ==========
+  [CONTROL VALVE]
+     FILE: CONTROL VALVE GD 705.xlsx
+     SHEETS: Sheet1
+  [FINAL DRIVE]
+     FILE: Copy of visual measurement final drive GD 705A - 4.xlsx
+     SHEETS: Sheet1
+  [TRANSMISION]
+     FILE: GD705A-4TRANSMISSION.xlsx
+     SHEETS: REC.SHEET | SDR | ADD.PART | SURCH.PART  | SALVAGE PART 
+     FILE: TRANSMISI DELIVERY CHECK SHEET.xlsx
+     SHEETS: Sheet1
+     FILE: TRANSMISI RECIVING CHECK SHEET.xlsx
+     SHEETS: Sheet1
+     FILE: Visual & Measurement transmision.xlsx
+     SHEETS: Sheet1 | Sheet2
+
+========== GD 825-2 ==========
+  [CONTROL VALVE]
+     FILE: CONTROL VALVE GD 825.xlsx
+     SHEETS: Sheet1
+     FILE: Dis assembly & measuring CONTROL VALVE GD 825-2.xlsx
+     SHEETS: Sheet1
+     FILE: Dis assembly & measuring CV GD 825.xlsx
+     SHEETS: Sheet1
+  [FINAL DRIVE]
+     FILE: 066diss _FINAL DRIVE_GD825-2.xls
+     SHEETS: PAGE 1 | PAGE 2
+     FILE: REC GD825A-2 FINAL DRIVE.xlsx
+     SHEETS: REC.SHEET | SDR | ADD.PART | SURCH.PART  | SALVAGE PART 
+     FILE: VISUAL MEASUREMENT final drive GD 825-2.xlsx
+     SHEETS: Sheet1
+  [TRANMISION\DELIVERY]
+     FILE: 013_TRANSMISSION GD825-2.xls
+     SHEETS: Transmission GD825-2 | Final Drive GD825-2) | Sheet5
+     FILE: 05) TM GD825A-2.xlsx
+     SHEETS: TM GD825A-2
+  [TRANMISION\TEST]
+     FILE: Checksheet test performance TM GD825A-2.xlsx
+     SHEETS: Sheet1 | Sheet2
+     FILE: Transmission G825A-2.xls
+     SHEETS: Transmission G825-2 | Sheet3
+
+========== HD 465-7R ==========
+  [AXLE]
+     FILE: REC HD465-7R REAR AXLE.xlsx
+     SHEETS: REC.SHEET  | SDR | ADD.PART | SURCHARGE.PART   | SALVAGE PART 
+  [CONTROL VALVE]
+     FILE: CONTOL VALVE HD 465 - 7 OR 7R.xlsx
+     SHEETS: Sheet1 | Sheet4 | Sheet2 | Sheet3
+  [FD LH]
+     FILE: REC HD465-7R FINAL DRIVE LH.xlsx
+     SHEETS: REC.SHEET  | SDR | ADD.PART | LIST SURCHARGE   | SALVAGE PART 
+  [FD RH]
+     FILE: REC HD465-7R FINAL DRIVE RH.xlsx
+     SHEETS: REC.SHEET  | SDR | ADD.PART | LIST SURCHARGE   | SALVAGE PART 
+  [TORQUE FLOW\DELIVERY RRECEIVING]
+     FILE: 01) TF HD465-7.xlsx
+     SHEETS: TF HD465-7 | OPD Torque Flow (TF)
+     FILE: 03) TF HD465-7.xlsx
+     SHEETS: TF HD465-7
+     FILE: REC HD465-7RTORQUE FLOW.xlsx
+     SHEETS: REC.SHEET | SDR | ADD.PART | SCRCH.PART | SALVAGE.PART
+
+========== HD 785-5 ==========
+  [AXLE]
+     FILE: _FD LH_WT090-.xlsx
+     SHEETS: REC.SHEET FD LH WT0012 | SDR FD LH WT0012  | ADD.PART FD LH WT0012 | SURCH.PART FD LH WT0012 | SALVAGE PART FD LH WT0012 
+     FILE: REAR AXLE DELIVERY CHECK SHEET.xlsx
+     SHEETS: Sheet1
+     FILE: RECIVING REAR AXLE.xlsx
+     SHEETS: Sheet1
+  [CONTROL VALVE]
+     FILE: DISS,MESUREMENT,ASSY.CONTROL VALVE HD 785 - 5.xlsx
+     SHEETS: Sheet1 | Sheet2 | Sheet3 | Sheet4 | Sheet5 | Sheet6 | Sheet7 | Sheet8 | Sheet9 | Sheet10
+     FILE: HD785ECMV.xls
+     SHEETS: HD785-5 | HD785-7 | Sheet1
+  [DIFFERENTIAL]
+     FILE: 084 diss_DIFFERENTIAL HD785-5.xls
+     SHEETS: PAGE 1 | PAGE 2
+     FILE: Differential Delivery check sheet.xlsx
+     SHEETS: Sheet1
+     FILE: Reciving differential.xlsx
+     SHEETS: Sheet1
+  [FD LH]
+     FILE: 063diss_FINAL DRIVE_HD785-5.xls
+     SHEETS: PAGE 1 | PAGE 2
+     FILE: Final drive delivery check sheet.xlsx
+     SHEETS: Sheet1
+     FILE: FINAL DRIVE RECIVING CHECK SHEET.xlsx
+     SHEETS: Sheet1
+     FILE: REC HD785-7FINAL DRIVE LH.xlsx
+     SHEETS: REC.SHEET  | SDR  | ADD.PART | LIST SURCHARGE   | SALVAGE PART 
+     FILE: visual measurement FINAL DRIVE HD 785-5.xlsx
+     SHEETS: Sheet1
+  [.]
+     FILE: HD785_Test_bench check sheet.xls
+     SHEETS: Sheet1 | Sheet2 | Sheet3
+  [TORQUE FLOW]
+     FILE: 010_Inspection Parts_TORQFLOW_HD785-5.xls
+     SHEETS: TC_PARTS Inspection | TM_PARTS Inspection | Sheet2
+  [TORQUE FLOW\DELIVERY]
+     FILE: 01) TF HD785-5.xlsx
+     SHEETS: TF HD785-5 | OPD Torque Flow (TF)
+     FILE: 010_TORQUE FLOW HD785-5.xls
+     SHEETS: Torque Flow HD785-5 (New) | Torque Flow HD785-5 | Final Drive HD | Differential HD | Axle HD | Steering Valve | Sheet5
+     FILE: 02) TF HD785-5.xlsx
+     SHEETS: TF HD785-5
+  [TORQUE FLOW\TORQUECOVENTER]
+     FILE: 010_diss TORQUE CONVERTER_HD785-5.xls
+     SHEETS: TC Dis C.Sheet
+     FILE: 020_ASSEMBLYTORQUE_CONVER_HD785_5.xls
+     SHEETS: Torque Converter
+     FILE: 020_ASSY.TORQUE_CONVER_HD785_5.xls
+     SHEETS: Torque Converter
+  [TORQUE FLOW\TRANSMISION]
+     FILE: 001.TRANSMISSION_HD785-5.xls
+     SHEETS: Torque Flow
+     FILE: 023.ASSSY.TRANSMISSION_HD785-5.xls
+     SHEETS: Torque Flow
+     FILE: REC HD785-5TORQUE FLOW.xlsx
+     SHEETS: RECEIVING | SDR | ADD.PART | LIST SURCHARGE | SALVAGE PART
+
+========== HD 785-7 ==========
+  [CONTROL VALVE]
+     FILE: CONTROL VALVE HD 785 - 7.xlsx
+     SHEETS: Sheet1
+  [DIFFERENTIAL]
+     FILE: DISSASSEMBLY DIFF.xlsx
+     SHEETS: Sheet1 | Sheet2
+     FILE: Reciving differential HD 785-7.xlsx
+     SHEETS: Sheet1
+  [FD LH]
+     FILE: Checksheet assembly FD HD 785-7.xlsx
+     SHEETS: Sheet1
+     FILE: Checksheet test performance FD HD785-7,HD465-7.xlsx
+     SHEETS: QA sheet Final drive  | QA sheet Final drive  (2) | QA sheet Final drive  rev 3
+     FILE: FINAL DRIVE HD 785 -7 LH & RH.xlsx
+     SHEETS: LH | RH | Sheet1
+     FILE: FINAL DRIVE HD 785 -7.xlsx
+     SHEETS: Sheet1 | Sheet2
+     FILE: RECEIVING FD 785-7.xlsx
+     SHEETS: REC.SHEET 
+     FILE: REVISI DISASSEMBLY CHECK SHEET & VISUAL AND MEASUREMENT FD 785 -7.xlsx
+     SHEETS: Sheet1
+  [GEAR PUMP BRAKE COOLING]
+     FILE: BRAKE PUMP DELIVERY CHECK SHEET.xlsx
+     SHEETS: Sheet1
+     FILE: BRAKE PUMP RECIVING CHECK SHHET.xlsx
+     SHEETS: Sheet1
+     FILE: BREAK PUMP.xlsx
+     SHEETS: Sheet1
+  [GEAR PUMP HIDROLIC]
+     FILE: HYD PUMP.xlsx
+     SHEETS: Sheet1
+     FILE: HYDROLIC PUMP DELIVERY CHECK SHEET.xlsx
+     SHEETS: Sheet1
+     FILE: HYDROLIC PUMP RECIVING CHECK SHEET.xlsx
+     SHEETS: Sheet1
+  [GEAR PUMP TC & TM]
+     FILE: tm pump.xlsx
+     SHEETS: Sheet1
+     FILE: TRANSMISI PUMP DELIVERY CHECK SHEET.xlsx
+     SHEETS: Sheet1
+     FILE: TRANSMISI PUMP RECIVING CHECK SHEET.xlsx
+     SHEETS: Sheet1
+  [TORQUE FLOW]
+     FILE: 01) TF HD785-7.xlsx
+     SHEETS: TF HD785-7 | OPD Torque Flow (TF)
+     FILE: cheeck sheet torque converter hd 785-7.xlsx
+     SHEETS: Sheet1
+     FILE: Copy of cheeck sheet torque converter.xlsx
+     SHEETS: Sheet1
+     FILE: DISASSEMBLY CHECK SHEET PTO& TORQUE CONVERTER HD 785-7.xlsx
+     SHEETS: PTO&TC | TRANSMISSION
+     FILE: REC HD785-7  TORQUE FLOW.xlsx
+     SHEETS: RECEIVING | SDR | ADD.PART | LIST SURCHARGE | SALVAGE PART
+
+========== HD1500 ==========
+  [REAR AXLE\DIFFFERENTIAL]
+     FILE: CHECKSHEET ASSY & DISS DIFFERENTIAL.xlsx
+     SHEETS: ASSEMBLY | DISASSEMBLY
+     FILE: Reciving differential.xlsx
+     SHEETS: Sheet1
+     FILE: VISUAL MEASUREMENT DIFFERENTIAL HD 1500-7.xls
+     SHEETS: PAGE 1 | PAGE 2
+  [REAR AXLE\FD]
+     FILE: DISASSEMBLY CHECK SHEET & VISUAL AND MEASUREMENT.xlsx
+     SHEETS: DISS & MEASURING | ASSEMBLY | Sheet3 | Sheet1
+  [REAR AXLE]
+     FILE: QA4_5 HD1500-5 AXLE ASS'Y.xls
+     SHEETS: QA4 AXLEf | QA5 AXLE
+     FILE: REAR AXLE DELIVERY CHECK SHEET 1500.xlsx
+     SHEETS: Sheet1
+     FILE: RECIVING REAR  AXLE HD 1500-7.xlsx
+     SHEETS: Sheet1
+  [.]
+     FILE: rec HD1500-7 TORQUE FLOW.xlsx
+     SHEETS: REC.SHEET | SDR | ADD.PART | SURCHARGE | SALVAGE 
+  [TORQUE CONVERTER]
+     FILE: HD 1500 - 7.xlsx
+     SHEETS: Sheet1
+     FILE: VISUAL & MEASUREMENT TM HD 1500 - 7.xlsx
+     SHEETS: Sheet1 | Sheet2
+  [Transmisi]
+     FILE: DELIVERY CHECK SHEET.xlsx
+     SHEETS: Sheet1
+     FILE: RECIVING CHECK SHEET.xlsx
+     SHEETS: Sheet1
+     FILE: torque flow HD 1500.xlsx
+     SHEETS: Sheet1
+     FILE: VISUAL & MEASUREMENT TM HD 1500 - 7.xlsx
+     SHEETS: Sheet1 | Sheet2
+
+========== PC 1250-8 ==========
+  [CONTROL VALVE]
+     FILE: CONTROL VALVE 1 DELIVERY CHECK SHEET.xlsx
+     SHEETS: Sheet1
+     FILE: CONTROL VALVE 1 RECIVING CHECK SHEET.xlsx
+     SHEETS: Sheet1
+     FILE: CONTROL VALVE 2 DELIVERY CHECK SHEET.xlsx
+     SHEETS: Sheet1
+     FILE: CONTROL VALVE 2 RECIVING CHECK SHEET.xlsx
+     SHEETS: Sheet1
+     FILE: CONTROL VALVE 3 DELIVERY CHECK SHEET.xlsx
+     SHEETS: Sheet1
+     FILE: CONTROL VALVE 3 RECIVING CHECK SHEET.xlsx
+     SHEETS: Sheet1
+  [FINAL DRIVE]
+     FILE: 030_FINAL DRIVE PC1250-7.xls
+     SHEETS: Final Drive_PC1250-7 | Sheet5
+     FILE: 072_DISS FINAL DRIVE_PC1250-7.xls
+     SHEETS: PAGE 1 | PAGE 2
+     FILE: FINAL DRIVE RECIVING CHECK SHEET.xlsx
+     SHEETS: Sheet1
+  [PISTON PUMP]
+     FILE: 002_PISTON PUMP_HPV 95+95 PC1250-7.xls
+     SHEETS: NO.1 PUMP_PC1250-7 | NO.2 PUMP_PC1250-7 | Sheet5
+  [PTO]
+     FILE: 128diss PTO_EXAVATOR  PC1250-7.xls
+     SHEETS: PAGE 1 | PAGE 2
+  [PTO\DELIVERY]
+     FILE: 037_PTO PC1250-7.xls
+     SHEETS: PTO_PC1250-7  | Sheet5
+  [PTO]
+     FILE: PTO DELIVERY CHECK SHEET.xlsx
+     SHEETS: Sheet1
+     FILE: PTO RECIVING CHECK SHEET.xlsx
+     SHEETS: Sheet1
+     FILE: VISUAL MEASUREMENT Pto Pc 1250 - 8.xlsx
+     SHEETS: Sheet1
+  [SWING MACHINARY]
+     FILE: 036. SWING MACHINERY PC1250-7.xls
+     SHEETS: Swing Machinery_PC1250-7 | Sheet5
+     FILE: 120_SWING MACHINERY PC1250-7.xls
+     SHEETS: PAGE 1 (2) | PAGE 1 | PAGE 2
+     FILE: FINAL DRIVE DELIVERY CHECK SHEET RH , LH.xlsx
+     SHEETS: Sheet1
+     FILE: SWING MACHICERY RECIVING CHECK SHEET.xlsx
+     SHEETS: Sheet1
+     FILE: SWING MACHINERY DELIVERY CHECK SHEET.xlsx
+     SHEETS: Sheet1
+     FILE: SWING MACHINERY PC 1250-8.xlsx
+     SHEETS: assembly | dissassembly | measuring
+
+========== PC 2000-8 ==========
+  [CONTROL VALVE LH]
+     FILE: CONTROL VALVE LH DELIVERY.xlsx
+     SHEETS: Sheet1
+     FILE: CONTROL VALVE LH RECIVING.xlsx
+     SHEETS: Sheet1
+     FILE: PC 2000 - 8 LH.xlsx
+     SHEETS: Sheet1
+  [CONTROL VALVE RH]
+     FILE: CONTROL VALVE RH DELIVERY CHECK SHEET.xlsx
+     SHEETS: Sheet1
+     FILE: CONTROL VALVE RH RECIVING CHECK SHEET.xlsx
+     SHEETS: Sheet1
+     FILE: Pc2000 - 8 RH.xlsx
+     SHEETS: Sheet1
+  [FINAL DRIVE]
+     FILE: 030_FINAL DRIVE PC 2000-8.xls
+     SHEETS: pc2000 | Sheet5
+     FILE: VISIAL MEASUREMENT FD PC 2000-8.xlsx
+     SHEETS: Sheet1
+  [PTO]
+     FILE: PTO PC 2000-8 RECEIVING CHECK SHEET.xlsx
+     SHEETS: Sheet1
+     FILE: VISUAL MEASUREMENT of PTO PC2000.xlsx
+     SHEETS: Sheet1
+  [SWING MACHINARY]
+     FILE: SWING MACHINARY DELIVERY CHECK SHEET.xlsx
+     SHEETS: Sheet1
+     FILE: SWING MACHINERY RECIVING CHECK SHEET.xlsx
+     SHEETS: Sheet1
+     FILE: VISUAL MEASUREMENT of SWING MACHINARY.xlsx
+     SHEETS: Sheet1
+
+========== PC3000 ==========
+  [.]
+     FILE: 036. SWING MACHINERY PC3000.xls
+     SHEETS: Swing Machinery_PC1250-7 | Sheet5
+     FILE: 037_PTO PC3000-6.xls
+     SHEETS: PTO_PC1250-7  | Sheet5
+
+========== PERFORMANCE TEST ALL UNIT ==========
+  [AFTER REVISI]
+     FILE: D155A-6 POWER MODULE TEST PERFORMANCE.xlsx
+     SHEETS: Sheet1
+     FILE: D375A-5.xlsx
+     SHEETS: Sheet1
+     FILE: D375A-6R POWER MODULE TEST PERFORMANCE.xlsx
+     SHEETS: Sheet1
+     FILE: GD 835-2 TRANSMISION TEST PERFORMANCE.xlsx
+     SHEETS: Sheet1
+     FILE: HD 1500 TORQUE FLOW TEST PERFORMANCE.xlsx
+     SHEETS: Sheet1
+     FILE: HD 465-7R.xlsx
+     SHEETS: Sheet1
+     FILE: HD 785-5.xlsx
+     SHEETS: Sheet1
+     FILE: HD 785-7 TORQUE FLOW TEST PERFORMANCE REV 1 2026.xlsx
+     SHEETS: Sheet1
+     FILE: HD 785-7 TORQUE FLOW TEST PERFORMANCE.xlsx
+     SHEETS: Sheet1
+     FILE: PM WA 600-8.xlsx
+     SHEETS: Sheet1
+     FILE: WA 800-3 TORQUFLOW TEST PERFORMANCE.xlsx
+     SHEETS: Sheet1
+  [PPM TEST REPORT]
+     FILE: D375A-6R Test Bench.xlsx
+     SHEETS: Sheet1
+     FILE: HD 1500 Test Bench.xlsx
+     SHEETS: Sheet1
+
+========== WA 800-3 ==========
+  [AXLE]
+     FILE: WL 100-0018 FRONT AXLE.xlsx
+     SHEETS: REC.SHEET | SDR | ADD.PART | SURCH.PART  | SALVAGE PART
+     FILE: WL100-0018 REAR AXLE.xlsx
+     SHEETS: REC.SHEET  | SDR | ADD.PART | SURCH.PART  | SALVAGE PART 
+  [CONTROL VALVE]
+     FILE: 013_CONTROL VALVE WA800-3.xls
+     SHEETS: Swing Machinery_PC1250-7 | Final Drive_PC1250-7 | CONTROL VALVE_WA | Sheet5
+     FILE: CV VISUAL MEASURING.xlsx
+     SHEETS: Sheet1
+  [DIFFERENTIAL]
+     FILE: DELIVERY CHECK SHEET FRONT.xlsx
+     SHEETS: Sheet1
+     FILE: DELIVERY CHECK SHEET REAR.xlsx
+     SHEETS: Sheet1
+     FILE: DIFFERENTIAL FRONT WA 800 - 3.xlsx
+     SHEETS: Sheet1
+     FILE: DIFFERENTIAL REAR WA 800 - 3.xlsx
+     SHEETS: Sheet1
+     FILE: REC WA800-3 REAR DIFFERENTIAL ADMO.xlsx
+     SHEETS: REC.SHEET | SDR | ADD.PART | LIST SURCHARGE | SALVAGE PART
+     FILE: RECIFING CHECK SHEET FRONT.xlsx
+     SHEETS: Sheet1
+     FILE: RECIVING CHECK SHEET REAR.xlsx
+     SHEETS: Sheet1
+     FILE: VISUAL MESUREMENT DIFFERENTIAL WA 800 - 3 FRONT.xlsx
+     SHEETS: Sheet1
+  [FINAL DRIVE]
+     FILE: 031_FINAL DRIVE WA800-3.xls
+     SHEETS: Swing Machinery_PC1250-7 | Final Drive_PC1250-7 | FINAL DRIVE_WA | Sheet5
+     FILE: Copy of Visual  Measurement FD WA 800 - 3 (Rear RH  LH ).xlsx
+     SHEETS: Sheet1
+     FILE: FINAL DRIVE FRONT LH WA 800 - 3.xlsx
+     SHEETS: Sheet1
+     FILE: FINAL DRIVE FRONT RH WA 800 - 3.xlsx
+     SHEETS: Sheet1
+     FILE: FINAL DRIVE REAR LH WA 800 - 3.xlsx
+     SHEETS: Sheet1
+     FILE: FINAL DRIVE REAR RH WA 800 - 3.xlsx
+     SHEETS: Sheet1
+     FILE: Visual  Measurement FD WA 800 -3 (Front RH  LH).xlsx
+     SHEETS: Sheet1
+     FILE: VISUAL MEASUREMENT  DIFFERENTIAL WA 800 - 3 REAR.xlsx
+     SHEETS: Sheet1
+  [PISTON PUMP]
+     FILE: 003_PISTON PUMP WA800-3.xls
+     SHEETS: Swing Machinery_PC1250-7 | Final Drive_PC1250-7 | hydraulic PUMP_WA | Sheet5
+  [TRANSMISION]
+     FILE: 035 diss_TRANSMISSION_WA800-3.xls
+     SHEETS: 1 | 2 | 3 | 4 | 5 | 6 | Sheet1
+     FILE: REC WA800-3 TORQUE FLOW.xlsx
+     SHEETS: REC.SHEET | SDR | ADD.PART | SURCH.PART | SALVAGE PART
+     FILE: torque converter assembly.xlsx
+     SHEETS: Sheet1
+     FILE: TRANSMISI DELIVERY.xlsx
+     SHEETS: Sheet1
+     FILE: TRANSMISI RECIVING.xlsx
+     SHEETS: Sheet1
+     FILE: vm torque flow wa 800 - 3.xlsx
+     SHEETS: Sheet1

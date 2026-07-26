@@ -112,6 +112,8 @@
                                 Swing Motor</option>
                             <option value="Swing Machinery" {{ old('major_category') == 'Swing Machinery' ? 'selected' : '' }}>🏭 Swing Machinery</option>
                             <option value="Hydraulic Cylinder" {{ old('major_category') == 'Hydraulic Cylinder' ? 'selected' : '' }}>🛢️ Hydraulic Cylinder</option>
+                            <option value="Front Suspension" {{ old('major_category') == 'Front Suspension' ? 'selected' : '' }}>🛞 Front Suspension</option>
+                            <option value="Rear Suspension" {{ old('major_category') == 'Rear Suspension' ? 'selected' : '' }}>🛞 Rear Suspension</option>
                         </select>
                         @error('major_category')
                             <p style="font-size: 0.75rem; color: var(--accent-red); margin-top: 6px;">{{ $message }}</p>
@@ -268,6 +270,8 @@
 
         const oldEgi = "{{ old('egi') }}";
 
+        // EGI per kategori — diselaraskan dengan checksheet COMPLETED Powertrain
+        // + template Engine yang sudah ada.
         const templateMap = {
             'Engine': ['PC2000-8', 'PC1250-8', 'D375-6', 'D155-6', 'WA800-3', 'GD825A-2', 'HD785-7', 'HD465-7R'],
             'TC/Transmission': ['HD785-7', 'D155-6', 'D375-6', 'GD825A-2', 'HD1500-7', 'WA800-3'],
@@ -275,7 +279,10 @@
             'Differential': ['HD785-7'],
             'PTO': ['PC1250-8', 'PC2000-8'],
             'Swing Machinery': ['PC1250-8', 'PC2000-8'],
-            'Control Valve': ['PC1250-8', 'PC2000-8']
+            'Control Valve': ['PC1250-8', 'PC2000-8', 'D155-6', 'D375-6', 'HD785-7', 'GD825A-2', 'WA800-3'],
+            'Hydraulic Cylinder': ['HD785-7'],
+            'Front Suspension': ['HD785-7'],
+            'Rear Suspension': ['HD785-7']
         };
 
         function populateEgiSelect(category) {

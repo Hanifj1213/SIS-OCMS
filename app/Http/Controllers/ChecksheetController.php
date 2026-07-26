@@ -37,29 +37,60 @@ class ChecksheetController extends Controller
             'answer'  => 'required|string|in:good,bad,none',
         ]);
 
-        $checksheet = $component->checksheets()
-            ->where('stage_number', $stage)
-            ->firstOrFail();
+        $itemId = $request->item_id;
+        $answer = $request->answer;
+        $userId = auth()->id();
 
-        // Update answers JSON
-        $answers = $checksheet->answers ?? [];
-        $answers[$request->item_id] = $request->answer;
-        
-        $updateData = [
-            'answers'   => $answers,
-            'filled_by' => auth()->id(),
-        ];
+        // Retry singkat untuk SQLite "database is locked" saat polling/status
+        // dan POST jawaban saling berkejaran di artisan serve.
+        $checksheet = null;
+        $lastError = null;
+        for ($attempt = 0; $attempt < 4; $attempt++) {
+            try {
+                $checksheet = \Illuminate\Support\Facades\DB::transaction(function () use ($component, $stage, $itemId, $answer, $userId) {
+                    $checksheet = $component->checksheets()
+                        ->where('stage_number', $stage)
+                        ->lockForUpdate()
+                        ->firstOrFail();
 
-        // Mark completed if all items answered
-        if (count($answers) >= count($checksheet->items)) {
-            $updateData['completed_at'] = now();
+                    $answers = $checksheet->answers ?? [];
+                    $answers[$itemId] = $answer;
+
+                    $updateData = [
+                        'answers'   => $answers,
+                        'filled_by' => $userId,
+                    ];
+
+                    if (count($answers) >= count($checksheet->items ?? [])) {
+                        $updateData['completed_at'] = now();
+                    }
+
+                    $checksheet->update($updateData);
+
+                    return $checksheet->fresh();
+                });
+                $lastError = null;
+                break;
+            } catch (\Throwable $e) {
+                $lastError = $e;
+                $msg = $e->getMessage();
+                if (!str_contains($msg, 'database is locked') && !str_contains($msg, 'HY000')) {
+                    throw $e;
+                }
+                usleep(120000 * ($attempt + 1));
+            }
         }
 
-        $checksheet->update($updateData);
+        if ($lastError || !$checksheet) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Database sibuk, coba lagi.',
+            ], 503);
+        }
 
         return response()->json([
             'success'  => true,
-            'progress' => $checksheet->fresh()->progress,
+            'progress' => $checksheet->progress,
         ]);
     }
 
