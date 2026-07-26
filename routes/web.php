@@ -3,6 +3,7 @@
 use App\Http\Controllers\ChecksheetController;
 use App\Http\Controllers\ComponentController;
 use App\Http\Controllers\FabricationRequestController;
+use App\Http\Controllers\LocalChecksheetController;
 use App\Http\Controllers\PartRequestController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StatusController;
@@ -60,6 +61,16 @@ Route::middleware(['auth'])->group(function () {
         ->name('components.approveStage');
     Route::post('components/{component}/reject-stage', [ComponentController::class, 'rejectStage'])
         ->name('components.rejectStage');
+
+    // Checksheet spreadsheet lokal (tampilan 1:1 Excel, data di database)
+    Route::get('checksheet-layouts', [LocalChecksheetController::class, 'index'])
+        ->name('checksheet.layouts');
+    Route::get('checksheet-layouts/{layout}', [LocalChecksheetController::class, 'preview'])
+        ->name('checksheet.layouts.preview');
+    Route::get('components/{component}/local-checksheet/{kind}', [LocalChecksheetController::class, 'show'])
+        ->name('components.local-checksheet');
+    Route::post('components/{component}/local-checksheet/{kind}/cell', [LocalChecksheetController::class, 'saveCell'])
+        ->name('components.local-checksheet.cell');
 
     // Fabrication Request (FR) — Stage 2+
     Route::get('components/{component}/fr', [FabricationRequestController::class, 'index'])

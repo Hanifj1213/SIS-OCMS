@@ -42,3 +42,8 @@ __pycache__/
 *.pyc
 tools/siap_state.json
 tools/xlsx_damage.json
+tools/preview/
+
+# Gambar hasil ekstraksi dari template Excel (~119 MB).
+# Dibuat ulang dengan: php artisan checksheet:import-layouts
+/public/checksheet-media
