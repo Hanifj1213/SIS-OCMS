@@ -162,35 +162,107 @@ class SpreadsheetLayoutImporter
             return null;
         }
 
+        $isCylinderHeadDisassembly = $this->isCylinderHeadDisassembly($sheet, $headers);
         $parts = [];
+        $lastPartNo = null;
+        $lastPartName = null;
         foreach ($headers as $i => $header) {
-            $endRow = $headers[$i + 1]['row'] ?? ($sheet['max_row'] ?? 0);
+            // Jangan ikutkan baris header berikutnya — kalau ikut, checkbox menimpa
+            // teks REUSE/SALVAGE/REPLACE di header ulang.
+            $sectionEnd = isset($headers[$i + 1])
+                ? ((int) $headers[$i + 1]['row'] - 1)
+                : (int) ($sheet['max_row'] ?? 0);
+            $sectionParts = [];
+            $lastAddedRow = null;
 
-            for ($r = $header['data_start']; $r < $endRow + 1; $r++) {
+            for ($r = $header['data_start']; $r <= $sectionEnd; $r++) {
+                if ($isCylinderHeadDisassembly && $this->isCylinderHeadDecisionBoundary($grid, $r, $header)) {
+                    break;
+                }
+
                 $no = $grid[$r][$header['no_col']] ?? null;
                 $name = $grid[$r][$header['name_col']] ?? null;
-
-                if (!$this->isPartNumber($no)) {
-                    continue;
-                }
-
                 $name = trim((string) $name);
-                if ($name === '') {
+                $isNumberedPart = $this->isPartNumber($no);
+                $nextName = trim((string) ($grid[$r + 1][$header['name_col']] ?? ''));
+                $isContinuation = !$isNumberedPart
+                    && $lastPartNo !== null
+                    && ($this->isContinuedPartName($name) || $this->isContinuedPartName($nextName));
+
+                if ($isNumberedPart) {
+                    // Angka pada tabel measurement/footer bukan part jika kolom
+                    // nama part kosong (contoh Timing Gear di bawah #33).
+                    if ($name === '') {
+                        continue;
+                    }
+                    $lastPartNo = is_float($no) ? (string) (int) $no : trim((string) $no);
+                    $lastPartName = $name;
+                } elseif (!$isContinuation) {
                     continue;
                 }
 
-                $cells = [];
-                foreach ($header['decisions'] as $label => $col) {
-                    $cells[$label] = $this->ref($col, $r);
+                // Pola template: row 178 "Camshaft", row 179 "continued".
+                // Jangan tambahkan row 179 lagi jika row 178 sudah dijadikan awal block.
+                if ($this->isContinuedPartName($name) && $lastAddedRow === $r - 1) {
+                    continue;
                 }
 
-                $parts[] = [
+                if ($name === '' && $lastPartName === null) {
+                    continue;
+                }
+
+                $sectionParts[] = [
                     'row' => $r,
-                    'no' => is_float($no) ? (string) (int) $no : trim((string) $no),
-                    'name' => $name,
+                    'no' => $lastPartNo,
+                    // Continuation adalah part fisik yang sama; nama disamakan
+                    // agar scan FR tidak membuat dua kandidat untuk satu part.
+                    'name' => $isContinuation ? ($lastPartName ?: $name) : $name,
                     'part_number' => $header['part_number_col']
                         ? trim((string) ($grid[$r][$header['part_number_col']] ?? ''))
                         : '',
+                    'continued' => $isContinuation,
+                ];
+                $lastAddedRow = $r;
+            }
+
+            for ($j = 0; $j < count($sectionParts); $j++) {
+                $startRow = $sectionParts[$j]['row'];
+                $hasNextPart = isset($sectionParts[$j + 1]);
+                $blockEnd = $hasNextPart
+                    ? $sectionParts[$j + 1]['row'] - 1
+                    : $sectionEnd;
+
+                // Potong di footer tanda tangan / section pengukuran.
+                $blockEnd = $this->clampBlockEnd($grid, $startRow, $blockEnd);
+
+                if ($isCylinderHeadDisassembly) {
+                    $blockEnd = $this->clampCylinderHeadDecisionEnd($grid, $startRow, $blockEnd, $header);
+                }
+
+                // Part terakhir section: jangan taruh keputusan di baris kosong
+                // page-break tepat di atas header ulang (kelihatan nempel REUSE).
+                if (!$hasNextPart || $isCylinderHeadDisassembly) {
+                    $blockEnd = $this->lastContentRowInBlock($grid, $startRow, $blockEnd, $header);
+                }
+
+                if ($blockEnd < $startRow) {
+                    $blockEnd = $startRow;
+                }
+
+                // Kotak keputusan = area merge vertikal + checkbox.
+                // Normalnya seluruh block part; kalau ada panduan posisi
+                // (RH/LH/FRONT/CENTRE/REAR) kotak mulai tepat DI BAWAH panduan.
+                $boxStart = $this->decisionBoxStart($grid, $startRow, $blockEnd, $header);
+
+                $cells = [];
+                foreach ($header['decisions'] as $label => $col) {
+                    $cells[$label] = $this->ref($col, $boxStart);
+                }
+
+                $parts[] = $sectionParts[$j] + [
+                    'decision_row' => $boxStart,
+                    'box_start' => $boxStart,
+                    'box_end' => $blockEnd,
                     'cells' => $cells,
                 ];
             }
@@ -204,6 +276,60 @@ class SpreadsheetLayoutImporter
             ),
             'parts' => $parts,
         ];
+    }
+
+    /**
+     * CYL HEAD DISASSY mencampur tabel part dan tabel measurement pada kolom
+     * NO/PART yang sama. Baris measurement harus dikeluarkan dari decision_map.
+     *
+     * @param  list<array<string, mixed>>  $headers
+     */
+    private function isCylinderHeadDisassembly(array $sheet, array $headers): bool
+    {
+        if (!str_contains($this->norm($sheet['name'] ?? ''), 'CYL HEAD')
+            || ($headers[0]['profile'] ?? null) !== 'disassembly'
+        ) {
+            return false;
+        }
+
+        return str_contains($this->norm($sheet['name'] ?? ''), 'DISASS');
+    }
+
+    /**
+     * Awal area measurement CYL HEAD. Sesudah penanda ini angka di kolom NO
+     * adalah nomor model/item pengukuran, bukan nomor part disassembly.
+     *
+     * @param  array<int, array<int, mixed>>  $grid
+     * @param  array<string, mixed>  $header
+     */
+    private function isCylinderHeadDecisionBoundary(array $grid, int $row, array $header): bool
+    {
+        $no = $this->norm($grid[$row][$header['no_col']] ?? '');
+
+        return preg_match(
+            '/^(?:NO\.?|ACTUAL|ENGINE MODEL|STANDARD OF\b|[A-Z]\.?\s*MEASURE\b|MEASURE\b|VALVE SPRINGS?|VALVE GUIDES?)$/',
+            $no
+        ) === 1
+            || preg_match('/^(?:STANDARD OF|[A-Z]\.?\s*MEASURE|MEASURE)\b/', $no) === 1;
+    }
+
+    /**
+     * @param  array<int, array<int, mixed>>  $grid
+     * @param  array<string, mixed>  $header
+     */
+    private function clampCylinderHeadDecisionEnd(
+        array $grid,
+        int $startRow,
+        int $blockEnd,
+        array $header
+    ): int {
+        for ($r = $startRow + 1; $r <= $blockEnd; $r++) {
+            if ($this->isCylinderHeadDecisionBoundary($grid, $r, $header)) {
+                return max($startRow, $r - 1);
+            }
+        }
+
+        return $blockEnd;
     }
 
     /**
@@ -225,6 +351,149 @@ class SpreadsheetLayoutImporter
         ksort($grid);
 
         return $grid;
+    }
+
+    /**
+     * Baris konten terakhir di dalam block (abaikan spacer kosong sebelum header ulang).
+     *
+     * @param  array<int, array<int, mixed>>  $grid
+     * @param  array<string, mixed>  $header
+     */
+    private function lastContentRowInBlock(array $grid, int $startRow, int $blockEnd, array $header): int
+    {
+        if ($blockEnd <= $startRow) {
+            return $startRow;
+        }
+
+        $decisionCols = array_values($header['decisions'] ?? []);
+        $decisionMin = $decisionCols !== [] ? min($decisionCols) : PHP_INT_MAX;
+        $last = $startRow;
+
+        for ($r = $startRow; $r <= $blockEnd; $r++) {
+            if ($this->isBlockBoundaryRow($grid, $r)) {
+                break;
+            }
+
+            $has = false;
+            foreach ($grid[$r] ?? [] as $c => $v) {
+                // Hanya area NO / part / kondisi — bukan kolom keputusan/sketch.
+                if ((int) $c >= $decisionMin) {
+                    continue;
+                }
+                if (trim((string) $v) !== '') {
+                    $has = true;
+                    break;
+                }
+            }
+
+            if ($has) {
+                $last = $r;
+            }
+        }
+
+        return $last;
+    }
+
+    /**
+     * Baris awal kotak keputusan (merge vertikal + checkbox).
+     *
+     * RH/LH/FRONT/CENTRE/REAR adalah panduan posisi inspeksi, bukan baris
+     * keputusan — checkbox harus berada tepat di bawah grid panduan itu supaya
+     * tidak menghalangi pengisian data.
+     *
+     * @param  array<int, array<int, mixed>>  $grid
+     * @param  array<string, mixed>  $header
+     */
+    private function decisionBoxStart(array $grid, int $startRow, int $blockEnd, array $header): int
+    {
+        if ($blockEnd <= $startRow) {
+            return $startRow;
+        }
+
+        $decisionCols = array_values($header['decisions'] ?? []);
+        $decisionMin = $decisionCols !== [] ? min($decisionCols) : PHP_INT_MAX;
+        $nameCol = (int) $header['name_col'];
+
+        $lastGuideRow = null;
+        for ($r = $startRow; $r <= $blockEnd; $r++) {
+            foreach ($grid[$r] ?? [] as $c => $value) {
+                $c = (int) $c;
+                if ($c <= $nameCol || $c >= $decisionMin) {
+                    continue;
+                }
+                if ($this->isPositionGuideLabel($value)) {
+                    $lastGuideRow = $r;
+                    break;
+                }
+            }
+        }
+
+        if ($lastGuideRow === null) {
+            return $startRow;
+        }
+
+        return min($lastGuideRow + 1, $blockEnd);
+    }
+
+    private function isPositionGuideLabel(mixed $value): bool
+    {
+        return in_array($this->norm($value), [
+            'RH', 'LH', 'R/H', 'L/H', 'FRONT', 'CENTRE', 'CENTER', 'REAR',
+        ], true);
+    }
+
+    /**
+     * Potong akhir block part sebelum footer tanda tangan / section berikutnya.
+     *
+     * @param  array<int, array<int, mixed>>  $grid
+     */
+    private function clampBlockEnd(array $grid, int $startRow, int $blockEnd): int
+    {
+        if ($blockEnd <= $startRow) {
+            return $startRow;
+        }
+
+        for ($r = $startRow + 1; $r <= $blockEnd; $r++) {
+            if ($this->isBlockBoundaryRow($grid, $r)) {
+                return max($startRow, $r - 1);
+            }
+        }
+
+        return $blockEnd;
+    }
+
+    /**
+     * Baris yang menandai akhir area part (bukan isi kondisi part).
+     *
+     * @param  array<int, array<int, mixed>>  $grid
+     */
+    private function isBlockBoundaryRow(array $grid, int $row): bool
+    {
+        foreach ($grid[$row] ?? [] as $value) {
+            $text = $this->norm($value);
+            if ($text === '') {
+                continue;
+            }
+
+            // Footer tanda tangan, section pengukuran gear, remarks — bukan isi part.
+            if (preg_match(
+                '/^(INSPECTION BY|APPROVAL BY|CHECKED BY|MECHANIC|PROD\.?\s*SUPERVISOR|REMARKS?:?|ATTACHED)\b/',
+                $text
+            )) {
+                return true;
+            }
+
+            // D375/PC1250: "FRONT SIDE TIMING GEAR MEASUREMENT"
+            // GD825A: "BACKLASH TIMING GEAR" / "END PLAY TIMING GEAR"
+            if (preg_match(
+                '/\b(TIMING\s*GEAR|BACKLASH\s*TIMING|END\s*PLAY\s*TIMING)\b/',
+                $text
+            )) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -346,6 +615,11 @@ class SpreadsheetLayoutImporter
         }
 
         return (bool) preg_match('/^\d+(\.0+)?$/', $s);
+    }
+
+    private function isContinuedPartName(string $name): bool
+    {
+        return $name !== '' && preg_match('/\bCONTINUED\b/i', $name) === 1;
     }
 
     /** Kolom+baris (1-based) menjadi referensi sel Excel, mis. 20,17 -> T17. */

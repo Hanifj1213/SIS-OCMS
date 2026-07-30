@@ -489,17 +489,21 @@
         <div class="fade-up" style="margin-bottom:12px; color:var(--text-secondary); font-size:0.85rem;">Mode: Sub Assy</div>
         @endif
         @php
-            // Mainline disassembly: crop kiri lebar (kolom A/B kosong) + sembunyikan tab.
-            // Sub Assy: multi-tab part → crop kiri tipis, tab bawah tetap terlihat.
-            $cropLeft = $gsheetEmbedUrl ? 120 : 46;
+            // Engine mainline: kolom A/B kosong → crop kiri lebar + sembunyikan tab bawah.
+            // Powertrain (Control Valve dkk.): konten mulai kolom A → crop kiri tipis
+            // (hanya baris nomor) + tab sheet NO1/NO2/NO3 tetap terlihat.
+            $isEngineDisassy = $comp->major_category === 'Engine';
+            $disassyCropMainlineLeft = $isEngineDisassy ? 120 : 46;
+            $disassyCropMainlineBottom = $isEngineDisassy ? 37 : 0;
+            $cropLeft = $gsheetEmbedUrl ? $disassyCropMainlineLeft : 46;
             $cropTop = 25;
-            $cropBottom = $gsheetEmbedUrl ? 37 : 0;
+            $cropBottom = $gsheetEmbedUrl ? $disassyCropMainlineBottom : 0;
             $disassySrc = $gsheetEmbedUrl ?: $gsheetSubassyDisassyEmbedUrl;
         @endphp
         <div class="glass-card fade-up" style="padding: 0; overflow: hidden; height: 90vh; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); position: relative;">
             <iframe id="gsheet-iframe" class="gsheet-embed"
                 data-src="{{ $disassySrc }}"
-                data-crop-mainline="120,25,37"
+                data-crop-mainline="{{ $disassyCropMainlineLeft }},25,{{ $disassyCropMainlineBottom }}"
                 data-crop-subassy="46,25,0"
                 style="position: absolute; top: -{{ $cropTop }}px; left: -{{ $cropLeft }}px; width: calc(100% + {{ $cropLeft }}px); height: calc(100% + {{ $cropTop + $cropBottom }}px); border: none;"
                 allowfullscreen>

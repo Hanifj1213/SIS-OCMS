@@ -23,6 +23,24 @@ class LocalChecksheetTest extends TestCase
     private const TEMPLATE = 'CHECKSHEET FOR PROCESS DEVELOPMEN ROBBY/POWERTRAIN/_SIAP_UPLOAD_GSHEET/'
         . 'Control Valve/D375-6/INSPECTION Control Valve D375-6.xlsx';
 
+    private const ENGINE_SUBASSY_DIR = 'CHECKSHEET FOR PROCESS DEVELOPMEN ROBBY/ENGINE/_SIAP_UPLOAD_GSHEET/';
+
+    /** @return array{path:string, egi:string} */
+    private function engineSubassyTemplate(string $model): array
+    {
+        $templates = [
+            'D155' => 'SUBASSY DISASSEMBLY ENGINE SAA6D140E-5 (D155).xlsx',
+            'PC2000-8' => 'SUBASSY DISASSEMBLY ENGINE SAA12V140E-3 (PC2000-8).xlsx',
+        ];
+        $path = base_path(self::ENGINE_SUBASSY_DIR . $templates[$model]);
+
+        if (!is_file($path)) {
+            $this->markTestSkipped("Template SIAP Engine Subassy {$model} tidak tersedia.");
+        }
+
+        return ['path' => $path, 'egi' => $model];
+    }
+
     private function templatePath(): string
     {
         $path = base_path(self::TEMPLATE);
@@ -85,6 +103,100 @@ class LocalChecksheetTest extends TestCase
         // ketiganya harus tetap terdeteksi.
         $this->assertSame(['U/A', 'U/R', 'R/N'], array_keys($map['parts'][0]['cells']));
         $this->assertNotSame('', $map['parts'][0]['name']);
+    }
+
+    public function test_import_detects_unnumbered_continued_part_block(): void
+    {
+        $template = $this->engineSubassyTemplate('D155');
+
+        $layout = app(SpreadsheetLayoutImporter::class)->import($template['path'], [
+            'major_category' => 'Engine',
+            'egi_model' => $template['egi'],
+            'kind' => 'subassy_disassembly',
+        ]);
+        $parts = $layout->decision_map['SUPPLY PUMP DISASSY']['parts'];
+        $continued = array_values(array_filter(
+            $parts,
+            fn ($part) => ($part['continued'] ?? false) === true
+        ));
+
+        $this->assertCount(2, $continued);
+        $this->assertSame(
+            [
+                ['no' => '5', 'name' => 'Feed pump', 'row' => 125, 'start' => 125, 'end' => 136],
+                ['no' => '7', 'name' => 'Camshaft', 'row' => 178, 'start' => 178, 'end' => 184],
+            ],
+            array_map(
+                static fn ($part) => [
+                    'no' => $part['no'],
+                    'name' => $part['name'],
+                    'row' => $part['row'],
+                    'start' => $part['box_start'],
+                    'end' => $part['box_end'],
+                ],
+                $continued
+            )
+        );
+    }
+
+    public function test_cylinder_head_decision_map_excludes_measurement_subtables(): void
+    {
+        $template = $this->engineSubassyTemplate('D155');
+
+        $layout = app(SpreadsheetLayoutImporter::class)->import($template['path'], [
+            'major_category' => 'Engine',
+            'egi_model' => $template['egi'],
+            'kind' => 'subassy_disassembly',
+        ]);
+        $map = $layout->decision_map['CYL HEAD DISASSY'];
+
+        $this->assertSame(
+            [
+                ['no' => '1', 'name' => 'Inserts of valve', 'row' => 15, 'end' => 21],
+                ['no' => '2', 'name' => 'Valves', 'row' => 72, 'end' => 80],
+                ['no' => '3', 'name' => 'Valve Springs', 'row' => 133, 'end' => 144],
+                ['no' => '5', 'name' => 'Measure thickness', 'row' => 238, 'end' => 239],
+                ['no' => '6', 'name' => 'Cyl.Head Crack', 'row' => 267, 'end' => 273],
+                ['no' => '7', 'name' => 'Air Pressure Test', 'row' => 316, 'end' => 319],
+            ],
+            array_map(
+                static fn ($part) => [
+                    'no' => $part['no'],
+                    'name' => $part['name'],
+                    'row' => $part['row'],
+                    'end' => $part['box_end'],
+                ],
+                $map['parts']
+            )
+        );
+
+        // Header keputusan tetap semua disimpan untuk audit/formatting.
+        $this->assertCount(6, $map['headers']);
+    }
+
+    public function test_pc2000_cylinder_head_keeps_multiple_parts_before_measurement_table(): void
+    {
+        $template = $this->engineSubassyTemplate('PC2000-8');
+
+        $layout = app(SpreadsheetLayoutImporter::class)->import($template['path'], [
+            'major_category' => 'Engine',
+            'egi_model' => $template['egi'],
+            'kind' => 'subassy_disassembly',
+        ]);
+        $map = $layout->decision_map['CYL HEAD DISASSY'];
+
+        $this->assertSame(
+            [
+                'Inserts of valve',
+                'Cyl.Head Crack',
+                'Measure thickness',
+                'Air Pressure Test',
+                'Valve Springs',
+                'Valves',
+            ],
+            array_column($map['parts'], 'name')
+        );
+        $this->assertSame([15, 65, 76, 139, 159, 231], array_column($map['parts'], 'row'));
     }
 
     public function test_layout_survives_compression_round_trip(): void

@@ -12,8 +12,10 @@
 function postToAppsScript(string $url, array $payload, int $timeout = 180): \Illuminate\Http\Client\Response
 {
     $json = json_encode($payload);
+    $connectTimeout = min(60, max(15, (int) ceil($timeout / 5)));
 
     $first = Illuminate\Support\Facades\Http::timeout($timeout)
+        ->connectTimeout($connectTimeout)
         ->withHeaders([
             'Accept' => 'application/json',
             'Content-Type' => 'application/json',
@@ -38,6 +40,7 @@ function postToAppsScript(string $url, array $payload, int $timeout = 180): \Ill
 
     // Penting: echo URL diikuti dengan GET — body POST sudah diproses di langkah 1
     return Illuminate\Support\Facades\Http::timeout($timeout)
+        ->connectTimeout($connectTimeout)
         ->withHeaders(['Accept' => 'application/json'])
         ->withOptions(['allow_redirects' => false])
         ->get($location);

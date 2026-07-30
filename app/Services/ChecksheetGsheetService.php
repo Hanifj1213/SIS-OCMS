@@ -230,7 +230,10 @@ class ChecksheetGsheetService
             }
 
             foreach ($read['sheets'] ?? [] as $tab) {
-                $parsed = $this->parseDisassemblyValues($tab['values'] ?? []);
+                $parsed = $this->parseDisassemblyValues(
+                    $tab['values'] ?? [],
+                    (string) ($tab['name'] ?? '')
+                );
                 if ($parsed === []) {
                     continue;
                 }
@@ -539,6 +542,7 @@ class ChecksheetGsheetService
         $rows = [];
         $dataStart = $headerRow + 1;
 
+        $partStarts = [];
         for ($r = $dataStart; $r < count($values); $r++) {
             $row = $values[$r];
             $noRaw = $row[$noCol] ?? null;
@@ -548,33 +552,42 @@ class ChecksheetGsheetService
                 continue;
             }
 
-            if (!is_numeric($noRaw) && !preg_match('/^\d+(\.\d+)?$/', trim((string) $noRaw))) {
+            if (! is_numeric($noRaw) && ! preg_match('/^\d+(\.\d+)?$/', trim((string) $noRaw))) {
                 continue;
             }
 
-            $partName = trim((string) $nameRaw);
-            if ($partName === '') {
+            if (trim((string) $nameRaw) === '') {
                 continue;
             }
 
+            $partStarts[] = $r;
+        }
+
+        for ($i = 0; $i < count($partStarts); $i++) {
+            $start = $partStarts[$i];
+            $end = isset($partStarts[$i + 1]) ? $partStarts[$i + 1] - 1 : count($values) - 1;
+            if ($end < $start) {
+                $end = $start;
+            }
+
+            $row = $values[$start];
+
+            $partName = trim((string) ($row[$nameCol] ?? ''));
             $partNumber = '';
             if ($partNumberCol !== null && isset($row[$partNumberCol])) {
                 $partNumber = trim((string) $row[$partNumberCol]);
             }
 
-            $needsRepair = false;
-            if ($urCol !== null && isset($row[$urCol])) {
-                $needsRepair = $this->isDecisionChecked($row[$urCol]);
-            }
-
-            $needsReplace = false;
-            if ($rnCol !== null && isset($row[$rnCol])) {
-                $needsReplace = $this->isDecisionChecked($row[$rnCol]);
-            }
+            // Merge vertikal: nilai checkbox di top-left (baris part).
+            // Layout lama (tanpa merge): checkbox di baris bawah block.
+            // Scan seluruh block supaya keduanya terbaca.
+            $needsRepair = $this->blockHasDecisionChecked($values, $start, $end, $urCol);
+            $needsReplace = $this->blockHasDecisionChecked($values, $start, $end, $rnCol);
 
             $rows[] = [
-                'row' => $r + 1,
-                'no' => $noRaw,
+                'row' => $start + 1,
+                'decision_row' => $start + 1,
+                'no' => $row[$noCol],
                 'part_number' => $partNumber,
                 'part_name' => $partName,
                 'needs_repair' => $needsRepair,
@@ -591,19 +604,38 @@ class ChecksheetGsheetService
      * @param  array<int, array<int, mixed>>  $values
      * @return list<array{row:int, no:mixed, part_number:string, part_name:string, needs_repair:bool, needs_replace:bool}>
      */
-    private function parseDisassemblyValues(array $values): array
+    private function parseDisassemblyValues(array $values, string $sheetName = ''): array
     {
         if ($values === []) {
             return [];
         }
 
+        $isCylinderHeadDisassembly = $this->isCylinderHeadDisassemblySheet($sheetName);
         $rows = [];
         $columns = null;
+        $ignoreNumberedRowsUntilNextHeader = false;
+        $partStarts = [];
+        $lastPartNo = null;
+        $lastPartName = null;
 
         for ($r = 0; $r < count($values); $r++) {
             $detected = $this->detectDisassemblyHeaderColumns($values[$r]);
             if ($detected !== null) {
+                if ($columns !== null && $partStarts !== []) {
+                    $rows = array_merge(
+                        $rows,
+                        $this->parseDisassemblyPartBlocks(
+                            $values,
+                            $columns,
+                            $partStarts,
+                            $r - 1,
+                            $isCylinderHeadDisassembly
+                        )
+                    );
+                }
                 $columns = $detected;
+                $ignoreNumberedRowsUntilNextHeader = false;
+                $partStarts = [];
                 continue;
             }
 
@@ -611,47 +643,167 @@ class ChecksheetGsheetService
                 continue;
             }
 
+            // CYL HEAD DISASSY mencampur tabel part dengan tabel measurement
+            // bernomor pada kolom NO/PART yang sama. Setelah header sub-tabel
+            // measurement, abaikan angka sampai header keputusan berikutnya.
+            if ($isCylinderHeadDisassembly
+                && $this->isCylinderHeadDecisionBoundary($values[$r], $columns)
+            ) {
+                if ($partStarts !== []) {
+                    $rows = array_merge(
+                        $rows,
+                        $this->parseDisassemblyPartBlocks($values, $columns, $partStarts, $r - 1, true)
+                    );
+                    $partStarts = [];
+                }
+                $ignoreNumberedRowsUntilNextHeader = true;
+                continue;
+            }
+
+            if ($ignoreNumberedRowsUntilNextHeader) {
+                continue;
+            }
+
             $row = $values[$r];
             $noRaw = $row[$columns['noCol']] ?? null;
             $nameRaw = $row[$columns['nameCol']] ?? null;
+            $name = trim((string) $nameRaw);
+            $isNumbered = $noRaw !== null
+                && trim((string) $noRaw) !== ''
+                && (is_numeric($noRaw) || preg_match('/^\d+(\.\d+)?$/', trim((string) $noRaw)));
+            $nextName = trim((string) ($values[$r + 1][$columns['nameCol']] ?? ''));
+            $isContinuation = !$isNumbered
+                && $lastPartNo !== null
+                && ($this->isContinuedPartName($name) || $this->isContinuedPartName($nextName));
 
-            if ($noRaw === null || trim((string) $noRaw) === '') {
+            if (!$isNumbered && !$isContinuation) {
                 continue;
             }
 
-            if (!is_numeric($noRaw) && !preg_match('/^\d+(\.\d+)?$/', trim((string) $noRaw))) {
+            if ($isNumbered) {
+                if ($name === '') {
+                    continue;
+                }
+                $lastPartNo = $noRaw;
+                $lastPartName = $name;
+            }
+
+            // Pola "Camshaft" diikuti "continued": row pertama menjadi anchor.
+            if ($this->isContinuedPartName($name)
+                && $partStarts !== []
+                && $partStarts[array_key_last($partStarts)]['start'] === $r - 1
+            ) {
                 continue;
             }
 
-            $partName = trim((string) $nameRaw);
-            if ($partName === '') {
-                continue;
+            $partStarts[] = [
+                'start' => $r,
+                'no' => $lastPartNo,
+                'name' => $isContinuation ? ($lastPartName ?: $name) : $name,
+            ];
+        }
+
+        if ($columns !== null && $partStarts !== []) {
+            $rows = array_merge(
+                $rows,
+                $this->parseDisassemblyPartBlocks(
+                    $values,
+                    $columns,
+                    $partStarts,
+                    count($values) - 1,
+                    $isCylinderHeadDisassembly
+                )
+            );
+        }
+
+        return $rows;
+    }
+
+    private function isCylinderHeadDisassemblySheet(string $sheetName): bool
+    {
+        $normalized = strtoupper(trim(preg_replace('/\s+/', ' ', $sheetName) ?? ''));
+
+        return str_contains($normalized, 'CYL HEAD')
+            && str_contains($normalized, 'DISASS');
+    }
+
+    /**
+     * @param  array<int, mixed>  $row
+     * @param  array{noCol:int, nameCol:int}  $columns
+     */
+    private function isCylinderHeadDecisionBoundary(array $row, array $columns): bool
+    {
+        $no = strtoupper(trim((string) ($row[$columns['noCol']] ?? '')));
+
+        return preg_match(
+            '/^(?:NO\.?|ACTUAL|ENGINE MODEL|STANDARD OF\b|[A-Z]\.?\s*MEASURE\b|MEASURE\b|VALVE SPRINGS?|VALVE GUIDES?)$/',
+            $no
+        ) === 1
+            || preg_match('/^(?:STANDARD OF|[A-Z]\.?\s*MEASURE|MEASURE)\b/', $no) === 1;
+    }
+
+    /**
+     * @param  array<int, array<int, mixed>>  $values
+     * @param  array{noCol:int, nameCol:int, partNumberCol:?int, reuseCol:?int, salvageCol:?int, replaceCol:?int}  $columns
+     * @param  list<array{start:int, no:mixed, name:string}>  $partStarts
+     * @param  int  $sectionEnd  indeks baris terakhir sebelum header berikutnya
+     * @return list<array{row:int, decision_row:int, no:mixed, part_number:string, part_name:string, needs_repair:bool, needs_replace:bool}>
+     */
+    private function parseDisassemblyPartBlocks(
+        array $values,
+        array $columns,
+        array $partStarts,
+        int $sectionEnd,
+        bool $clampCylinderHead = false
+    ): array
+    {
+        $rows = [];
+
+        for ($i = 0; $i < count($partStarts); $i++) {
+            $start = $partStarts[$i]['start'];
+            $end = isset($partStarts[$i + 1])
+                ? $partStarts[$i + 1]['start'] - 1
+                : $sectionEnd;
+            if ($end < $start) {
+                $end = $start;
             }
+
+            if ($clampCylinderHead) {
+                for ($r = $start + 1; $r <= $end; $r++) {
+                    if ($this->isCylinderHeadDecisionBoundary($values[$r] ?? [], $columns)) {
+                        $end = max($start, $r - 1);
+                        break;
+                    }
+                }
+            }
+
+            $row = $values[$start];
 
             $partNumber = '';
             if ($columns['partNumberCol'] !== null && isset($row[$columns['partNumberCol']])) {
                 $partNumber = trim((string) $row[$columns['partNumberCol']]);
             }
 
-            $needsRepair = $columns['salvageCol'] !== null
-                && isset($row[$columns['salvageCol']])
-                && $this->isDecisionChecked($row[$columns['salvageCol']]);
-
-            $needsReplace = $columns['replaceCol'] !== null
-                && isset($row[$columns['replaceCol']])
-                && $this->isDecisionChecked($row[$columns['replaceCol']]);
+            $needsRepair = $this->blockHasDecisionChecked($values, $start, $end, $columns['salvageCol']);
+            $needsReplace = $this->blockHasDecisionChecked($values, $start, $end, $columns['replaceCol']);
 
             $rows[] = [
-                'row' => $r + 1,
-                'no' => $noRaw,
+                'row' => $start + 1,
+                'decision_row' => $start + 1,
+                'no' => $partStarts[$i]['no'],
                 'part_number' => $partNumber,
-                'part_name' => $partName,
+                'part_name' => $partStarts[$i]['name'],
                 'needs_repair' => $needsRepair,
                 'needs_replace' => $needsReplace,
             ];
         }
 
         return $rows;
+    }
+
+    private function isContinuedPartName(string $name): bool
+    {
+        return $name !== '' && preg_match('/\bCONTINUED\b/i', $name) === 1;
     }
 
     /**
@@ -714,6 +866,27 @@ class ChecksheetGsheetService
         }
 
         return null;
+    }
+
+    /**
+     * Baca keputusan di seluruh block part — mendukung merge vertikal
+     * (nilai di top-left) maupun checkbox di baris bawah.
+     *
+     * @param  array<int, array<int, mixed>>  $values
+     */
+    private function blockHasDecisionChecked(array $values, int $start, int $end, ?int $col): bool
+    {
+        if ($col === null) {
+            return false;
+        }
+
+        for ($r = $start; $r <= $end; $r++) {
+            if ($this->isDecisionChecked($values[$r][$col] ?? null)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
