@@ -4,6 +4,7 @@ use App\Http\Controllers\ChecksheetController;
 use App\Http\Controllers\ComponentController;
 use App\Http\Controllers\FabricationRequestController;
 use App\Http\Controllers\LocalChecksheetController;
+use App\Http\Controllers\MolController;
 use App\Http\Controllers\PartRequestController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StatusController;
@@ -61,6 +62,11 @@ Route::middleware(['auth'])->group(function () {
         ->name('components.approveStage');
     Route::post('components/{component}/reject-stage', [ComponentController::class, 'rejectStage'])
         ->name('components.rejectStage');
+    // Stage 6 (Painting): dokumentasi foto hasil pengecatan
+    Route::post('components/{component}/painting/photos', [ComponentController::class, 'uploadPaintingPhotos'])
+        ->name('components.painting.upload');
+    Route::delete('components/{component}/painting/photos', [ComponentController::class, 'deletePaintingPhoto'])
+        ->name('components.painting.delete');
 
     // Checksheet spreadsheet lokal (tampilan 1:1 Excel, data di database)
     Route::get('checksheet-layouts', [LocalChecksheetController::class, 'index'])
@@ -77,10 +83,32 @@ Route::middleware(['auth'])->group(function () {
         ->name('components.fr.index');
     Route::post('components/{component}/fr/scan', [FabricationRequestController::class, 'scan'])
         ->name('components.fr.scan');
+    // 'create' harus sebelum '{fr}' agar tidak tertangkap route model binding
+    Route::get('components/{component}/fr/create', [FabricationRequestController::class, 'create'])
+        ->name('components.fr.create');
+    Route::post('components/{component}/fr/single', [FabricationRequestController::class, 'storeSingle'])
+        ->name('components.fr.storeSingle');
     Route::post('components/{component}/fr', [FabricationRequestController::class, 'store'])
         ->name('components.fr.store');
+    Route::get('components/{component}/fr/{fr}/edit', [FabricationRequestController::class, 'edit'])
+        ->name('components.fr.edit');
+    Route::put('components/{component}/fr/{fr}', [FabricationRequestController::class, 'update'])
+        ->name('components.fr.update');
+    Route::patch('components/{component}/fr/{fr}/status', [FabricationRequestController::class, 'updateStatus'])
+        ->name('components.fr.update-status');
     Route::get('components/{component}/fr/{fr}/pdf', [FabricationRequestController::class, 'pdf'])
         ->name('components.fr.pdf');
+    // MOL (Mechanic Order List) — form kosong mengikuti template MOL.xlsx tab "ADD 1"
+    Route::get('components/{component}/mol', [MolController::class, 'create'])
+        ->name('components.mol.create');
+    Route::post('components/{component}/mol', [MolController::class, 'store'])
+        ->name('components.mol.store');
+    // Export PDF MOL otomatis dihapus — dokumen MOL diisi manual oleh mekanik
+    // lalu diunggah lewat components.mol.upload-document.
+    Route::post('components/{component}/mol/document', [MolController::class, 'uploadDocument'])
+        ->name('components.mol.upload-document');
+    Route::delete('components/{component}/mol/document', [MolController::class, 'deleteDocument'])
+        ->name('components.mol.delete-document');
 
     // Resource route komponen (hanya action yang tersedia di controller)
     Route::resource('components', ComponentController::class)

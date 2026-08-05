@@ -158,5 +158,101 @@
         "egi": "HD785-7",
         "stage": "INSPECTION",
         "uploaded_at": "2026-07-23T09:00:59+07:00"
+    },
+    "Control Valve/D155-6/ASSEMBLY Control Valve D155-6.xlsx": {
+        "id": "1ZDzQNsQBX6y36wu3Ck6D5E0tbw_l_bmoAcUq90tyN8o",
+        "url": "https://docs.google.com/spreadsheets/d/1ZDzQNsQBX6y36wu3Ck6D5E0tbw_l_bmoAcUq90tyN8o/edit",
+        "category": "Control Valve",
+        "egi": "D155-6",
+        "stage": "ASSEMBLY",
+        "uploaded_at": "2026-08-05T23:34:25+07:00"
+    },
+    "Control Valve/D375-6/ASSEMBLY Control Valve D375-6.xlsx": {
+        "id": "1VGk-KzKNjkvUQSfbutpB8YOjFVQFTqpcyO96n7tWNFo",
+        "url": "https://docs.google.com/spreadsheets/d/1VGk-KzKNjkvUQSfbutpB8YOjFVQFTqpcyO96n7tWNFo/edit",
+        "category": "Control Valve",
+        "egi": "D375-6",
+        "stage": "ASSEMBLY",
+        "uploaded_at": "2026-08-05T23:34:39+07:00"
+    },
+    "Control Valve/GD825A-2/ASSEMBLY Control Valve GD825A-2.xlsx": {
+        "id": "1M-xw5HgTObFou2elj4rZmrQDSRuoi4TzG1_T7dGH1AI",
+        "url": "https://docs.google.com/spreadsheets/d/1M-xw5HgTObFou2elj4rZmrQDSRuoi4TzG1_T7dGH1AI/edit",
+        "category": "Control Valve",
+        "egi": "GD825A-2",
+        "stage": "ASSEMBLY",
+        "uploaded_at": "2026-08-05T23:34:53+07:00"
+    },
+    "Control Valve/HD785-7/ASSEMBLY Control Valve HD785-7.xlsx": {
+        "id": "1xun23KqoNoow1rikIRgpxQKaxr8x1XXDSWz9ygNISIY",
+        "url": "https://docs.google.com/spreadsheets/d/1xun23KqoNoow1rikIRgpxQKaxr8x1XXDSWz9ygNISIY/edit",
+        "category": "Control Valve",
+        "egi": "HD785-7",
+        "stage": "ASSEMBLY",
+        "uploaded_at": "2026-08-05T23:35:07+07:00"
+    },
+    "Control Valve/PC2000-8/ASSEMBLY Control Valve PC2000-8.xlsx": {
+        "id": "1X68SmoetAaGr0qIJQIlev1PvuxMZu3XfGhUBjpVnbDk",
+        "url": "https://docs.google.com/spreadsheets/d/1X68SmoetAaGr0qIJQIlev1PvuxMZu3XfGhUBjpVnbDk/edit",
+        "category": "Control Valve",
+        "egi": "PC2000-8",
+        "stage": "ASSEMBLY",
+        "uploaded_at": "2026-08-05T23:37:03+07:00"
+    },
+    "Control Valve/WA800-3/ASSEMBLY Control Valve WA800-3.xlsx": {
+        "id": "1nBkJpknzQiTWQ6VRxKLB7yhsHKfuGEbtqvnL54dDIZc",
+        "url": "https://docs.google.com/spreadsheets/d/1nBkJpknzQiTWQ6VRxKLB7yhsHKfuGEbtqvnL54dDIZc/edit",
+        "category": "Control Valve",
+        "egi": "WA800-3",
+        "stage": "ASSEMBLY",
+        "uploaded_at": "2026-08-05T23:38:39+07:00"
+    },
+    "Control Valve/PC1250-8/ASSEMBLY Control Valve PC1250-8.xlsx": {
+        "id": "1K1nXDJglsnfCyvtp48RuOJamHC2Ya25ZpR3Ct1Aqmas",
+        "url": "https://docs.google.com/spreadsheets/d/1K1nXDJglsnfCyvtp48RuOJamHC2Ya25ZpR3Ct1Aqmas/edit",
+        "category": "Control Valve",
+        "egi": "PC1250-8",
+        "stage": "ASSEMBLY",
+        "uploaded_at": "2026-08-05T23:41:25+07:00"
+    },
+    "Control Valve/PC1250-8/TEST Control Valve PC1250-8.xlsx": {
+        "id": "17XgcOvcFdu57vGpJRnayvhXXaP1PrdM7MWeVvsEdKdo",
+        "url": "https://docs.google.com/spreadsheets/d/17XgcOvcFdu57vGpJRnayvhXXaP1PrdM7MWeVvsEdKdo/edit",
+        "category": "Control Valve",
+        "egi": "PC1250-8",
+        "stage": "TEST",
+        "uploaded_at": "2026-08-05T23:41:50+07:00"
+    },
+    "Control Valve/PC2000-8/TEST Control Valve PC2000-8.xlsx": {
+        "id": "1pFiexqFEVQdiXIYLRJxpX_tWYU10ml7DexrN7_JAcXw",
+        "url": "https://docs.google.com/spreadsheets/d/1pFiexqFEVQdiXIYLRJxpX_tWYU10ml7DexrN7_JAcXw/edit",
+        "category": "Control Valve",
+        "egi": "PC2000-8",
+        "stage": "TEST",
+        "uploaded_at": "2026-08-05T23:42:17+07:00"
+    },
+    "Hydraulic Cylinder/HD785-7/ASSEMBLY Hydraulic Cylinder HD785-7.xlsx": {
+        "id": "1rXHCffDwdkkPhfo4lnExzTgbw7YxPHA4bYZuWVvnEX0",
+        "url": "https://docs.google.com/spreadsheets/d/1rXHCffDwdkkPhfo4lnExzTgbw7YxPHA4bYZuWVvnEX0/edit",
+        "category": "Hydraulic Cylinder",
+        "egi": "HD785-7",
+        "stage": "ASSEMBLY",
+        "uploaded_at": "2026-08-05T23:43:17+07:00"
+    },
+    "Rear Suspension/HD785-7/ASSEMBLY Rear Suspension HD785-7.xlsx": {
+        "id": "1k9MbdRNp2Camg3Zz5tIUwdfr42BBKxwCw1LNYhP2WRM",
+        "url": "https://docs.google.com/spreadsheets/d/1k9MbdRNp2Camg3Zz5tIUwdfr42BBKxwCw1LNYhP2WRM/edit",
+        "category": "Rear Suspension",
+        "egi": "HD785-7",
+        "stage": "ASSEMBLY",
+        "uploaded_at": "2026-08-05T23:43:46+07:00"
+    },
+    "Front Suspension/HD785-7/ASSEMBLY Front Suspension HD785-7.xlsx": {
+        "id": "1a0imVP_g356peC72e_JUfoDR2SguO3HSgMQjUpNAq-Q",
+        "url": "https://docs.google.com/spreadsheets/d/1a0imVP_g356peC72e_JUfoDR2SguO3HSgMQjUpNAq-Q/edit",
+        "category": "Front Suspension",
+        "egi": "HD785-7",
+        "stage": "ASSEMBLY",
+        "uploaded_at": "2026-08-06T00:00:51+07:00"
     }
 }

@@ -1,5 +1,12 @@
 <x-app-layout>
 
+@php
+    // Tahap yang SEDANG DILIHAT. Saat mekanik me-review tahap lama,
+    // $reviewStage terisi dan panel per-tahap (FR/MOL) harus mengikutinya —
+    // memakai current_stage saja membuat panel Stage 2 ikut muncul di Stage 1.
+    $viewedStage = $reviewStage ?? $comp->current_stage;
+@endphp
+
     <div class="section fade-up">
         <div class="ocms-page-header">
             <h1>{{ $comp->serial_number }}</h1>
@@ -251,110 +258,164 @@
     </div>
     @endif
 
-    {{-- Part Requests --}}
-    @if($comp->partRequests->count() > 0)
-    <div class="section">
-        <div class="section-title fade-up">Permintaan Suku Cadang</div>
-        <div class="glass-card fade-up table-scroll" style="padding: 0;">
-            <table class="ocms-table">
-                <thead>
-                    <tr>
-                        <th>Part</th>
-                        <th>Qty</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($comp->partRequests as $pr)
-                    <tr>
-                        <td style="font-weight: 600; color: var(--text-primary);">{{ $pr->part_name }}</td>
-                        <td class="mono">{{ $pr->qty }}</td>
-                        <td>
-                            @if($pr->status == 'Pending')
-                                <span class="badge badge-gold">⏳ Pending</span>
-                            @elseif($pr->status == 'Available')
-                                <span class="badge badge-green">✅ Available</span>
-                            @else
-                                <span class="badge badge-red">❌ Out of Stock</span>
-                            @endif
-                        </td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
-    </div>
-    @endif
-
-    {{-- Fabrication Request (FR) — Stage 2+ --}}
-    @if($comp->current_stage >= 2)
+    {{-- FR & MOL Panel — Stage 2+ dengan Tab Toggle --}}
+    @if($viewedStage >= 2)
     <div class="section" id="fr-panel">
-        <div class="section-title fade-up">Fabrication Request (PLO/09/F-021)</div>
+        <div class="section-title fade-up">Dokumen FR & MOL</div>
         <div class="glass-card fade-up">
             <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 8px;">
                 @if($comp->major_category === 'Engine')
-                    Scan spreadsheet <strong>Disassembly</strong> (centang <strong>SALVAGE</strong> → FR, <strong>REPLACE</strong> → Part Request).
+                    Scan spreadsheet <strong>Disassembly</strong> (SALVAGE → FR, REPLACE → Part Request/MOL).
+                @elseif($comp->gsheet_url)
+                    Scan spreadsheet <strong>Inspection &amp; Disassembly</strong> (U/R / SALVAGE → FR, R/N / REPLACE → Part Request/MOL).
                 @else
-                    Scan spreadsheet <strong>Inspection</strong> (centang <strong>U/R</strong> → FR, <strong>R/N</strong> → Part Request).
+                    Scan spreadsheet <strong>Inspection</strong> (U/R → FR, R/N → Part Request/MOL).
                 @endif
-                Form internal: Repair → FR, Replace → PR.
+                Form internal: Repair → FR, Replace → PR/MOL.
             </p>
             <p id="fr-scan-profile" style="font-size: 0.7rem; color: var(--text-muted); margin-bottom: 16px;"></p>
 
             @role('Mechanic|Supervisor|SuperAdmin')
             <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px;">
-                <button type="button" id="fr-scan-btn" class="btn-primary">🔍 Scan Spreadsheet</button>
+                <button type="button" id="fr-scan-btn" class="btn-primary">🔍 Scan Spreadsheet (FR & MOL)</button>
+                <a href="{{ route('components.fr.create', $comp->comp_id) }}" class="btn-secondary" style="text-decoration:none;">📝 Form FR Kosong (PLO/09/F-021)</a>
+                <a href="{{ $comp->gsheet_sdr_url ?: 'https://docs.google.com/spreadsheets/d/1HvxiqXGEvH_nscYugPjOEfgIdq9Ps9nEyKqt_vNrd_8/edit?usp=sharing' }}" target="_blank" class="btn-secondary" style="text-decoration:none;">📊 SDR</a>
+                <a href="https://llk-parts.ru/#" target="_blank" class="btn-secondary" style="text-decoration:none;">🔗 LLK Parts Catalog</a>
                 <span id="fr-scan-status" style="font-size: 0.75rem; color: var(--text-muted); align-self: center;"></span>
-            </div>
-
-            <div id="fr-candidates-wrap" style="display:none; margin-bottom: 20px;">
-                <div class="section-title" style="font-size: 0.85rem; margin-bottom: 10px;">Kandidat Fabrication Request</div>
-                <div id="fr-candidates-list"></div>
-                <div class="section-title" style="font-size: 0.85rem; margin: 16px 0 10px; display:none;" id="pr-candidates-title">Kandidat Part Request (Gudang)</div>
-                <div id="pr-candidates-list"></div>
-                <div style="margin-top: 12px;">
-                    <button type="button" id="fr-save-btn" class="btn-primary" disabled>💾 Simpan FR / PR Terpilih</button>
-                </div>
             </div>
             @endrole
 
-            <div id="fr-list-wrap">
-                @if($comp->fabricationRequests->count() > 0)
+            {{-- Tab Toggle Buttons --}}
+            <div style="display: flex; gap: 0; margin-bottom: 0; border-bottom: 2px solid rgba(255,255,255,0.06);">
+                <button type="button" id="tab-fr-btn" class="btn-primary" style="border-radius: 8px 8px 0 0; padding: 8px 24px; font-size: 0.85rem;">
+                    📋 Fabrication Request ({{ $comp->fabricationRequests->count() }})
+                </button>
+                <button type="button" id="tab-mol-btn" class="btn-secondary" style="border-radius: 8px 8px 0 0; padding: 8px 24px; font-size: 0.85rem; margin-left: 4px;">
+                    📦 Material Order List ({{ $comp->partRequests->count() }})
+                </button>
+            </div>
+
+            {{-- TAB: FR List --}}
+            <div id="tab-fr-content" style="padding-top: 16px;">
+                <div id="fr-list-wrap">
+                    @if($comp->fabricationRequests->count() > 0)
+                    <div class="table-scroll" style="padding: 0;">
+                        <table class="ocms-table" id="fr-table">
+                            <thead>
+                                <tr>
+                                    <th>No. FR</th>
+                                    <th>Part</th>
+                                    <th>Status</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($comp->fabricationRequests as $fr)
+                                <tr data-fr-id="{{ $fr->fr_id }}">
+                                    <td class="mono" style="font-size: 0.75rem;">{{ $fr->fr_number }}</td>
+                                    <td style="font-weight: 600;">
+                                        {{ $fr->part_name }}
+                                        @if($fr->section)
+                                            <span style="font-size:0.65rem; font-weight:600; padding:1px 6px; border-radius:6px; background:rgba(96,165,250,0.15); color:#93c5fd;">{{ $fr->section }}</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if($fr->status === 'done')
+                                            <span class="badge badge-green">Done</span>
+                                        @elseif($fr->status === 'printed')
+                                            <span class="badge badge-cyan">Printed</span>
+                                        @else
+                                            <span class="badge badge-gold">Draft</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                                            <a href="{{ route('components.fr.edit', [$comp->comp_id, $fr->fr_id]) }}" class="btn-secondary" style="padding: 4px 10px; font-size: 0.7rem; text-decoration: none;">✏️ Edit Form PLO/09/F-021</a>
+                                            <a href="{{ route('components.fr.pdf', [$comp->comp_id, $fr->fr_id]) }}" target="_blank" class="btn-secondary" style="padding: 4px 10px; font-size: 0.7rem; text-decoration: none;">🖨 PDF</a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                    @else
+                    <p id="fr-empty-msg" style="color: var(--text-muted); font-size: 0.85rem; text-align: center; padding: 16px;">
+                        Belum ada Fabrication Request untuk komponen ini.
+                    </p>
+                    @endif
+                </div>
+            </div>
+
+            {{-- TAB: MOL List --}}
+            <div id="tab-mol-content" style="display: none; padding-top: 16px;">
+                {{-- Upload Dokumen MOL --}}
+                @role('Mechanic|Supervisor|SuperAdmin')
+                <div style="margin-bottom: 16px; padding: 12px; border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; background: rgba(0,0,0,0.1);">
+                    <div style="font-weight: 600; font-size: 0.85rem; margin-bottom: 8px;">📄 Dokumen MOL</div>
+                    @if($comp->mol_document_path)
+                        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                            <a href="{{ asset($comp->mol_document_path) }}" target="_blank" class="btn-secondary" style="padding: 6px 14px; font-size: 0.8rem; text-decoration: none;">👁 Lihat Dokumen MOL</a>
+                            <form id="mol-upload-form" enctype="multipart/form-data" style="display: flex; gap: 8px; align-items: center;">
+                                @csrf
+                                <input type="file" name="mol_document" accept=".pdf,.jpg,.jpeg,.png" style="font-size: 0.75rem; max-width: 220px;" id="mol-doc-input">
+                                <button type="submit" class="btn-primary" style="padding: 6px 14px; font-size: 0.75rem;">🔄 Upload Ulang</button>
+                            </form>
+                            <button type="button" id="mol-doc-delete-btn" class="btn-secondary" style="padding: 6px 14px; font-size: 0.75rem; color: #f87171;">🗑 Hapus</button>
+                        </div>
+                        <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 6px;">File: {{ basename($comp->mol_document_path) }}</div>
+                    @else
+                        <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                            <form id="mol-upload-form" enctype="multipart/form-data" style="display: flex; gap: 8px; align-items: center;">
+                                @csrf
+                                <input type="file" name="mol_document" accept=".pdf,.jpg,.jpeg,.png" style="font-size: 0.75rem; max-width: 220px;" id="mol-doc-input">
+                                <button type="submit" class="btn-primary" style="padding: 6px 14px; font-size: 0.75rem;">📤 Upload Dokumen MOL</button>
+                            </form>
+                        </div>
+                        <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 6px;">Format: PDF, JPG, PNG (maks. 10 MB)</div>
+                    @endif
+                    <span id="mol-upload-status" style="font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; display: block;"></span>
+                </div>
+                @else
+                {{-- Non-mechanic: hanya bisa lihat dokumen --}}
+                @if($comp->mol_document_path)
+                <div style="margin-bottom: 16px;">
+                    <a href="{{ asset($comp->mol_document_path) }}" target="_blank" class="btn-secondary" style="padding: 6px 14px; font-size: 0.8rem; text-decoration: none;">👁 Lihat Dokumen MOL</a>
+                    <span style="font-size: 0.7rem; color: var(--text-muted); margin-left: 8px;">{{ basename($comp->mol_document_path) }}</span>
+                </div>
+                @endif
+                @endrole
+
+                {{-- MOL Part Request List --}}
+                @if($comp->partRequests->count() > 0)
                 <div class="table-scroll" style="padding: 0;">
-                    <table class="ocms-table" id="fr-table">
+                    <table class="ocms-table">
                         <thead>
                             <tr>
-                                <th>No. FR</th>
                                 <th>Part</th>
-                                <th>Jenis</th>
-                                <th>Sumber</th>
+                                <th>Section</th>
                                 <th>Status</th>
-                                <th>Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($comp->fabricationRequests as $fr)
-                            <tr data-fr-id="{{ $fr->fr_id }}">
-                                <td class="mono" style="font-size: 0.75rem;">{{ $fr->fr_number }}</td>
-                                <td style="font-weight: 600;">
-                                    {{ $fr->part_name }}
-                                    @if($fr->section)
-                                        <span style="font-size:0.65rem; font-weight:600; padding:1px 6px; border-radius:6px; background:rgba(96,165,250,0.15); color:#93c5fd;">{{ $fr->section }}</span>
-                                    @endif
-                                </td>
-                                <td>{{ $fr->workTypeLabel() }}</td>
-                                <td><span class="badge badge-cyan">{{ strtoupper($fr->source) }}</span></td>
+                            @foreach($comp->partRequests as $pr)
+                            <tr>
+                                <td style="font-weight: 600; color: var(--text-primary);">{{ $pr->part_name }}</td>
                                 <td>
-                                    @if($fr->status === 'done')
-                                        <span class="badge badge-green">Done</span>
-                                    @elseif($fr->status === 'printed')
-                                        <span class="badge badge-cyan">Printed</span>
+                                    @if($pr->section)
+                                        <span style="font-size:0.65rem; font-weight:600; padding:1px 6px; border-radius:6px; background:rgba(96,165,250,0.15); color:#93c5fd;">{{ $pr->section }}</span>
                                     @else
-                                        <span class="badge badge-gold">Draft</span>
+                                        -
                                     @endif
                                 </td>
                                 <td>
-                                    <a href="{{ route('components.fr.pdf', [$comp->comp_id, $fr->fr_id]) }}" target="_blank" class="btn-secondary" style="padding: 4px 10px; font-size: 0.7rem;">🖨 PDF</a>
+                                    @if($pr->status == 'Pending')
+                                        <span class="badge badge-gold">⏳ Pending</span>
+                                    @elseif($pr->status == 'Available')
+                                        <span class="badge badge-green">✅ Available</span>
+                                    @else
+                                        <span class="badge badge-red">❌ Out of Stock</span>
+                                    @endif
                                 </td>
                             </tr>
                             @endforeach
@@ -362,11 +423,130 @@
                     </table>
                 </div>
                 @else
-                <p id="fr-empty-msg" style="color: var(--text-muted); font-size: 0.85rem; text-align: center; padding: 16px;">
-                    Belum ada Fabrication Request untuk komponen ini.
+                <p style="color: var(--text-muted); font-size: 0.85rem; text-align: center; padding: 16px;">
+                    Belum ada Part Request / MOL untuk komponen ini.
                 </p>
                 @endif
             </div>
+        </div>
+    </div>
+    @endif
+
+    {{-- Stage 3: Machining & Fabrication — semua output FR ditampilkan langsung --}}
+    @if($viewedStage == 3)
+    <div class="section" id="fr-output-panel">
+        <div class="section-title fade-up">🛠 Machining & Fabrication — Output FR ({{ $comp->fabricationRequests->count() }})</div>
+        @forelse($comp->fabricationRequests as $fr)
+        <div class="glass-card fade-up" style="margin-bottom: 16px; padding: 0; overflow: hidden;">
+            <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; padding: 14px 18px; border-bottom: 1px solid rgba(255,255,255,0.06);">
+                <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                    <span class="mono" style="font-size: 0.75rem; color: var(--accent-cyan);">{{ $fr->fr_number }}</span>
+                    <strong style="font-size: 0.9rem;">{{ $fr->part_name }}</strong>
+                    @if($fr->section)
+                        <span style="font-size:0.65rem; font-weight:600; padding:1px 6px; border-radius:6px; background:rgba(96,165,250,0.15); color:#93c5fd;">{{ $fr->section }}</span>
+                    @endif
+                    <span style="font-size: 0.75rem; color: var(--text-muted);">{{ $fr->workTypeLabel() }}</span>
+                    @if($fr->status === 'done')
+                        <span class="badge badge-green">Done</span>
+                    @elseif($fr->status === 'printed')
+                        <span class="badge badge-cyan">Printed</span>
+                    @else
+                        <span class="badge badge-gold">Draft</span>
+                    @endif
+                </div>
+                <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                    <a href="{{ route('components.fr.edit', [$comp->comp_id, $fr->fr_id]) }}" class="btn-secondary" style="padding: 4px 10px; font-size: 0.7rem; text-decoration: none;">✏️ Edit</a>
+                    <a href="{{ route('components.fr.pdf', [$comp->comp_id, $fr->fr_id]) }}" target="_blank" class="btn-secondary" style="padding: 4px 10px; font-size: 0.7rem; text-decoration: none;">🖨 Buka PDF</a>
+                </div>
+            </div>
+            {{-- PDF di-lazy-load supaya halaman tidak merender puluhan PDF sekaligus --}}
+            <iframe class="fr-pdf-embed" data-src="{{ route('components.fr.pdf', [$comp->comp_id, $fr->fr_id]) }}"
+                title="FR {{ $fr->fr_number }}"
+                style="display: block; width: 100%; height: 78vh; border: none; background: #fff;"></iframe>
+        </div>
+        @empty
+        <div class="glass-card fade-up">
+            <p style="color: var(--text-muted); font-size: 0.85rem; text-align: center; padding: 24px;">
+                Belum ada Fabrication Request. Hasil scan spreadsheet Stage 2 (SALVAGE / U/R) akan muncul di sini sebagai dokumen FR PLO/09/F-021.
+            </p>
+        </div>
+        @endforelse
+    </div>
+    <script>
+        // Lazy-load PDF FR: src dipasang saat kartu mendekati viewport.
+        document.addEventListener('DOMContentLoaded', function() {
+            const frames = Array.from(document.querySelectorAll('iframe.fr-pdf-embed[data-src]'));
+            if (frames.length === 0) return;
+
+            function load(f) {
+                const url = f.getAttribute('data-src');
+                if (url && !f.getAttribute('src')) f.setAttribute('src', url);
+                f.removeAttribute('data-src');
+            }
+
+            if (!('IntersectionObserver' in window)) { frames.forEach(load); return; }
+
+            const obs = new IntersectionObserver(function(entries) {
+                entries.forEach(function(e) {
+                    if (e.isIntersecting) { load(e.target); obs.unobserve(e.target); }
+                });
+            }, { rootMargin: '400px 0px' });
+
+            frames.forEach(function(f) { obs.observe(f); });
+        });
+    </script>
+    @endif
+
+    {{-- Stage 6: Painting — dokumentasi foto hasil pengecatan --}}
+    @if($viewedStage == 6)
+    @php $paintingImages = array_values($comp->painting_images ?? []); @endphp
+    <div class="section" id="painting-panel">
+        <div class="section-title fade-up">🎨 Painting — Dokumentasi Foto ({{ count($paintingImages) }})</div>
+        <div class="glass-card fade-up">
+            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 16px;">
+                Unggah foto komponen setelah selesai pengecatan sebagai bukti dokumentasi tahap Painting.
+            </p>
+
+            @role('Mechanic|Supervisor|SuperAdmin')
+            <form action="{{ route('components.painting.upload', $comp->comp_id) }}" method="POST" enctype="multipart/form-data"
+                  style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 20px; padding: 12px; border: 1px dashed rgba(255,255,255,0.15); border-radius: 10px;">
+                @csrf
+                <input type="file" name="photos[]" accept=".jpg,.jpeg,.png,.webp" multiple required style="font-size: 0.75rem; max-width: 320px;">
+                <button type="submit" class="btn-primary" style="padding: 8px 16px; font-size: 0.8rem;">📤 Upload Foto</button>
+                <span style="font-size: 0.7rem; color: var(--text-muted);">JPG/PNG/WebP, maks. 10 MB per foto, hingga 12 foto sekali unggah.</span>
+            </form>
+            @endrole
+
+            @if(count($paintingImages) > 0)
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px;">
+                @foreach($paintingImages as $idx => $img)
+                <div style="border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; overflow: hidden; background: rgba(0,0,0,0.15);">
+                    <a href="{{ asset($img['path']) }}" target="_blank" title="Buka ukuran penuh">
+                        <img src="{{ asset($img['path']) }}" alt="Foto painting {{ $idx + 1 }}"
+                             style="display: block; width: 100%; height: 170px; object-fit: cover;">
+                    </a>
+                    <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 8px 10px;">
+                        <span style="font-size: 0.65rem; color: var(--text-muted);">
+                            {{ $img['uploaded_at'] ?? '' }}{{ !empty($img['uploaded_by']) ? ' · ' . $img['uploaded_by'] : '' }}
+                        </span>
+                        @role('Mechanic|Supervisor|SuperAdmin')
+                        <form action="{{ route('components.painting.delete', $comp->comp_id) }}" method="POST" style="margin: 0;"
+                              onsubmit="return confirm('Hapus foto ini?');">
+                            @csrf
+                            @method('DELETE')
+                            <input type="hidden" name="index" value="{{ $idx }}">
+                            <button type="submit" class="btn-secondary" style="padding: 3px 8px; font-size: 0.65rem; color: #f87171;">🗑</button>
+                        </form>
+                        @endrole
+                    </div>
+                </div>
+                @endforeach
+            </div>
+            @else
+            <p style="color: var(--text-muted); font-size: 0.85rem; text-align: center; padding: 16px;">
+                Belum ada foto dokumentasi painting.
+            </p>
+            @endif
         </div>
     </div>
     @endif
@@ -407,13 +587,24 @@
     @php
         // Spreadsheet tahap 2: mainline + sub-assy (disassembly & measurement).
         // PC2000-8 lama tanpa salinan disassembly memakai sheet legacy.
+        // Tahap 4 (Assembly) & 5 (Test Bench) memakai salinan GSheet sendiri.
+        $toEmbed = fn ($url) => $url . (str_contains($url, '?') ? '&' : '?') . 'rm=minimal';
+
         $gsheetEmbedUrl = null;
         $gsheetMeasurementEmbedUrl = null;
         $gsheetSubassyDisassyEmbedUrl = null;
         $gsheetSubassyMeasureEmbedUrl = null;
-        if ($checksheetStage == 2) {
-            $toEmbed = fn ($url) => $url . (str_contains($url, '?') ? '&' : '?') . 'rm=minimal';
+        $gsheetAssemblyEmbedUrl = null;
+        $gsheetTestbenchEmbedUrl = null;
 
+        if ($checksheetStage == 4 && $comp->gsheet_assembly_url) {
+            $gsheetAssemblyEmbedUrl = $toEmbed($comp->gsheet_assembly_url);
+        }
+        if ($checksheetStage == 5 && $comp->gsheet_testbench_url) {
+            $gsheetTestbenchEmbedUrl = $toEmbed($comp->gsheet_testbench_url);
+        }
+
+        if ($checksheetStage == 2) {
             $rawGsheet = $comp->gsheet_url
                 ?: (
                     $comp->major_category === 'Engine' && $comp->egi === 'PC2000-8'
@@ -435,8 +626,9 @@
         }
         $hasDisassyPanel = $gsheetEmbedUrl || $gsheetSubassyDisassyEmbedUrl;
         $hasMeasurePanel = $gsheetMeasurementEmbedUrl || $gsheetSubassyMeasureEmbedUrl;
+        $hasStageGsheetPanel = $gsheetAssemblyEmbedUrl || $gsheetTestbenchEmbedUrl;
     @endphp
-    @if($hasDisassyPanel || $hasMeasurePanel)
+    @if($hasDisassyPanel || $hasMeasurePanel || $hasStageGsheetPanel)
     <style>
         .cs-scope-toggle {
             display: inline-flex;
@@ -541,6 +733,36 @@
                 data-crop-mainline="46,25,0"
                 data-crop-subassy="46,25,0"
                 style="position: absolute; top: -{{ $mCropTop }}px; left: -{{ $mCropLeft }}px; width: calc(100% + {{ $mCropLeft }}px); height: calc(100% + {{ $mCropTop }}px); border: none;"
+                allowfullscreen>
+            </iframe>
+        </div>
+    </div>
+    @endif
+
+    @if($gsheetAssemblyEmbedUrl)
+    {{-- Stage 4: checksheet Assembly dari salinan GSheet (mirip Disassembly).
+         Crop kiri tipis (hanya kolom nomor baris) supaya tidak ada konten
+         terpotong; bar tab bawah dibiarkan terlihat. --}}
+    <div class="section" id="checksheet-review">
+        <div class="section-title fade-up">🔩 Assembly — Checksheet</div>
+        <div class="glass-card fade-up" style="padding: 0; overflow: hidden; height: 90vh; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); position: relative;">
+            <iframe id="gsheet-iframe-assembly" class="gsheet-embed"
+                data-src="{{ $gsheetAssemblyEmbedUrl }}"
+                style="position: absolute; top: -25px; left: -46px; width: calc(100% + 46px); height: calc(100% + 25px); border: none;"
+                allowfullscreen>
+            </iframe>
+        </div>
+    </div>
+    @endif
+
+    @if($gsheetTestbenchEmbedUrl)
+    {{-- Stage 5: checksheet Test Bench dari salinan GSheet --}}
+    <div class="section" id="checksheet-review">
+        <div class="section-title fade-up">🧪 Test Bench — Checksheet</div>
+        <div class="glass-card fade-up" style="padding: 0; overflow: hidden; height: 90vh; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); position: relative;">
+            <iframe id="gsheet-iframe-testbench" class="gsheet-embed"
+                data-src="{{ $gsheetTestbenchEmbedUrl }}"
+                style="position: absolute; top: -25px; left: -46px; width: calc(100% + 46px); height: calc(100% + 25px); border: none;"
                 allowfullscreen>
             </iframe>
         </div>
@@ -768,7 +990,7 @@
         </script>
     @endif
 
-    @if($currentChecksheet && !$hasDisassyPanel)
+    @if($currentChecksheet && !$hasDisassyPanel && !$hasStageGsheetPanel)
     <div class="section" id="checksheet-review">
         <div class="section-title fade-up">Checksheet — {{ $stageNames[$checksheetStage] ?? '' }}</div>
         <div class="glass-card fade-up" id="csContainer">
@@ -1530,7 +1752,9 @@
                         </div>
                         @endif
 
-                        @if($comp->current_stage == 5)
+                        {{-- Quality Gate manual hanya untuk komponen TANPA checksheet
+                             Test Bench GSheet (spreadsheet menggantikannya) --}}
+                        @if($comp->current_stage == 5 && !$comp->gsheet_testbench_url)
                         <div style="background: var(--accent-purple-dim); border: 1px solid rgba(167, 139, 250, 0.15); border-radius: 14px; padding: 28px; margin-bottom: 24px;">
                             <div class="section-title" style="color: var(--accent-purple); margin-bottom: 16px;">🧪 Quality Gate — Test Performance</div>
                             <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 16px;">Standar Tekanan Oli: <strong style="color: var(--text-primary);">40 – 50 psi</strong></p>
@@ -1544,10 +1768,16 @@
                             <textarea name="remarks" class="ocms-input" placeholder="Tambahkan catatan untuk Management sebelum mengajukan approval..." style="width: 100%; min-height: 80px; resize: vertical;"></textarea>
                         </div>
 
+                        {{-- Stage 2-5 wajib approval Management (GL); stage 1 & 6 lanjut otomatis --}}
+                        @php $needsApproval = in_array($comp->current_stage, [2, 3, 4, 5]); @endphp
                         <div style="display: flex; justify-content: space-between; align-items: center;">
                             <a href="{{ route('components.index') }}" class="btn-secondary">← Kembali</a>
                             @role('Mechanic|Supervisor|SuperAdmin')
-                            <button type="submit" class="btn-primary">Ajukan Approval ke Tahap {{ $comp->current_stage + 1 }} →</button>
+                            <button type="submit" class="btn-primary">
+                                {{ $needsApproval
+                                    ? 'Ajukan Approval ke Tahap ' . ($comp->current_stage + 1) . ' →'
+                                    : 'Selesaikan Tahap & Lanjut ke Tahap ' . ($comp->current_stage + 1) . ' →' }}
+                            </button>
                             @else
                             <span style="font-size: 0.75rem; color: var(--text-muted); font-style: italic;">Hanya Mekanik/Supervisor yang bisa mengajukan proses.</span>
                             @endrole
@@ -1567,224 +1797,152 @@
     </div>
     @endif
 
-    @if($comp->current_stage >= 2)
-    @role('Mechanic|Supervisor|SuperAdmin')
+    {{-- Skrip panel FR & MOL (Tab toggle, auto-scan, upload MOL) --}}
+    @if($viewedStage >= 2)
     <script>
     (function() {
         const compId = @json($comp->comp_id);
         const csrf = @json(csrf_token());
         const scanUrl = @json(route('components.fr.scan', $comp->comp_id));
-        const storeUrl = @json(route('components.fr.store', $comp->comp_id));
-        const pdfBase = @json(url('components/' . $comp->comp_id . '/fr'));
+        const molUploadUrl = @json(route('components.mol.upload-document', $comp->comp_id));
+        const molDeleteUrl = @json(route('components.mol.delete-document', $comp->comp_id));
 
+        // Tab Toggle Elements
+        const tabFrBtn = document.getElementById('tab-fr-btn');
+        const tabMolBtn = document.getElementById('tab-mol-btn');
+        const tabFrContent = document.getElementById('tab-fr-content');
+        const tabMolContent = document.getElementById('tab-mol-content');
+
+        if (tabFrBtn && tabMolBtn) {
+            tabFrBtn.addEventListener('click', function() {
+                tabFrBtn.className = 'btn-primary';
+                tabMolBtn.className = 'btn-secondary';
+                tabFrContent.style.display = 'block';
+                tabMolContent.style.display = 'none';
+            });
+
+            tabMolBtn.addEventListener('click', function() {
+                tabMolBtn.className = 'btn-primary';
+                tabFrBtn.className = 'btn-secondary';
+                tabMolContent.style.display = 'block';
+                tabFrContent.style.display = 'none';
+            });
+        }
+
+        // Scan Button (Auto-Create FR & MOL)
         const scanBtn = document.getElementById('fr-scan-btn');
         const scanStatus = document.getElementById('fr-scan-status');
         const scanProfile = document.getElementById('fr-scan-profile');
-        const wrap = document.getElementById('fr-candidates-wrap');
-        const list = document.getElementById('fr-candidates-list');
-        const prList = document.getElementById('pr-candidates-list');
-        const prTitle = document.getElementById('pr-candidates-title');
-        const saveBtn = document.getElementById('fr-save-btn');
 
-        if (!scanBtn) return;
+        if (scanBtn) {
+            scanBtn.addEventListener('click', async function() {
+                scanBtn.disabled = true;
+                scanStatus.textContent = 'Memindai & membuat FR/MOL…';
+                try {
+                    const res = await fetch(scanUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': csrf,
+                        },
+                        body: JSON.stringify({}),
+                    });
+                    const data = await res.json();
+                    if (!data.ok) throw new Error(data.message || 'Scan gagal');
 
-        let candidates = [];
-        let prCandidates = [];
+                    if (scanProfile && data.scan_profile_label) {
+                        scanProfile.textContent = 'Profil scan: ' + data.scan_profile_label;
+                    }
 
-        // Nama part datang dari sel spreadsheet — jangan pernah masuk innerHTML mentah.
-        function esc(value) {
-            if (value === null || value === undefined) return '';
-            return String(value)
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#39;');
-        }
+                    let msg = '✅ ' + (data.message || 'Scan selesai.');
+                    if (data.gsheet_error) {
+                        msg += ` (GSheet: ${data.gsheet_error})`;
+                    } else if (data.gsheet_sheet) {
+                        msg += ` — sheet: ${data.gsheet_sheet}`;
+                    }
+                    if ((data.skipped || []).length) {
+                        msg += `, ${data.skipped.length} dilewati (sudah ada)`;
+                    }
+                    scanStatus.textContent = msg;
 
-        function sectionBadge(section) {
-            if (!section) return '';
-            return ` <span style="font-size:0.65rem; font-weight:600; padding:1px 6px; border-radius:6px; background:rgba(96,165,250,0.15); color:#93c5fd;">${esc(section)}</span>`;
-        }
-
-        function workTypeSelect(name, value) {
-            const opts = [
-                ['repair', 'Repair'],
-                ['fabrikasi', 'Fabrikasi'],
-                ['modifikasi', 'Modifikasi'],
-            ];
-            let html = `<select name="${name}" class="ocms-select fr-work-type" style="font-size:0.75rem;">`;
-            opts.forEach(([v, label]) => {
-                html += `<option value="${v}" ${v === value ? 'selected' : ''}>${label}</option>`;
+                    // Reload jika ada FR/PR baru yang berhasil dibuat
+                    const createdFrCount = (data.created_fr || []).length;
+                    const createdPrCount = (data.created_pr || []).length;
+                    if (createdFrCount > 0 || createdPrCount > 0) {
+                        setTimeout(() => location.reload(), 1500);
+                    }
+                } catch (e) {
+                    scanStatus.textContent = '⚠ ' + (e.message || 'Gagal scan');
+                } finally {
+                    scanBtn.disabled = false;
+                }
             });
-            html += '</select>';
-            return html;
         }
 
-        function renderCandidates() {
-            const hasFr = candidates.length > 0;
-            const hasPr = prCandidates.length > 0;
-
-            if (!hasFr && !hasPr) {
-                wrap.style.display = 'none';
-                saveBtn.disabled = true;
-                return;
-            }
-
-            wrap.style.display = 'block';
-
-            if (hasFr) {
-                list.innerHTML = candidates.map((c, i) => `
-                    <div class="fr-candidate-row" data-index="${i}" style="display:grid; grid-template-columns: 28px 1fr 120px 1fr; gap:10px; align-items:start; padding:12px; margin-bottom:8px; border:1px solid rgba(255,255,255,0.06); border-radius:10px; background:rgba(0,0,0,0.15);">
-                        <input type="checkbox" class="fr-pick" data-index="${i}" checked style="margin-top:8px;">
-                        <div>
-                            <div style="font-weight:600; font-size:0.85rem;">${esc(c.part_name)}${sectionBadge(c.section)}</div>
-                            <div style="font-size:0.7rem; color:var(--text-muted);">P/N: ${esc(c.part_number) || '-'} | Sumber: ${esc(c.source).toUpperCase()}</div>
-                            <textarea class="ocms-input fr-instruction" data-index="${i}" placeholder="Instruksi kerja (opsional)" style="width:100%; min-height:48px; margin-top:6px; font-size:0.75rem;">${esc(c.instruction)}</textarea>
-                        </div>
-                        <div>${workTypeSelect('work_type_' + i, c.work_type || 'repair')}</div>
-                        <div style="font-size:0.7rem; color:var(--text-muted);">Qty: ${c.qty || 1}</div>
-                    </div>
-                `).join('');
-            } else {
-                list.innerHTML = '<p style="font-size:0.75rem;color:var(--text-muted);">Tidak ada kandidat FR baru.</p>';
-            }
-
-            if (hasPr) {
-                prTitle.style.display = 'block';
-                prList.innerHTML = prCandidates.map((c, i) => `
-                    <div class="pr-candidate-row" data-index="${i}" style="display:grid; grid-template-columns: 28px 1fr; gap:10px; align-items:center; padding:10px; margin-bottom:8px; border:1px solid rgba(248,113,113,0.15); border-radius:10px; background:rgba(248,113,113,0.05);">
-                        <input type="checkbox" class="pr-pick" data-index="${i}" checked>
-                        <div>
-                            <div style="font-weight:600; font-size:0.85rem;">${esc(c.part_name)}${sectionBadge(c.section)}</div>
-                            <div style="font-size:0.7rem; color:var(--text-muted);">P/N: ${esc(c.part_number) || '-'} | Qty: ${c.qty || 1} | Sumber: ${esc(c.source).toUpperCase()}</div>
-                        </div>
-                    </div>
-                `).join('');
-            } else {
-                prTitle.style.display = 'none';
-                prList.innerHTML = '';
-            }
-
-            list.querySelectorAll('.fr-pick').forEach(cb => cb.addEventListener('change', updateSaveState));
-            prList.querySelectorAll('.pr-pick').forEach(cb => cb.addEventListener('change', updateSaveState));
-            updateSaveState();
-        }
-
-        function updateSaveState() {
-            const anyFr = list.querySelectorAll('.fr-pick:checked').length > 0;
-            const anyPr = prList.querySelectorAll('.pr-pick:checked').length > 0;
-            saveBtn.disabled = !(anyFr || anyPr);
-        }
-
-        scanBtn.addEventListener('click', async function() {
-            scanBtn.disabled = true;
-            scanStatus.textContent = 'Memindai…';
-            try {
-                const res = await fetch(scanUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': csrf,
-                    },
-                    body: JSON.stringify({}),
-                });
-                const data = await res.json();
-                if (!data.ok) throw new Error(data.message || 'Scan gagal');
-
-                candidates = data.candidates || [];
-                prCandidates = data.part_request_candidates || [];
-                if (scanProfile && data.scan_profile_label) {
-                    scanProfile.textContent = 'Profil scan: ' + data.scan_profile_label;
+        // Upload Dokumen MOL AJAX
+        const molUploadForm = document.getElementById('mol-upload-form');
+        const molUploadStatus = document.getElementById('mol-upload-status');
+        if (molUploadForm) {
+            molUploadForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const fileInput = document.getElementById('mol-doc-input');
+                if (!fileInput || !fileInput.files.length) {
+                    if (molUploadStatus) molUploadStatus.textContent = '⚠ Pilih file terlebih dahulu.';
+                    return;
                 }
-                renderCandidates();
 
-                let msg = `${candidates.length} FR + ${prCandidates.length} PR kandidat`;
-                if (candidates.length === 0 && prCandidates.length === 0) {
-                    msg = 'Tidak ada kandidat baru';
-                }
-                if (data.gsheet_error) {
-                    msg += ` (GSheet: ${data.gsheet_error})`;
-                } else if (data.gsheet_sheet) {
-                    msg += ` — sheet: ${data.gsheet_sheet}`;
-                }
-                if ((data.skipped || []).length) {
-                    msg += `, ${data.skipped.length} dilewati (sudah ada)`;
-                }
-                scanStatus.textContent = msg;
-            } catch (e) {
-                scanStatus.textContent = '⚠ ' + (e.message || 'Gagal scan');
-            } finally {
-                scanBtn.disabled = false;
-            }
-        });
+                const formData = new FormData(molUploadForm);
+                if (molUploadStatus) molUploadStatus.textContent = 'Mengunggah dokumen…';
 
-        saveBtn.addEventListener('click', async function() {
-            const picks = [];
-            list.querySelectorAll('.fr-pick:checked').forEach(cb => {
-                const i = parseInt(cb.dataset.index, 10);
-                const c = candidates[i];
-                if (!c) return;
-                const row = list.querySelector(`.fr-candidate-row[data-index="${i}"]`);
-                const workType = row?.querySelector('.fr-work-type')?.value || 'repair';
-                const instruction = row?.querySelector('.fr-instruction')?.value || '';
-                picks.push({
-                    part_name: c.part_name,
-                    part_number: c.part_number || '',
-                    section: c.section || '',
-                    qty: c.qty || 1,
-                    work_type: workType,
-                    instruction: instruction,
-                    source: c.source || 'manual',
-                });
+                try {
+                    const res = await fetch(molUploadUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': csrf,
+                        },
+                        body: formData,
+                    });
+                    const data = await res.json();
+                    if (!data.ok) throw new Error(data.message || 'Upload gagal');
+
+                    if (molUploadStatus) molUploadStatus.textContent = '✅ ' + data.message;
+                    setTimeout(() => location.reload(), 1000);
+                } catch (err) {
+                    if (molUploadStatus) molUploadStatus.textContent = '⚠ ' + (err.message || 'Gagal upload');
+                }
             });
+        }
 
-            const prPicks = [];
-            prList.querySelectorAll('.pr-pick:checked').forEach(cb => {
-                const i = parseInt(cb.dataset.index, 10);
-                const c = prCandidates[i];
-                if (!c) return;
-                prPicks.push({
-                    part_name: c.part_name,
-                    section: c.section || '',
-                    qty: c.qty || 1,
-                });
+        // Delete Dokumen MOL AJAX
+        const molDocDeleteBtn = document.getElementById('mol-doc-delete-btn');
+        if (molDocDeleteBtn) {
+            molDocDeleteBtn.addEventListener('click', async function() {
+                if (!confirm('Hapus dokumen MOL ini?')) return;
+
+                if (molUploadStatus) molUploadStatus.textContent = 'Menghapus dokumen…';
+
+                try {
+                    const res = await fetch(molDeleteUrl, {
+                        method: 'DELETE',
+                        headers: {
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': csrf,
+                        },
+                    });
+                    const data = await res.json();
+                    if (!data.ok) throw new Error(data.message || 'Hapus gagal');
+
+                    if (molUploadStatus) molUploadStatus.textContent = '✅ Dokumen dihapus.';
+                    setTimeout(() => location.reload(), 1000);
+                } catch (err) {
+                    if (molUploadStatus) molUploadStatus.textContent = '⚠ ' + (err.message || 'Gagal hapus');
+                }
             });
-
-            if (!picks.length && !prPicks.length) return;
-
-            saveBtn.disabled = true;
-            scanStatus.textContent = 'Menyimpan…';
-            try {
-                const res = await fetch(storeUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': csrf,
-                    },
-                    body: JSON.stringify({
-                        items: picks.length ? picks : undefined,
-                        part_request_items: prPicks.length ? prPicks : undefined,
-                    }),
-                });
-                const data = await res.json();
-                if (!data.ok) throw new Error(data.message || 'Simpan gagal');
-
-                scanStatus.textContent = '✅ ' + data.message;
-                candidates = [];
-                prCandidates = [];
-                wrap.style.display = 'none';
-                location.reload();
-            } catch (e) {
-                scanStatus.textContent = '⚠ ' + (e.message || 'Gagal simpan');
-                saveBtn.disabled = false;
-            }
-        });
+        }
     })();
     </script>
-    @endrole
     @endif
 
 </x-app-layout>

@@ -36,11 +36,23 @@ class Component extends Model
         'gsheet_measurement_url',
         'gsheet_subassy_disassembly_url',
         'gsheet_subassy_measurement_url',
+        'gsheet_sdr_url',
+        'gsheet_assembly_url',
+        'gsheet_testbench_url',
+        'painting_images',
+        'mol_wo_number',
+        'mol_order_type',
+        'mol_order_date',
+        'mol_ir_number',
+        'mol_ir_date',
+        'mol_note',
+        'mol_document_path',
         'status',
     ];
 
     protected $casts = [
         'is_waiting_approval' => 'boolean',
+        'painting_images' => 'array',
         'date_defitted' => 'date',
         'date_delivery' => 'date',
         'smr' => 'integer',

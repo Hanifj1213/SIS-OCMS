@@ -161,7 +161,9 @@ return [
     */
 
     'features' => [
-        Features::registration(),
+        // Registrasi publik DITUTUP: user baru hanya dibuat oleh SuperAdmin
+        // lewat menu Admin → Users (temuan keamanan S-4, laporan test 05/08).
+        // Features::registration(),
         Features::resetPasswords(),
         Features::emailVerification(),
         Features::twoFactorAuthentication([

@@ -110,4 +110,68 @@ return array_merge([
       'PC2000-8' => '1-3tBQhnbKSy0qy-GLhTcXRs9XBA1X0gvKrB_sNz-pM8',
     ),
   ),
+  'sdr_templates' => 
+  array (
+    'default' => '1HvxiqXGEvH_nscYugPjOEfgIdq9Ps9nEyKqt_vNrd_8',
+  ),
+  'assembly_templates' => 
+  array (
+    'Engine' => 
+    array (
+      'SA12V140E-1' => '1VQ-Z7g_kR9XXApRWbjG7lzC0zCzHnVquyxjzEyHG12w',
+      'SAA6D140E-5' => '1iAEDa_gYTGXGIG8Gn5IKadQCRtSexZFUpV4D0o4KMiE',
+      'D155-6' => '1iAEDa_gYTGXGIG8Gn5IKadQCRtSexZFUpV4D0o4KMiE',
+      'D155' => '1iAEDa_gYTGXGIG8Gn5IKadQCRtSexZFUpV4D0o4KMiE',
+      'SAA6D170E-5' => '1dTEG8f4vRWa4tZMyVrpld47C4GtpAO-qELz2ZVh_UQU',
+      'D375-6' => '1dTEG8f4vRWa4tZMyVrpld47C4GtpAO-qELz2ZVh_UQU',
+      'D375' => '1dTEG8f4vRWa4tZMyVrpld47C4GtpAO-qELz2ZVh_UQU',
+      'PC1250-8' => '1dTEG8f4vRWa4tZMyVrpld47C4GtpAO-qELz2ZVh_UQU',
+      'WA800-3' => '1VQ-Z7g_kR9XXApRWbjG7lzC0zCzHnVquyxjzEyHG12w',
+    ),
+    'Control Valve' => 
+    array (
+      'D155-6' => '1ZDzQNsQBX6y36wu3Ck6D5E0tbw_l_bmoAcUq90tyN8o',
+      'D375-6' => '1VGk-KzKNjkvUQSfbutpB8YOjFVQFTqpcyO96n7tWNFo',
+      'GD825A-2' => '1M-xw5HgTObFou2elj4rZmrQDSRuoi4TzG1_T7dGH1AI',
+      'GD825A' => '1M-xw5HgTObFou2elj4rZmrQDSRuoi4TzG1_T7dGH1AI',
+      'HD785-7' => '1xun23KqoNoow1rikIRgpxQKaxr8x1XXDSWz9ygNISIY',
+      'PC2000-8' => '1X68SmoetAaGr0qIJQIlev1PvuxMZu3XfGhUBjpVnbDk',
+      'WA800-3' => '1nBkJpknzQiTWQ6VRxKLB7yhsHKfuGEbtqvnL54dDIZc',
+      'PC1250-8' => '1K1nXDJglsnfCyvtp48RuOJamHC2Ya25ZpR3Ct1Aqmas',
+    ),
+    'Hydraulic Cylinder' => 
+    array (
+      'HD785-7' => '1rXHCffDwdkkPhfo4lnExzTgbw7YxPHA4bYZuWVvnEX0',
+    ),
+    'Rear Suspension' => 
+    array (
+      'HD785-7' => '1k9MbdRNp2Camg3Zz5tIUwdfr42BBKxwCw1LNYhP2WRM',
+    ),
+    'Front Suspension' => 
+    array (
+      'HD785-7' => '1a0imVP_g356peC72e_JUfoDR2SguO3HSgMQjUpNAq-Q',
+    ),
+  ),
+  'testbench_templates' => 
+  array (
+    'Engine' => 
+    array (
+      'SA12V140E-1' => '1BH9RDpm_tHnxTQgcrws8WxAuBDHxzycuMIbdrvnF9YM',
+      'SAA12V140E-3' => '1MkGgaHR9AEi3XmL5ZUejqLDCQgDI5wLJumnaIoc19Es',
+      'PC2000-8' => '1MkGgaHR9AEi3XmL5ZUejqLDCQgDI5wLJumnaIoc19Es',
+      'SAA6D140E-5' => '11NWOmZaxn53oUB1XYYifAw8QR-ewM1DiWLrzjFYOe9o',
+      'D155-6' => '11NWOmZaxn53oUB1XYYifAw8QR-ewM1DiWLrzjFYOe9o',
+      'D155' => '11NWOmZaxn53oUB1XYYifAw8QR-ewM1DiWLrzjFYOe9o',
+      'SAA6D170E-5' => '1Qh-3Sw6DyJbePO_ITg_hf7EpAQt5Nt5p4OtUmiktVwI',
+      'D375-6' => '1Qh-3Sw6DyJbePO_ITg_hf7EpAQt5Nt5p4OtUmiktVwI',
+      'D375' => '1Qh-3Sw6DyJbePO_ITg_hf7EpAQt5Nt5p4OtUmiktVwI',
+      'PC1250-8' => '1Qh-3Sw6DyJbePO_ITg_hf7EpAQt5Nt5p4OtUmiktVwI',
+      'WA800-3' => '1BH9RDpm_tHnxTQgcrws8WxAuBDHxzycuMIbdrvnF9YM',
+    ),
+    'Control Valve' => 
+    array (
+      'PC1250-8' => '17XgcOvcFdu57vGpJRnayvhXXaP1PrdM7MWeVvsEdKdo',
+      'PC2000-8' => '1pFiexqFEVQdiXIYLRJxpX_tWYU10ml7DexrN7_JAcXw',
+    ),
+  ),
 ));

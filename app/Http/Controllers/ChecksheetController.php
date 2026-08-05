@@ -32,6 +32,12 @@ class ChecksheetController extends Controller
      */
     public function saveAnswer(Request $request, Component $component, int $stage)
     {
+        // RBAC: hanya pelaksana yang boleh mengubah jawaban checksheet
+        // (Management / user tanpa role hanya boleh melihat).
+        if (!auth()->user()->hasAnyRole(['Mechanic', 'Supervisor', 'SuperAdmin'])) {
+            return response()->json(['error' => 'Tidak memiliki izin.'], 403);
+        }
+
         $request->validate([
             'item_id' => 'required|string',
             'answer'  => 'required|string|in:good,bad,none',
@@ -40,6 +46,20 @@ class ChecksheetController extends Controller
         $itemId = $request->item_id;
         $answer = $request->answer;
         $userId = auth()->id();
+
+        // item_id harus benar-benar ada di checksheet; jawaban dengan id
+        // ngawur dulu ikut menaikkan progress (%).
+        $target = $component->checksheets()
+            ->where('stage_number', $stage)
+            ->firstOrFail();
+
+        $validIds = collect($target->items ?? [])->pluck('id')->all();
+        if (!in_array($itemId, $validIds, true)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Item checksheet tidak dikenal.',
+            ], 422);
+        }
 
         // Retry singkat untuk SQLite "database is locked" saat polling/status
         // dan POST jawaban saling berkejaran di artisan serve.

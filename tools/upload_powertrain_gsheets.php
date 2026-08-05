@@ -171,13 +171,16 @@ if ($dryRun) {
     exit(0);
 }
 
-// Isi config untuk DISASSEMBLY + INSPECTION (stage 2) tanpa menimpa env()
+// Isi config untuk DISASSEMBLY + INSPECTION (stage 2), ASSEMBLY (stage 4)
+// dan TEST (stage 5) tanpa menimpa env()
 $configPath = __DIR__ . '/../config/checksheet_gsheets.php';
 $config = include $configPath;
 
 $stageMap = [
     'DISASSEMBLY' => 'disassembly_templates',
     'INSPECTION' => 'measurement_templates',
+    'ASSEMBLY' => 'assembly_templates',
+    'TEST' => 'testbench_templates',
 ];
 
 $updated = 0;

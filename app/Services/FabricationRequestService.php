@@ -125,9 +125,11 @@ class FabricationRequestService
 
         $gsheet = $this->gsheetService->readPartDecisionRows($component);
         $profile = $gsheet['profile'] ?? 'inspection';
-        $profileLabel = $profile === 'disassembly'
-            ? 'Disassembly (SALVAGE → FR, REPLACE → PR)'
-            : 'Inspection (U/R → FR, R/N → PR)';
+        $profileLabel = match ($profile) {
+            'disassembly' => 'Disassembly (SALVAGE → FR, REPLACE → PR)',
+            'inspection+disassembly' => 'Inspection & Disassembly (U/R / SALVAGE → FR, R/N / REPLACE → PR)',
+            default => 'Inspection (U/R → FR, R/N → PR)',
+        };
 
         foreach ($gsheet['rows'] ?? [] as $row) {
             $section = trim((string) ($row['sheet'] ?? ''));

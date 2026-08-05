@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\ChecksheetTemplate;
 use App\Models\Component;
 use App\Models\ComponentChecksheet;
+use App\Jobs\DuplicateChecksheetGsheets;
 use App\Models\PartRequest;
 use App\Services\ChecksheetGsheetService;
 use App\Services\FabricationRequestService;
@@ -199,10 +200,11 @@ class ComponentController extends Controller
             ]);
         }
 
-        // Duplikasi otomatis template Google Sheets disassembly per-EGI
-        // (jika dikonfigurasi). Gagal pun pendaftaran tetap sukses; akan
-        // dicoba lagi saat halaman detail dibuka.
-        app(ChecksheetGsheetService::class)->duplicateForComponent($component);
+        // Duplikasi template Google Sheets dijalankan di LATAR BELAKANG.
+        // Ada empat jenis template dan tiap panggilan Apps Script bisa 10–20
+        // detik, sehingga totalnya melewati batas 30 detik PHP dan membuat
+        // pendaftaran gagal padahal komponen sudah tersimpan.
+        DuplicateChecksheetGsheets::dispatch($component->comp_id);
 
         return redirect()->route('components.show', $component->comp_id)
             ->with('success', 'Komponen "' . $component->serial_number . '" berhasil didaftarkan dan QR Code telah di-generate.');
@@ -233,12 +235,12 @@ class ComponentController extends Controller
         $this->ensureChecksheetForStage($component, $reviewStage ?? $component->current_stage);
         $component->load('checksheets'); // Reload jika baru digenerate
 
-        // Retry duplikasi GSheet untuk komponen lama / yang gagal saat daftar
-        if ($component->current_stage >= 2) {
-            $gsheetService = app(ChecksheetGsheetService::class);
-            if ($gsheetService->hasPendingDuplication($component)) {
-                $gsheetService->duplicateForComponent($component);
-            }
+        // Retry duplikasi GSheet untuk komponen lama / yang gagal saat daftar.
+        // Dikerjakan di latar belakang: memanggil Apps Script langsung di sini
+        // membuat halaman detail menggantung sampai belasan detik.
+        if ($component->current_stage >= 2
+            && app(ChecksheetGsheetService::class)->hasPendingDuplication($component)) {
+            DuplicateChecksheetGsheets::dispatch($component->comp_id);
         }
 
         return view('overhauls.show', [
@@ -275,14 +277,18 @@ class ComponentController extends Controller
         // terlacak di database).
         // Stage 2 memakai spreadsheet bila komponen punya gsheet_url
         // (Engine mainline / Powertrain Control Valve dkk.).
-        $usesGsheetChecksheet = $currentStage == 2
+        // Stage 4 (Assembly) & 5 (Test Bench) juga memakai spreadsheet bila
+        // salinan GSheet-nya tersedia.
+        $usesGsheetChecksheet = ($currentStage == 2
             && (
                 (bool) $component->gsheet_url
                 || (
                     $component->major_category === 'Engine'
                     && strtoupper(trim((string) $component->egi)) === 'PC2000-8'
                 )
-            );
+            ))
+            || ($currentStage == 4 && (bool) $component->gsheet_assembly_url)
+            || ($currentStage == 5 && (bool) $component->gsheet_testbench_url);
 
         $checksheet = $component->checksheets()->where('stage_number', $currentStage)->first();
         if (!$usesGsheetChecksheet && $checksheet && !$checksheet->is_complete) {
@@ -327,7 +333,9 @@ class ComponentController extends Controller
         }
 
         // === TAHAP 5: Quality Gate (Test Performance) ===
-        if ($currentStage == 5) {
+        // Bila komponen punya checksheet Test Bench (GSheet), input tekanan oli
+        // manual digantikan pengisian di spreadsheet.
+        if ($currentStage == 5 && !$component->gsheet_testbench_url) {
             $request->validate([
                 'oil_pressure' => 'required|numeric|min:0',
             ]);
@@ -487,6 +495,69 @@ class ComponentController extends Controller
 
         return redirect()->route('components.show', $component->comp_id)
             ->with('success', 'Approval ditolak. Komponen dikembalikan ke mekanik pada tahap ' . $component->current_stage . '.');
+    }
+
+    /**
+     * Stage 6 (Painting): unggah foto dokumentasi hasil pengecatan.
+     */
+    public function uploadPaintingPhotos(Request $request, Component $component)
+    {
+        if (!auth()->user()->hasAnyRole(['Mechanic', 'Supervisor', 'SuperAdmin'])) {
+            return back()->withErrors(['painting' => 'Anda tidak memiliki izin mengunggah foto painting.']);
+        }
+
+        $request->validate([
+            'photos' => 'required|array|min:1|max:12',
+            'photos.*' => 'image|mimes:jpeg,png,jpg,webp|max:10240',
+        ]);
+
+        $images = $component->painting_images ?? [];
+
+        foreach ($request->file('photos') as $photo) {
+            $images[] = [
+                'path' => 'storage/' . $photo->store('painting-photos', 'public'),
+                'uploaded_at' => now()->toDateTimeString(),
+                'uploaded_by' => auth()->user()->name,
+            ];
+        }
+
+        $component->update(['painting_images' => $images]);
+
+        return redirect()
+            ->to(route('components.show', $component->comp_id) . '#painting-panel')
+            ->with('success', count($request->file('photos')) . ' foto painting berhasil diunggah.');
+    }
+
+    /**
+     * Stage 6 (Painting): hapus satu foto dokumentasi.
+     */
+    public function deletePaintingPhoto(Request $request, Component $component)
+    {
+        if (!auth()->user()->hasAnyRole(['Mechanic', 'Supervisor', 'SuperAdmin'])) {
+            return back()->withErrors(['painting' => 'Anda tidak memiliki izin menghapus foto painting.']);
+        }
+
+        $request->validate(['index' => 'required|integer|min:0']);
+
+        $images = array_values($component->painting_images ?? []);
+        $index = $request->integer('index');
+
+        if (!array_key_exists($index, $images)) {
+            return back()->withErrors(['painting' => 'Foto tidak ditemukan.']);
+        }
+
+        $removed = $images[$index];
+        unset($images[$index]);
+        $component->update(['painting_images' => array_values($images)]);
+
+        $relative = preg_replace('#^storage/#', '', (string) ($removed['path'] ?? ''));
+        if ($relative) {
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($relative);
+        }
+
+        return redirect()
+            ->to(route('components.show', $component->comp_id) . '#painting-panel')
+            ->with('success', 'Foto painting dihapus.');
     }
 
     /**

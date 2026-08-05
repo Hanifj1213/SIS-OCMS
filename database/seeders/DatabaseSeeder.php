@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             RoleAndUserSeeder::class,
             ChecksheetTemplateSeeder::class,
+            DeliveryChecksheetTemplateSeeder::class,
         ]);
     }
 }

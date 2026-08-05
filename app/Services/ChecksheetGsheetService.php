@@ -15,6 +15,32 @@ use Illuminate\Support\Facades\Log;
  */
 class ChecksheetGsheetService
 {
+    /**
+     * Cast nilai sel spreadsheet ke string dengan aman.
+     *
+     * Beberapa response Apps Script bisa mengirim sel sebagai array (misal
+     * rich-text runs atau cell gabungan yang tidak terduga) — `(string)`
+     * langsung terhadap array memicu fatal "Array to string conversion" dan
+     * menggagalkan seluruh scan. Di sini array diratakan jadi teks, nilai
+     * lain (null, bool, angka) diperlakukan seperti cast string biasa.
+     */
+    private function cellToString(mixed $value): string
+    {
+        if (is_array($value)) {
+            return implode(' ', array_map(fn ($v) => $this->cellToString($v), $value));
+        }
+
+        if ($value === null) {
+            return '';
+        }
+
+        if (is_bool($value)) {
+            return $value ? '1' : '';
+        }
+
+        return (string) $value;
+    }
+
     private const KINDS = [
         'disassembly' => [
             'config' => 'disassembly_templates',
@@ -36,11 +62,26 @@ class ChecksheetGsheetService
             'column' => 'gsheet_subassy_measurement_url',
             'prefix' => 'SUBASSY MEASUREMENT',
         ],
+        'sdr' => [
+            'config' => 'sdr_templates',
+            'column' => 'gsheet_sdr_url',
+            'prefix' => 'SDR',
+        ],
+        'assembly' => [
+            'config' => 'assembly_templates',
+            'column' => 'gsheet_assembly_url',
+            'prefix' => 'ASSEMBLY',
+        ],
+        'testbench' => [
+            'config' => 'testbench_templates',
+            'column' => 'gsheet_testbench_url',
+            'prefix' => 'TESTBENCH',
+        ],
     ];
 
     /**
      * ID template jenis tertentu untuk komponen ini, atau null.
-     * Lookup: config.{kind}.{major_category}.{EGI}
+     * Lookup: config.{kind}.{major_category}.{EGI} atau fallback default.
      */
     public function templateIdFor(Component $component, string $kind = 'disassembly'): ?string
     {
@@ -58,6 +99,10 @@ class ChecksheetGsheetService
         if (!$id && str_starts_with($egi, 'GD825A')) {
             $alt = $egi === 'GD825A' ? 'GD825A-2' : 'GD825A';
             $id = config("checksheet_gsheets.{$configKey}.{$category}.{$alt}");
+        }
+
+        if (!$id) {
+            $id = config("checksheet_gsheets.{$configKey}.default");
         }
 
         return $id ?: null;
@@ -191,7 +236,32 @@ class ChecksheetGsheetService
             return $this->readDisassemblyDecisionRows($component);
         }
 
-        return $this->readInspectionDecisionRows($component);
+        // Untuk Powertrain (seperti Control Valve D155-6), baca Inspeksi DULU.
+        // Jika ada gsheet_url (Disassembly), gabungkan pindaian Disassembly
+        // agar keputusan SALVAGE / REPLACE di sheet Disassembly tidak terlewat!
+        $inspectionResult = $this->readInspectionDecisionRows($component);
+
+        if ($component->gsheet_url) {
+            $disassemblyResult = $this->readDisassemblyDecisionRows($component);
+            if (!empty($disassemblyResult['rows'])) {
+                $inspectionRows = $inspectionResult['rows'] ?? [];
+                $disassemblyRows = $disassemblyResult['rows'];
+
+                $mergedRows = array_merge($inspectionRows, $disassemblyRows);
+                $sheets = array_filter([
+                    $inspectionResult['sheet'] ?? null,
+                    $disassemblyResult['sheet'] ?? null,
+                ]);
+
+                return [
+                    'sheet' => implode(', ', array_unique($sheets)),
+                    'profile' => 'inspection+disassembly',
+                    'rows' => $mergedRows,
+                ];
+            }
+        }
+
+        return $inspectionResult;
     }
 
     /**
@@ -394,35 +464,48 @@ class ChecksheetGsheetService
             return ['ok' => false, 'error' => 'GSHEET_COPY_WEBAPP_URL belum dikonfigurasi.'];
         }
 
-        try {
-            $json = json_encode($body);
+        // Apps Script sering timeout pada percobaan pertama (cold start).
+        // Dua percobaan dengan jeda singkat jauh mengurangi cURL error 28.
+        $lastError = null;
 
-            $response = Http::timeout(30)
-                ->withHeaders(['Accept' => 'application/json', 'Content-Type' => 'application/json'])
-                ->withBody($json, 'application/json')
-                ->withOptions(['allow_redirects' => false])
-                ->post($webappUrl);
+        for ($attempt = 1; $attempt <= 2; $attempt++) {
+            try {
+                $json = json_encode($body);
 
-            if (in_array($response->status(), [301, 302, 303, 307, 308], true)) {
-                $location = $response->header('Location');
-                if ($location && !str_starts_with($location, 'http')) {
-                    $parts = parse_url($webappUrl);
-                    $location = ($parts['scheme'] ?? 'https') . '://' . ($parts['host'] ?? '') . $location;
+                $response = Http::timeout(30)
+                    ->connectTimeout(15)
+                    ->withHeaders(['Accept' => 'application/json', 'Content-Type' => 'application/json'])
+                    ->withBody($json, 'application/json')
+                    ->withOptions(['allow_redirects' => false])
+                    ->post($webappUrl);
+
+                if (in_array($response->status(), [301, 302, 303, 307, 308], true)) {
+                    $location = $response->header('Location');
+                    if ($location && !str_starts_with($location, 'http')) {
+                        $parts = parse_url($webappUrl);
+                        $location = ($parts['scheme'] ?? 'https') . '://' . ($parts['host'] ?? '') . $location;
+                    }
+                    if ($location) {
+                        $response = Http::timeout(30)
+                            ->connectTimeout(15)
+                            ->withHeaders(['Accept' => 'application/json'])
+                            ->withOptions(['allow_redirects' => false])
+                            ->get($location);
+                    }
                 }
-                if ($location) {
-                    $response = Http::timeout(30)
-                        ->withHeaders(['Accept' => 'application/json'])
-                        ->withOptions(['allow_redirects' => false])
-                        ->get($location);
+
+                return $response->json();
+            } catch (\Throwable $e) {
+                $lastError = $e;
+                Log::warning("GSheet webapp attempt {$attempt} error: " . $e->getMessage());
+
+                if ($attempt < 2) {
+                    usleep(1500000);   // jeda 1,5 detik sebelum percobaan kedua
                 }
             }
-
-            return $response->json();
-        } catch (\Throwable $e) {
-            Log::warning('GSheet webapp error: ' . $e->getMessage());
-
-            return ['ok' => false, 'error' => $e->getMessage()];
         }
+
+        return ['ok' => false, 'error' => $lastError?->getMessage() ?? 'Unknown error'];
     }
 
     public function extractSpreadsheetId(string $url): ?string
@@ -459,7 +542,7 @@ class ChecksheetGsheetService
         for ($r = 0; $r < $scanLimit; $r++) {
             $row = $values[$r];
             foreach ($row as $c => $cell) {
-                $text = strtoupper(trim((string) $cell));
+                $text = strtoupper(trim($this->cellToString($cell)));
                 if ($text === '') {
                     continue;
                 }
@@ -493,7 +576,7 @@ class ChecksheetGsheetService
         $rnLoose = null;
         for ($r = $headerRow; $r < min($headerRow + 3, count($values)); $r++) {
             foreach ($values[$r] as $c => $cell) {
-                $text = strtoupper(trim((string) $cell));
+                $text = strtoupper(trim($this->cellToString($cell)));
                 if ($text === '') {
                     continue;
                 }
@@ -527,7 +610,7 @@ class ChecksheetGsheetService
         if ($urCol === null || $rnCol === null) {
             $decisionCol = null;
             foreach ($values[$headerRow] as $c => $cell) {
-                if (str_contains(strtoupper(trim((string) $cell)), 'DECISION')) {
+                if (str_contains(strtoupper(trim($this->cellToString($cell))), 'DECISION')) {
                     $decisionCol = $c;
                     break;
                 }
@@ -547,16 +630,17 @@ class ChecksheetGsheetService
             $row = $values[$r];
             $noRaw = $row[$noCol] ?? null;
             $nameRaw = $row[$nameCol] ?? null;
+            $noText = trim($this->cellToString($noRaw));
 
-            if ($noRaw === null || trim((string) $noRaw) === '') {
+            if ($noRaw === null || $noText === '') {
                 continue;
             }
 
-            if (! is_numeric($noRaw) && ! preg_match('/^\d+(\.\d+)?$/', trim((string) $noRaw))) {
+            if (! is_numeric($noRaw) && ! preg_match('/^\d+(\.\d+)?$/', $noText)) {
                 continue;
             }
 
-            if (trim((string) $nameRaw) === '') {
+            if (trim($this->cellToString($nameRaw)) === '') {
                 continue;
             }
 
@@ -572,10 +656,10 @@ class ChecksheetGsheetService
 
             $row = $values[$start];
 
-            $partName = trim((string) ($row[$nameCol] ?? ''));
+            $partName = trim($this->cellToString($row[$nameCol] ?? ''));
             $partNumber = '';
             if ($partNumberCol !== null && isset($row[$partNumberCol])) {
-                $partNumber = trim((string) $row[$partNumberCol]);
+                $partNumber = trim($this->cellToString($row[$partNumberCol]));
             }
 
             // Merge vertikal: nilai checkbox di top-left (baris part).
@@ -667,11 +751,12 @@ class ChecksheetGsheetService
             $row = $values[$r];
             $noRaw = $row[$columns['noCol']] ?? null;
             $nameRaw = $row[$columns['nameCol']] ?? null;
-            $name = trim((string) $nameRaw);
+            $name = trim($this->cellToString($nameRaw));
+            $noText = trim($this->cellToString($noRaw));
             $isNumbered = $noRaw !== null
-                && trim((string) $noRaw) !== ''
-                && (is_numeric($noRaw) || preg_match('/^\d+(\.\d+)?$/', trim((string) $noRaw)));
-            $nextName = trim((string) ($values[$r + 1][$columns['nameCol']] ?? ''));
+                && $noText !== ''
+                && (is_numeric($noRaw) || preg_match('/^\d+(\.\d+)?$/', $noText));
+            $nextName = trim($this->cellToString($values[$r + 1][$columns['nameCol']] ?? ''));
             $isContinuation = !$isNumbered
                 && $lastPartNo !== null
                 && ($this->isContinuedPartName($name) || $this->isContinuedPartName($nextName));
@@ -733,7 +818,7 @@ class ChecksheetGsheetService
      */
     private function isCylinderHeadDecisionBoundary(array $row, array $columns): bool
     {
-        $no = strtoupper(trim((string) ($row[$columns['noCol']] ?? '')));
+        $no = strtoupper(trim($this->cellToString($row[$columns['noCol']] ?? '')));
 
         return preg_match(
             '/^(?:NO\.?|ACTUAL|ENGINE MODEL|STANDARD OF\b|[A-Z]\.?\s*MEASURE\b|MEASURE\b|VALVE SPRINGS?|VALVE GUIDES?)$/',
@@ -781,7 +866,7 @@ class ChecksheetGsheetService
 
             $partNumber = '';
             if ($columns['partNumberCol'] !== null && isset($row[$columns['partNumberCol']])) {
-                $partNumber = trim((string) $row[$columns['partNumberCol']]);
+                $partNumber = trim($this->cellToString($row[$columns['partNumberCol']]));
             }
 
             $needsRepair = $this->blockHasDecisionChecked($values, $start, $end, $columns['salvageCol']);
@@ -820,7 +905,7 @@ class ChecksheetGsheetService
         $replaceCol = null;
 
         foreach ($row as $c => $cell) {
-            $text = strtoupper(trim((string) $cell));
+            $text = strtoupper(trim($this->cellToString($cell)));
             if ($text === '') {
                 continue;
             }

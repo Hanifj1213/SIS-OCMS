@@ -24,6 +24,11 @@ class PartRequestController extends Controller
      */
     public function updateStatus(Request $request, PartRequest $partRequest)
     {
+        // RBAC: hanya pelaksana yang boleh mengubah status part.
+        if (!auth()->user()->hasAnyRole(['Mechanic', 'Supervisor', 'SuperAdmin'])) {
+            abort(403, 'Hanya Mechanic/Supervisor/SuperAdmin yang boleh mengubah status Part Request.');
+        }
+
         $request->validate([
             'status' => 'required|in:Available,Out of Stock',
         ]);
