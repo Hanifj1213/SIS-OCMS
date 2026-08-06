@@ -46,7 +46,7 @@
     <div class="section">
         <div class="section-title fade-up">📈 Distribusi Komponen per Tahapan (On Progress)</div>
         <div class="glass-card fade-up" style="padding: 32px;">
-            <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 12px;">
+            <div class="stage-dist-grid" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 12px;">
                 @php
                     $stageLabels = [
                         1 => 'Receiving',
@@ -84,6 +84,12 @@
             background: var(--accent-cyan-dim);
             color: var(--accent-cyan);
             box-shadow: 0 0 20px rgba(72, 202, 228, 0.1);
+        }
+        @media (max-width: 768px) {
+            .stage-dist-grid { grid-template-columns: repeat(4, 1fr) !important; }
+        }
+        @media (max-width: 420px) {
+            .stage-dist-grid { grid-template-columns: repeat(2, 1fr) !important; }
         }
     </style>
 

@@ -611,12 +611,24 @@
             .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
             .grid-8 { display: grid; grid-template-columns: repeat(8, 1fr); gap: 8px; }
 
+            /* Grid apa pun (termasuk yang pakai inline style) jadi 1 kolom di HP */
             @media (max-width: 768px) {
                 .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
                 .grid-8 { grid-template-columns: repeat(4, 1fr); }
                 .ocms-nav-links { display: none; }
-                .ocms-main { padding: 20px 16px 60px; }
+                .ocms-main { padding: 16px 12px 60px; }
                 .ocms-nav-inner { padding: 0 16px; }
+                .section { margin-bottom: 28px; }
+                .ocms-page-header h1 { font-size: 1.35rem; }
+                .stack-mobile { grid-template-columns: 1fr !important; }
+
+                /* Stage bar: 7 node dibungkus jadi 2 baris, konektor disembunyikan */
+                .stage-bar { flex-wrap: wrap; gap: 8px; }
+                .stage-connector { display: none; }
+                .stage-node { flex: 1 1 calc(25% - 8px); min-width: 76px; padding: 10px 2px; }
+
+                .glass-card { border-radius: 14px; }
+                .metric-card .metric-value { font-size: 1.4rem; }
             }
 
             /* ============ SECTION SPACING ============ */

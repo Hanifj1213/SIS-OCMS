@@ -36,14 +36,41 @@ FABRIKASI/
 # Data lokal / tool agent / artefak sesi — jangan ikut push
 /database/database.sqlite
 /database/database.sqlite-*
-/.aider.chat.history.md
-/.aider.input.history
-/.aider.tags.cache.v4/
+/database/database.sqlite.*
+/.aider*
 /.agents/
 /.claude/
 /data/
 /hyperagent-openai-gateway/
 /Presensi dan Logbook KP*
+/skills-lock.json
+/proxy.py
+
+# Catatan kerja internal & berkas scratch pengembangan (lokal saja)
+/CLAUDE.md
+/handoff.md
+/KESIMPULAN_SESI_*.md
+/LAPORAN_TEST_PROYEK.txt
+/PLAN_MULTI_EGI_CHECKSHEET.md
+/PROJECT_CONTEXT.md
+/build_final_data.py
+/extract_excel.py
+/extract_images.py
+/fix_iframe.py
+/list_items.py
+/revert_checksheet.py
+/excel_data.json
+/excel_data_v2.json
+/image_map.json
+/scratch_*.json
+/scratch_*.txt
+/20250325160734-AlamTri-gede.png
+/storage/left side.png
+/storage/rear1.png
+/storage/rear2.png
+/storage/rightsideview.png
+/tools/_gitlog_*.txt
+/tools/fill_logbook_kp.py
 storage/framework/sessions/
 storage/framework/views/
 storage/logs/

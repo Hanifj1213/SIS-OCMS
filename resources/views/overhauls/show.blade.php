@@ -30,12 +30,12 @@
     @endif
 
     {{-- Damage Core Info + QR Code --}}
-    <div class="section" style="display: grid; grid-template-columns: 1fr 240px; gap: 20px;">
+    <div class="section dc-layout" style="display: grid; grid-template-columns: 1fr 240px; gap: 20px;">
         <div class="glass-card fade-up">
             <div class="section-title" style="margin-bottom: 16px;">📋 Damage Core — Informasi Komponen</div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0;">
+            <div class="dc-cols" style="display: grid; grid-template-columns: 1fr 1fr; gap: 0;">
                 {{-- Left Column --}}
-                <div style="border-right: 1px solid rgba(var(--ink), 0.04);">
+                <div class="dc-col-l" style="border-right: 1px solid rgba(var(--ink), 0.04);">
                     <div style="display: flex; padding: 10px 16px 10px 0; border-bottom: 1px solid rgba(var(--ink), 0.03);">
                         <span style="color: var(--text-muted); width: 40%; font-size: 0.8rem;">EGI</span>
                         <span class="mono" style="font-size: 0.85rem; font-weight: 600;">{{ $comp->egi ?? '-' }}</span>
@@ -66,7 +66,7 @@
                     </div>
                 </div>
                 {{-- Right Column --}}
-                <div style="padding-left: 16px;">
+                <div class="dc-col-r" style="padding-left: 16px;">
                     <div style="display: flex; padding: 10px 0; border-bottom: 1px solid rgba(var(--ink), 0.03);">
                         <span style="color: var(--text-muted); width: 45%; font-size: 0.8rem;">Component Model</span>
                         <span style="font-size: 0.85rem;"><span class="badge badge-cyan">{{ $comp->major_category }}</span></span>
@@ -236,6 +236,37 @@
             border-color: rgba(248, 113, 113, 0.5);
             background: rgba(248, 113, 113, 0.08);
         }
+
+        /* ===== Tampilan HP ===== */
+        @media (max-width: 768px) {
+            /* Damage Core: info + QR ditumpuk, kolom kiri/kanan jadi satu */
+            .dc-layout { grid-template-columns: 1fr !important; }
+            .dc-cols { grid-template-columns: 1fr !important; }
+            .dc-col-l { border-right: none !important; }
+            .dc-col-l > div { padding-right: 0 !important; }
+            .dc-col-r { padding-left: 0 !important; }
+
+            /* Kartu waktu 3 dimensi ditumpuk vertikal */
+            .time3d-grid { grid-template-columns: 1fr; gap: 8px; }
+            .t3-value { font-size: 0.95rem; }
+
+            /* Panel crew: form tambah nama turun ke baris sendiri, full width */
+            .crew-add-form { margin-left: 0 !important; flex-basis: 100%; }
+            .crew-add-form input[type="text"] { width: auto !important; flex: 1; }
+
+            /* Tombol aksi (Kembali / Approve / Ajukan) boleh turun baris */
+            .action-bar { flex-wrap: wrap; gap: 12px; }
+            .action-bar > div { flex-wrap: wrap; }
+
+            /* Embed GSheet & PDF sedikit lebih pendek supaya tidak memakan layar */
+            .gsheet-shell { height: 72vh !important; }
+            .fr-pdf-embed { height: 60vh !important; }
+        }
+
+        @media (max-width: 480px) {
+            .time3d-tile { padding: 9px 12px; }
+            .crew-panel { padding: 10px 12px; }
+        }
     </style>
 
     {{-- Progress Bar --}}
@@ -358,7 +389,7 @@
 
                         @if($canManageCrew)
                             <form method="POST" action="{{ route('components.crew.add', $comp->comp_id) }}"
-                                  style="display: flex; gap: 6px; margin-left: auto;">
+                                  class="crew-add-form" style="display: flex; gap: 6px; margin-left: auto;">
                                 @csrf
                                 <input type="text" name="name" required maxlength="100" placeholder="Nama mekanik…"
                                        style="width: 160px; background: var(--select-option-bg); color: var(--text-primary); border: 1px solid var(--glass-border-light); border-radius: 999px; padding: 5px 12px; font-size: 0.72rem;">
@@ -966,7 +997,7 @@
             $cropBottom = $gsheetEmbedUrl ? $disassyCropMainlineBottom : 0;
             $disassySrc = $gsheetEmbedUrl ?: $gsheetSubassyDisassyEmbedUrl;
         @endphp
-        <div class="glass-card fade-up" style="padding: 0; overflow: hidden; height: 90vh; border-radius: 12px; border: 1px solid rgba(var(--ink), 0.1); position: relative;">
+        <div class="glass-card fade-up gsheet-shell" style="padding: 0; overflow: hidden; height: 90vh; border-radius: 12px; border: 1px solid rgba(var(--ink), 0.1); position: relative;">
             <iframe id="gsheet-iframe" class="gsheet-embed"
                 data-src="{{ $disassySrc }}"
                 data-crop-mainline="{{ $disassyCropMainlineLeft }},25,{{ $disassyCropMainlineBottom }}"
@@ -1001,7 +1032,7 @@
             $mCropTop = 25;
             $measureSrc = $gsheetMeasurementEmbedUrl ?: $gsheetSubassyMeasureEmbedUrl;
         @endphp
-        <div class="glass-card fade-up" style="padding: 0; overflow: hidden; height: 90vh; border-radius: 12px; border: 1px solid rgba(var(--ink), 0.1); position: relative;">
+        <div class="glass-card fade-up gsheet-shell" style="padding: 0; overflow: hidden; height: 90vh; border-radius: 12px; border: 1px solid rgba(var(--ink), 0.1); position: relative;">
             <iframe id="gsheet-iframe-measure" class="gsheet-embed"
                 data-src="{{ $measureSrc }}"
                 data-crop-mainline="46,25,0"
@@ -1017,7 +1048,7 @@
     <div class="section" id="checksheet-assembly">
         <div class="section-title fade-up">🔩 Assembly — Checksheet</div>
         @if($gsheetAssemblyEmbedUrl)
-        <div class="glass-card fade-up" style="padding: 0; overflow: hidden; height: 90vh; border-radius: 12px; border: 1px solid rgba(var(--ink), 0.1); position: relative;">
+        <div class="glass-card fade-up gsheet-shell" style="padding: 0; overflow: hidden; height: 90vh; border-radius: 12px; border: 1px solid rgba(var(--ink), 0.1); position: relative;">
             <iframe id="gsheet-iframe-assembly" class="gsheet-embed"
                 data-src="{{ $gsheetAssemblyEmbedUrl }}"
                 style="position: absolute; top: -25px; left: -46px; width: calc(100% + 46px); height: calc(100% + 25px); border: none;"
@@ -1048,7 +1079,7 @@
     <div class="section" id="checksheet-testbench">
         <div class="section-title fade-up">🧪 Test Bench — Checksheet</div>
         @if($gsheetTestbenchEmbedUrl)
-        <div class="glass-card fade-up" style="padding: 0; overflow: hidden; height: 90vh; border-radius: 12px; border: 1px solid rgba(var(--ink), 0.1); position: relative;">
+        <div class="glass-card fade-up gsheet-shell" style="padding: 0; overflow: hidden; height: 90vh; border-radius: 12px; border: 1px solid rgba(var(--ink), 0.1); position: relative;">
             <iframe id="gsheet-iframe-testbench" class="gsheet-embed"
                 data-src="{{ $gsheetTestbenchEmbedUrl }}"
                 style="position: absolute; top: -25px; left: -46px; width: calc(100% + 46px); height: calc(100% + 25px); border: none;"
@@ -2007,7 +2038,7 @@
                         <p style="font-size: 0.85rem; color: var(--text-secondary);">Komponen ini sedang menunggu persetujuan dari Management untuk lanjut ke Tahap {{ $comp->current_stage + 1 }}.</p>
                     </div>
                     
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div class="action-bar" style="display: flex; justify-content: space-between; align-items: center;">
                         <a href="{{ route('components.index') }}" class="btn-secondary">← Kembali</a>
                         @role('Management|SuperAdmin')
                         <div style="display: flex; gap: 12px;">
@@ -2065,7 +2096,7 @@
 
                         {{-- Stage 2-5 wajib approval Management (GL); stage 1 & 6 lanjut otomatis --}}
                         @php $needsApproval = in_array($comp->current_stage, [2, 3, 4, 5]); @endphp
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div class="action-bar" style="display: flex; justify-content: space-between; align-items: center;">
                             <a href="{{ route('components.index') }}" class="btn-secondary">← Kembali</a>
                             @role('Mechanic|Supervisor|SuperAdmin')
                             <button type="submit" class="btn-primary">
@@ -2081,7 +2112,7 @@
                 @endif
             @else
                 {{-- Stage 7 (RFU): panel penutup ada di atas; di sini hanya navigasi --}}
-                <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div class="action-bar" style="display: flex; justify-content: space-between; align-items: center;">
                     <a href="{{ route('components.index') }}" class="btn-secondary">← Kembali</a>
                     <span style="font-size: 0.8rem; color: var(--accent-green); font-weight: 600;">🎉 Overhaul selesai — komponen berstatus RFU</span>
                 </div>
