@@ -257,7 +257,7 @@ class ComponentController extends Controller
     }
 
     /**
-     * Proses perpindahan tahapan + Quality Gate logic.
+     * Proses perpindahan tahapan.
      */
     public function updateStage(Request $request, Component $component)
     {
@@ -336,23 +336,6 @@ class ComponentController extends Controller
                 $component->fresh(['inspectionDetails', 'fabricationRequests']),
                 auth()->id()
             );
-        }
-
-        // === TAHAP 5: Quality Gate (Test Performance) ===
-        // Bila komponen punya checksheet Test Bench (GSheet), input tekanan oli
-        // manual digantikan pengisian di spreadsheet.
-        if ($currentStage == 5 && !$component->gsheet_testbench_url) {
-            $request->validate([
-                'oil_pressure' => 'required|numeric|min:0',
-            ]);
-
-            $pressure = (float) $request->oil_pressure;
-
-            if ($pressure < 40 || $pressure > 50) {
-                return back()->withErrors([
-                    'oil_pressure' => 'GAGAL QC: Tekanan oli aktual (' . $pressure . ' psi) di luar toleransi spesifikasi (40 - 50 psi). Komponen TIDAK LOLOS uji fungsi, harap lakukan perbaikan ulang.',
-                ])->withInput();
-            }
         }
 
         // Tambahkan catatan mekanik ke log saat ini

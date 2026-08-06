@@ -870,7 +870,7 @@
                     <div class="bento-icon cyan">🔒</div>
                     <h3 class="bento-title">Quality Gate Enforcement</h3>
                     <p class="bento-text">
-                        Sistem secara otomatis memvalidasi parameter kritis (tekanan oli, toleransi pengukuran) sebelum 
+                        Sistem memvalidasi kelengkapan checksheet dan approval Management sebelum
                         komponen boleh melanjutkan ke tahap berikutnya. Tidak ada lagi bypass manual.
                     </p>
                     <span class="bento-tag cyan">Zero Defect</span>
@@ -933,14 +933,13 @@
 
                 @php
                     $stages = [
-                        ['num' => 1, 'name' => 'Receiving',     'desc' => 'Komponen diterima di gudang PRC, dilakukan registrasi dan generate QR Code unik untuk identifikasi digital.'],
-                        ['num' => 2, 'name' => 'Disassembly',   'desc' => 'Pembongkaran komponen menjadi sub-komponen. Setiap part diberikan label dan dicatat kondisinya.'],
-                        ['num' => 3, 'name' => 'Measuring & Inspection', 'desc' => 'Pengukuran presisi setiap part dengan standar toleransi. Keputusan: Reused, Repair, atau Replace.'],
-                        ['num' => 4, 'name' => 'Parts & Repair', 'desc' => 'Part yang perlu perbaikan di-machining. Part yang perlu diganti otomatis direquest ke gudang.'],
-                        ['num' => 5, 'name' => 'Assembly',       'desc' => 'Perakitan ulang komponen dengan part yang telah lulus inspeksi. Proses sesuai SOP standar OEM.'],
-                        ['num' => 6, 'name' => 'Test Bench',     'desc' => 'Quality Gate kritis: pengujian tekanan oli (40-50 psi) dan performa mekanis. Nilai di luar standar ditolak otomatis.'],
-                        ['num' => 7, 'name' => 'Painting & Finishing', 'desc' => 'Pengecatan dan finishing akhir sesuai standar korporat. Inspeksi visual final dilakukan.'],
-                        ['num' => 8, 'name' => 'Delivery / RFU', 'desc' => 'Komponen dinyatakan Ready for Use. Berita Acara Serah Terima di-generate dan komponen siap didistribusi.'],
+                        ['num' => 1, 'name' => 'Receiving',      'desc' => 'Komponen diterima di PRC, dilakukan registrasi dan generate QR Code unik untuk identifikasi digital.'],
+                        ['num' => 2, 'name' => 'DIS Assembling', 'desc' => 'Pembongkaran, pencucian & pengukuran via checksheet digital. Keputusan part: Reuse, Salvage/Repair, atau Replace.'],
+                        ['num' => 3, 'name' => 'Machining & Fabrication', 'desc' => 'Part yang perlu perbaikan difabrikasi (FR otomatis). Part yang perlu diganti otomatis direquest ke gudang.'],
+                        ['num' => 4, 'name' => 'Assembly',       'desc' => 'Perakitan ulang komponen dengan part yang telah lulus inspeksi, dipandu checksheet assembly per EGI.'],
+                        ['num' => 5, 'name' => 'Test Performance & Painting', 'desc' => 'Uji fungsi di test bench dengan checksheet digital, dilanjutkan pengecatan dan dokumentasi foto.'],
+                        ['num' => 6, 'name' => 'Delivery',       'desc' => 'Serah terima komponen dengan checksheet delivery. Kelengkapan diverifikasi sebelum keluar workshop.'],
+                        ['num' => 7, 'name' => 'RFU',            'desc' => 'Komponen dinyatakan Ready for Use. Berita Acara dapat dicetak dan komponen siap didistribusi.'],
                     ];
                 @endphp
 

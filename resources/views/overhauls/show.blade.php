@@ -2058,17 +2058,6 @@
                         </div>
                         @endif
 
-                        {{-- Quality Gate manual hanya untuk komponen TANPA checksheet
-                             Test Bench GSheet (spreadsheet menggantikannya) --}}
-                        @if($comp->current_stage == 5 && !$comp->gsheet_testbench_url)
-                        <div style="background: var(--accent-purple-dim); border: 1px solid rgba(167, 139, 250, 0.15); border-radius: 14px; padding: 28px; margin-bottom: 24px;">
-                            <div class="section-title" style="color: var(--accent-purple); margin-bottom: 16px;">🧪 Quality Gate — Test Performance</div>
-                            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 16px;">Standar Tekanan Oli: <strong style="color: var(--text-primary);">40 – 50 psi</strong></p>
-                            <label class="ocms-label">Tekanan Oli Aktual (psi)</label>
-                            <input type="number" step="0.1" min="0" name="oil_pressure" class="ocms-input" placeholder="45.0" value="{{ old('oil_pressure') }}" required style="max-width: 300px; font-family: 'JetBrains Mono', monospace;">
-                            <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 8px;">Nilai di luar 40-50 psi akan ditolak oleh Quality Gate.</p>
-                        </div>
-                        @endif
                         <div style="margin-bottom: 24px;">
                             <label class="ocms-label" style="display: block; margin-bottom: 8px;">Catatan / Remarks (Opsional)</label>
                             <textarea name="remarks" class="ocms-input" placeholder="Tambahkan catatan untuk Management sebelum mengajukan approval..." style="width: 100%; min-height: 80px; resize: vertical;"></textarea>

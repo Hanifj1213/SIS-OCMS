@@ -128,7 +128,7 @@ class StageFourToSevenPanelsTest extends TestCase
 
     // ===== Stage 5 =====
 
-    public function test_stage_5_dengan_gsheet_testbench_menggantikan_quality_gate_manual(): void
+    public function test_stage_5_dengan_gsheet_testbench_menampilkan_embed(): void
     {
         $component = $this->makeComponent(5, [
             'gsheet_testbench_url' => 'https://docs.google.com/spreadsheets/d/BENCH123/edit',
@@ -142,7 +142,7 @@ class StageFourToSevenPanelsTest extends TestCase
         $response->assertSee('id="gsheet-iframe-testbench"', false);
         $response->assertDontSee('name="oil_pressure"', false);
 
-        // Ajukan approval tanpa oil_pressure: harus lolos validasi
+        // Ajukan approval: tidak ada lagi validasi Quality Gate manual
         $this->actingAs($this->mechanic())
             ->post(route('components.updateStage', $component->comp_id))
             ->assertSessionHasNoErrors();
@@ -150,20 +150,24 @@ class StageFourToSevenPanelsTest extends TestCase
         $this->assertTrue($component->fresh()->is_waiting_approval);
     }
 
-    public function test_stage_5_tanpa_gsheet_masih_memakai_quality_gate_manual(): void
+    public function test_stage_5_tidak_lagi_menampilkan_quality_gate_manual(): void
     {
+        // Quality Gate tekanan oli dihapus total — komponen tanpa GSheet
+        // test bench pun tidak lagi diminta input manual.
         $component = $this->makeComponent(5);
 
         $response = $this->actingAs($this->mechanic())
             ->get(route('components.show', $component->comp_id));
 
         $response->assertOk();
-        $response->assertSee('name="oil_pressure"', false);
+        $response->assertDontSee('name="oil_pressure"', false);
+        $response->assertDontSee('Quality Gate — Test Performance');
 
-        // Tanpa oil_pressure harus ditolak validasi
         $this->actingAs($this->mechanic())
             ->post(route('components.updateStage', $component->comp_id))
-            ->assertSessionHasErrors('oil_pressure');
+            ->assertSessionHasNoErrors();
+
+        $this->assertTrue($component->fresh()->is_waiting_approval);
     }
 
     // ===== Stage 5: Painting (digabung dengan Test Performance) =====
