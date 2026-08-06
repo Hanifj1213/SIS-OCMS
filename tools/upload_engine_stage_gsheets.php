@@ -6,8 +6,8 @@
  *
  * Pemetaan engine → unit:
  *   SA12V140E-1  → WA800-3            (sudah terupload sesi sebelumnya)
- *   SA6D140E-2   → GD825A-2/GD825A    (assembly .doc & testbench TIDAK ADA — dilewati)
- *   SAA12V140E-3 → PC2000-8           (assembly .doc — hanya testbench)
+ *   SA6D140E-2   → GD825A-2/GD825A    (assembly & testbench xlsx dibuat manual user)
+ *   SAA12V140E-3 → PC2000-8           (assembly xlsx dibuat manual user)
  *   SAA6D140E-5  → D155-6/D155
  *   SAA6D170E-5  → D375-6/D375/PC1250-8
  *
@@ -40,6 +40,30 @@ $tmp = getenv('TEMP');
 
 // Satu entri per file yang diupload; 'egis' = semua key config yang diisi ID sama.
 $queue = [
+    [
+        // xlsx rapi buatan manual user (menggantikan hasil ekstraksi .doc)
+        'config_key' => 'assembly_templates',
+        'model' => 'SA6D140E-2',
+        'egis' => ['SA6D140E-2', 'GD825A-2', 'GD825A'],
+        'path' => $engineRoot . '/SA6D140E-2/MAINLINE/ASSEMBLY/ASSEMBLY ENGINE SA6D140E-2.xlsx',
+        'filename' => 'ASSEMBLY ENGINE SA6D140E-2.xlsx',
+    ],
+    [
+        // Testbench GD825A dibuat manual user (file aslinya tidak pernah ada)
+        'config_key' => 'testbench_templates',
+        'model' => 'SA6D140E-2',
+        'egis' => ['SA6D140E-2', 'GD825A-2', 'GD825A'],
+        'path' => $engineRoot . '/SA6D140E-2/MAINLINE/TESTBENCH/TESTBENCH ENGINE SA6D140E-2.xlsx',
+        'filename' => 'TESTBENCH ENGINE SA6D140E-2.xlsx',
+    ],
+    [
+        // xlsx rapi buatan manual user (menggantikan hasil ekstraksi .doc)
+        'config_key' => 'assembly_templates',
+        'model' => 'SAA12V140E-3',
+        'egis' => ['SAA12V140E-3', 'PC2000-8'],
+        'path' => $engineRoot . '/SAA12V140E-3/MAIN LINE/ASSEMBLY/ASSEMBLY ENGINE SAA12V140E-3.xlsx',
+        'filename' => 'ASSEMBLY ENGINE SAA12V140E-3.xlsx',
+    ],
     [
         'config_key' => 'assembly_templates',
         'model' => 'SAA6D140E-5',

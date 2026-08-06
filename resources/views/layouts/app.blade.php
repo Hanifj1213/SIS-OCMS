@@ -42,18 +42,28 @@
                 document.addEventListener('visibilitychange', () => { if (!document.hidden) tick(); });
                 return () => clearInterval(timer);
             };
+
+            // === Tema light/dark: terapkan sebelum render agar tidak berkedip ===
+            (function() {
+                const saved = localStorage.getItem('ocms-theme');
+                if (saved === 'light') document.documentElement.dataset.theme = 'light';
+            })();
         </script>
 
         <style>
             /* ============================================
                SIS-OCMS PREMIUM DESIGN SYSTEM
-               Dark Mode / Corporate Adaro Palette
+               Dark / Light Mode — Corporate Adaro Palette
+               --ink = komponen RGB "tinta"; semua warna teks/garis
+               transparan diturunkan dari sini agar ikut berganti tema.
             ============================================ */
             :root {
+                --ink: 255, 255, 255;
                 --bg-primary: #0B2B26;
                 --bg-secondary: #091528;
-                --bg-card: rgba(255, 255, 255, 0.03);
-                --bg-card-hover: rgba(255, 255, 255, 0.06);
+                --bg-tertiary: #0d1f3c;
+                --bg-card: rgba(var(--ink), 0.03);
+                --bg-card-hover: rgba(var(--ink), 0.06);
                 --accent-gold: #D4AF37;
                 --accent-gold-dim: rgba(212, 175, 55, 0.15);
                 --accent-gold-hover: #EAA112;
@@ -65,12 +75,46 @@
                 --accent-red-dim: rgba(248, 113, 113, 0.12);
                 --accent-purple: #A78BFA;
                 --accent-purple-dim: rgba(167, 139, 250, 0.12);
-                --glass-border: rgba(255, 255, 255, 0.06);
-                --glass-border-light: rgba(255, 255, 255, 0.10);
-                --text-primary: rgba(255, 255, 255, 0.92);
-                --text-secondary: rgba(255, 255, 255, 0.55);
-                --text-muted: rgba(255, 255, 255, 0.25);
+                --glass-border: rgba(var(--ink), 0.08);
+                --glass-border-light: rgba(var(--ink), 0.14);
+                --text-primary: rgba(var(--ink), 0.95);
+                --text-secondary: rgba(var(--ink), 0.72);
+                --text-muted: rgba(var(--ink), 0.50);
                 --shadow-heavy: 0 24px 48px rgba(0, 0, 0, 0.3);
+                --nav-bg: rgba(11, 43, 38, 0.6);
+                --nav-bg-solid: rgba(11, 43, 38, 0.95);
+                --on-accent: #0B2B26;
+                --select-option-bg: #0B2B26;
+            }
+
+            html[data-theme="light"] {
+                --ink: 12, 35, 30;
+                --bg-primary: #E7EDEA;
+                --bg-secondary: #E0E7EF;
+                --bg-tertiary: #D9E1EC;
+                --bg-card: rgba(255, 255, 255, 0.88);
+                --bg-card-hover: #FFFFFF;
+                --accent-gold: #92580A;
+                --accent-gold-dim: rgba(146, 88, 10, 0.14);
+                --accent-gold-hover: #A9650C;
+                --accent-cyan: #0C637C;
+                --accent-cyan-dim: rgba(12, 99, 124, 0.12);
+                --accent-green: #036B4F;
+                --accent-green-dim: rgba(3, 107, 79, 0.12);
+                --accent-red: #C71F1F;
+                --accent-red-dim: rgba(199, 31, 31, 0.12);
+                --accent-purple: #5B21B6;
+                --accent-purple-dim: rgba(91, 33, 182, 0.12);
+                --glass-border: rgba(var(--ink), 0.16);
+                --glass-border-light: rgba(var(--ink), 0.24);
+                --text-primary: rgba(var(--ink), 0.95);
+                --text-secondary: rgba(var(--ink), 0.80);
+                --text-muted: rgba(var(--ink), 0.62);
+                --shadow-heavy: 0 24px 48px rgba(12, 35, 30, 0.12);
+                --nav-bg: rgba(255, 255, 255, 0.82);
+                --nav-bg-solid: rgba(255, 255, 255, 0.98);
+                --on-accent: #FFFFFF;
+                --select-option-bg: #FFFFFF;
             }
 
             * { box-sizing: border-box; }
@@ -81,7 +125,7 @@
 
             body.ocms-body {
                 font-family: 'Inter', -apple-system, sans-serif;
-                background: linear-gradient(170deg, var(--bg-primary) 0%, var(--bg-secondary) 40%, #0d1f3c 100%);
+                background: linear-gradient(170deg, var(--bg-primary) 0%, var(--bg-secondary) 40%, var(--bg-tertiary) 100%);
                 background-attachment: fixed;
                 color: var(--text-primary);
                 min-height: 100vh;
@@ -93,7 +137,7 @@
                 position: sticky;
                 top: 0;
                 z-index: 100;
-                background: rgba(11, 43, 38, 0.6);
+                background: var(--nav-bg);
                 backdrop-filter: blur(24px) saturate(180%);
                 -webkit-backdrop-filter: blur(24px) saturate(180%);
                 border-bottom: 1px solid var(--glass-border);
@@ -155,7 +199,7 @@
             }
             .ocms-nav-link:hover {
                 color: var(--text-primary);
-                background: rgba(255, 255, 255, 0.05);
+                background: rgba(var(--ink), 0.05);
             }
             .ocms-nav-link.active {
                 color: var(--accent-gold);
@@ -248,7 +292,7 @@
                 position: absolute;
                 top: 0; left: 0; right: 0;
                 height: 1px;
-                background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+                background: linear-gradient(90deg, transparent, rgba(var(--ink), 0.08), transparent);
             }
             .glass-card:hover {
                 background: var(--bg-card-hover);
@@ -327,13 +371,13 @@
             }
             .stage-node.completed { background: var(--accent-green-dim); color: var(--accent-green); }
             .stage-node.active { background: var(--accent-cyan-dim); color: var(--accent-cyan); box-shadow: 0 0 20px rgba(72, 202, 228, 0.15); }
-            .stage-node.pending { background: rgba(255,255,255,0.02); color: var(--text-muted); }
+            .stage-node.pending { background: rgba(var(--ink), 0.02); color: var(--text-muted); }
             .stage-connector {
                 width: 16px; height: 2px;
                 border-radius: 1px;
             }
             .stage-connector.done { background: var(--accent-green); opacity: 0.3; }
-            .stage-connector.undone { background: rgba(255,255,255,0.06); }
+            .stage-connector.undone { background: rgba(var(--ink), 0.06); }
 
             /* ============ MODULE CARDS ============ */
             .module-card {
@@ -362,7 +406,7 @@
                 top: 36px; right: 28px;
                 width: 32px; height: 32px;
                 border-radius: 8px;
-                background: rgba(255,255,255,0.04);
+                background: rgba(var(--ink), 0.04);
                 border: 1px solid var(--glass-border);
                 display: flex;
                 align-items: center;
@@ -397,11 +441,11 @@
                 padding: 14px 16px;
                 font-size: 0.85rem;
                 color: var(--text-secondary);
-                border-bottom: 1px solid rgba(255,255,255,0.02);
+                border-bottom: 1px solid rgba(var(--ink), 0.02);
                 transition: background 0.2s;
             }
             .ocms-table tbody tr:hover td {
-                background: rgba(255,255,255,0.02);
+                background: rgba(var(--ink), 0.02);
             }
             .ocms-table .mono {
                 font-family: 'JetBrains Mono', monospace;
@@ -435,7 +479,7 @@
                 background: linear-gradient(135deg, var(--accent-gold), var(--accent-gold-hover));
                 border: none;
                 border-radius: 12px;
-                color: #0B2B26;
+                color: var(--on-accent);
                 font-family: 'Inter', sans-serif;
                 font-size: 0.85rem;
                 font-weight: 700;
@@ -453,7 +497,7 @@
                 align-items: center;
                 gap: 8px;
                 padding: 12px 24px;
-                background: rgba(255,255,255,0.04);
+                background: rgba(var(--ink), 0.04);
                 border: 1px solid var(--glass-border);
                 border-radius: 12px;
                 color: var(--text-secondary);
@@ -465,7 +509,7 @@
                 text-decoration: none;
             }
             .btn-secondary:hover {
-                background: rgba(255,255,255,0.08);
+                background: rgba(var(--ink), 0.08);
                 color: var(--text-primary);
             }
             .btn-danger {
@@ -497,7 +541,7 @@
             .ocms-input {
                 width: 100%;
                 padding: 14px 16px;
-                background: rgba(255, 255, 255, 0.04);
+                background: rgba(var(--ink), 0.04);
                 border: 1px solid var(--glass-border);
                 border-radius: 12px;
                 color: var(--text-primary);
@@ -509,14 +553,14 @@
             .ocms-input:focus {
                 border-color: var(--accent-gold);
                 box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
-                background: rgba(255, 255, 255, 0.06);
+                background: rgba(var(--ink), 0.06);
             }
             .ocms-input::placeholder { color: var(--text-muted); }
 
             .ocms-select {
                 width: 100%;
                 padding: 14px 16px;
-                background: rgba(255, 255, 255, 0.04);
+                background: rgba(var(--ink), 0.04);
                 border: 1px solid var(--glass-border);
                 border-radius: 12px;
                 color: var(--text-primary);
@@ -526,7 +570,7 @@
                 outline: none;
                 -webkit-appearance: none;
             }
-            .ocms-select option { background: #0B2B26; color: white; }
+            .ocms-select option { background: var(--select-option-bg); color: var(--text-primary); }
             .ocms-select:focus {
                 border-color: var(--accent-gold);
                 box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
@@ -605,8 +649,8 @@
                 pointer-events: none;
                 opacity: 0.02;
                 background-image:
-                    linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
-                    linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px);
+                    linear-gradient(rgba(var(--ink), 0.1) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(var(--ink), 0.1) 1px, transparent 1px);
                 background-size: 80px 80px;
             }
 
@@ -619,8 +663,24 @@
             /* Scrollbar */
             ::-webkit-scrollbar { width: 6px; }
             ::-webkit-scrollbar-track { background: transparent; }
-            ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
-            ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+            ::-webkit-scrollbar-thumb { background: rgba(var(--ink), 0.1); border-radius: 3px; }
+            ::-webkit-scrollbar-thumb:hover { background: rgba(var(--ink), 0.2); }
+
+            /* Theme toggle */
+            .ocms-theme-btn {
+                background: rgba(var(--ink), 0.04);
+                border: 1px solid var(--glass-border);
+                border-radius: 8px;
+                padding: 6px 10px;
+                cursor: pointer;
+                font-size: 0.9rem;
+                line-height: 1;
+                transition: all 0.2s;
+            }
+            .ocms-theme-btn:hover { background: rgba(var(--ink), 0.08); }
+            .theme-icon-light { display: none; }
+            html[data-theme="light"] .theme-icon-dark { display: none; }
+            html[data-theme="light"] .theme-icon-light { display: inline; }
 
             /* Mobile menu */
             .mobile-menu-btn {
@@ -640,7 +700,7 @@
                 gap: 4px;
                 padding: 12px 16px 16px;
                 border-top: 1px solid var(--glass-border);
-                background: rgba(11, 43, 38, 0.95);
+                background: var(--nav-bg-solid);
                 backdrop-filter: blur(24px);
             }
             .ocms-mobile-menu.open { display: flex; }
@@ -693,6 +753,9 @@
                 </div>
 
                 <div class="ocms-nav-user">
+                    <button type="button" class="ocms-theme-btn" onclick="ocmsToggleTheme()" title="Ganti tema terang/gelap" aria-label="Ganti tema">
+                        <span class="theme-icon-dark">🌙</span><span class="theme-icon-light">☀️</span>
+                    </button>
                     <div>
                         <div class="ocms-nav-username">{{ Auth::user()->name }}</div>
                         <div class="ocms-nav-role">{{ Auth::user()->roles->pluck('name')->implode(', ') }}</div>
@@ -743,6 +806,14 @@
                 delay: i * 0.05
             });
         });
+
+        // === Toggle tema light/dark (tersimpan per-browser di localStorage) ===
+        window.ocmsToggleTheme = function() {
+            const html = document.documentElement;
+            const next = html.dataset.theme === 'light' ? 'dark' : 'light';
+            if (next === 'light') { html.dataset.theme = 'light'; } else { delete html.dataset.theme; }
+            localStorage.setItem('ocms-theme', next);
+        };
 
         // === Auto-dismiss alert sukses setelah 6 detik ===
         document.querySelectorAll('.alert-success').forEach(el => {

@@ -466,13 +466,15 @@ class ChecksheetGsheetService
 
         // Apps Script sering timeout pada percobaan pertama (cold start).
         // Dua percobaan dengan jeda singkat jauh mengurangi cURL error 28.
+        // Action "read" (multi-tab) butuh lebih lama dari copy/upload singkat.
+        $httpTimeout = (($body['action'] ?? '') === 'read') ? 90 : 30;
         $lastError = null;
 
         for ($attempt = 1; $attempt <= 2; $attempt++) {
             try {
                 $json = json_encode($body);
 
-                $response = Http::timeout(30)
+                $response = Http::timeout($httpTimeout)
                     ->connectTimeout(15)
                     ->withHeaders(['Accept' => 'application/json', 'Content-Type' => 'application/json'])
                     ->withBody($json, 'application/json')
@@ -486,7 +488,7 @@ class ChecksheetGsheetService
                         $location = ($parts['scheme'] ?? 'https') . '://' . ($parts['host'] ?? '') . $location;
                     }
                     if ($location) {
-                        $response = Http::timeout(30)
+                        $response = Http::timeout($httpTimeout)
                             ->connectTimeout(15)
                             ->withHeaders(['Accept' => 'application/json'])
                             ->withOptions(['allow_redirects' => false])

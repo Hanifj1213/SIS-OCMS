@@ -6,14 +6,19 @@ use App\Models\ChecksheetTemplate;
 use Illuminate\Database\Seeder;
 
 /**
- * Stage 7 (RFU/Delivery) — checksheet internal seperti Receiving.
+ * Stage 6 (Delivery / Serah Terima) — checksheet internal seperti Receiving.
+ * (Stage 7 kini murni RFU: halaman penutup tanpa checksheet.)
  *
- * Item diambil dari template asli:
+ * Item Engine SA12V140E-1 diambil dari template asli:
  * CHECKSHEET FOR PROCESS DEVELOPMEN ROBBY/ENGINE/SA12V140E-1/MAINLINE/DELIVERY/
  * DELIVERY ENGINE SA12V140E-1.ods (Delivery Inspection Sheet, RC/QR06/EG/24/04).
  *
  * Nomor item mengikuti sheet asli (51-52 tidak ada teksnya di file sumber —
  * hanya callout gambar), grup mengikuti sudut pandang sketch.
+ *
+ * EGI/kategori lain di-clone dari template Receiving stage 1 masing-masing:
+ * form fisiknya memang satu dokumen "Delivery & Receiving" yang sama, sehingga
+ * daftar item kelengkapan yang diperiksa identik.
  */
 class DeliveryChecksheetTemplateSeeder extends Seeder
 {
@@ -117,12 +122,44 @@ class DeliveryChecksheetTemplateSeeder extends Seeder
             $items[] = $define(++$seq, 'Front View', $label, $no);
         }
 
+        // Bersihkan sisa template lama yang masih menempel di stage 7 (skema lama).
+        ChecksheetTemplate::where('stage_number', 7)->delete();
+
         ChecksheetTemplate::updateOrCreate(
-            ['major_category' => 'Engine', 'stage_number' => 7, 'egi_model' => 'SA12V140E-1'],
+            ['major_category' => 'Engine', 'stage_number' => 6, 'egi_model' => 'SA12V140E-1'],
             [
                 'template_name' => 'Engine Delivery Inspection Sheet (RC/QR06/EG/24/04)',
                 'items' => $items,
             ]
         );
+
+        // Clone semua template Receiving (stage 1) menjadi template Delivery
+        // (stage 6) untuk kategori/EGI yang belum punya template delivery asli.
+        foreach (ChecksheetTemplate::where('stage_number', 1)->get() as $receiving) {
+            $exists = ChecksheetTemplate::where('stage_number', 6)
+                ->where('major_category', $receiving->major_category)
+                ->when(
+                    $receiving->egi_model === null,
+                    fn ($q) => $q->whereNull('egi_model'),
+                    fn ($q) => $q->where('egi_model', $receiving->egi_model)
+                )
+                ->exists();
+
+            if ($exists) {
+                continue;
+            }
+
+            ChecksheetTemplate::create([
+                'major_category' => $receiving->major_category,
+                'stage_number' => 6,
+                'egi_model' => $receiving->egi_model,
+                'template_name' => str_replace(
+                    ['Receiving Inspection Sheet', 'Receiving Inspection'],
+                    ['Delivery Inspection Sheet', 'Delivery Inspection'],
+                    $receiving->template_name
+                ),
+                'items' => $receiving->items,
+            ]);
+        }
     }
 }

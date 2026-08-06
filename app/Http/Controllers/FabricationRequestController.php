@@ -61,6 +61,11 @@ class FabricationRequestController extends Controller
             return $denied;
         }
 
+        // Baca multi-tab GSheet + retry cold-start Apps Script sering > 30 detik.
+        // Batas hanya dinaikkan untuk request scan ini, bukan dihilangkan global.
+        set_time_limit(180);
+        ini_set('max_execution_time', '180');
+
         $result = $this->frService->scanCandidates($component);
 
         $candidates = $result['candidates'] ?? [];

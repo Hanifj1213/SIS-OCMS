@@ -13,10 +13,21 @@
         href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap"
         rel="stylesheet">
 
+    <script>
+        // Tema light/dark — ikut pilihan yang sama dengan halaman utama
+        (function() {
+            if (localStorage.getItem('ocms-theme') === 'light') {
+                document.documentElement.dataset.theme = 'light';
+            }
+        })();
+    </script>
+
     <style>
         :root {
+            --ink: 255, 255, 255;
             --bg-primary: #0B2B26;
             --bg-secondary: #091528;
+            --bg-tertiary: #0d1f3c;
             --accent-gold: #D4AF37;
             --accent-gold-dim: rgba(212, 175, 55, 0.15);
             --accent-cyan: #48CAE4;
@@ -25,11 +36,35 @@
             --accent-green-dim: rgba(52, 211, 153, 0.12);
             --accent-red: #F87171;
             --accent-red-dim: rgba(248, 113, 113, 0.12);
-            --glass-border: rgba(255, 255, 255, 0.06);
-            --glass-border-light: rgba(255, 255, 255, 0.10);
-            --text-primary: rgba(255, 255, 255, 0.92);
-            --text-secondary: rgba(255, 255, 255, 0.55);
-            --text-muted: rgba(255, 255, 255, 0.25);
+            --glass-border: rgba(var(--ink), 0.08);
+            --glass-border-light: rgba(var(--ink), 0.14);
+            --text-primary: rgba(var(--ink), 0.95);
+            --text-secondary: rgba(var(--ink), 0.72);
+            --text-muted: rgba(var(--ink), 0.50);
+            --nav-bg: rgba(11, 43, 38, 0.6);
+            --on-accent: #0B2B26;
+        }
+
+        html[data-theme="light"] {
+            --ink: 12, 35, 30;
+            --bg-primary: #E7EDEA;
+            --bg-secondary: #E0E7EF;
+            --bg-tertiary: #D9E1EC;
+            --accent-gold: #92580A;
+            --accent-gold-dim: rgba(146, 88, 10, 0.14);
+            --accent-cyan: #0C637C;
+            --accent-cyan-dim: rgba(12, 99, 124, 0.12);
+            --accent-green: #036B4F;
+            --accent-green-dim: rgba(3, 107, 79, 0.12);
+            --accent-red: #C71F1F;
+            --accent-red-dim: rgba(199, 31, 31, 0.12);
+            --glass-border: rgba(var(--ink), 0.16);
+            --glass-border-light: rgba(var(--ink), 0.24);
+            --text-primary: rgba(var(--ink), 0.95);
+            --text-secondary: rgba(var(--ink), 0.80);
+            --text-muted: rgba(var(--ink), 0.62);
+            --nav-bg: rgba(255, 255, 255, 0.82);
+            --on-accent: #FFFFFF;
         }
 
         * {
@@ -40,7 +75,7 @@
 
         body {
             font-family: 'Inter', -apple-system, sans-serif;
-            background: linear-gradient(170deg, var(--bg-primary) 0%, var(--bg-secondary) 40%, #0d1f3c 100%);
+            background: linear-gradient(170deg, var(--bg-primary) 0%, var(--bg-secondary) 40%, var(--bg-tertiary) 100%);
             color: var(--text-primary);
             min-height: 100vh;
             min-height: 100dvh;
@@ -52,7 +87,7 @@
         /* === HEADER === */
         .cs-header {
             padding: 16px 24px;
-            background: rgba(11, 43, 38, 0.6);
+            background: var(--nav-bg);
             backdrop-filter: blur(24px);
             border-bottom: 1px solid var(--glass-border);
             display: flex;
@@ -111,7 +146,7 @@
         .cs-progress-bar {
             width: 100%;
             height: 6px;
-            background: rgba(255, 255, 255, 0.06);
+            background: rgba(var(--ink), 0.06);
             border-radius: 3px;
             overflow: hidden;
         }
@@ -140,7 +175,7 @@
 
         .cs-toggle-group {
             display: flex;
-            background: rgba(255, 255, 255, 0.04);
+            background: rgba(var(--ink), 0.04);
             border-radius: 8px;
             padding: 4px;
             border: 1px solid var(--glass-border);
@@ -160,7 +195,7 @@
         }
 
         .cs-toggle-btn.active {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(var(--ink), 0.1);
             color: var(--accent-cyan);
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
         }
@@ -184,7 +219,7 @@
             cursor: zoom-in;
             transition: all 0.25s;
             opacity: 0.85;
-            background: rgba(255, 255, 255, 0.02);
+            background: rgba(var(--ink), 0.02);
         }
 
         .cs-slide-ref-thumb:hover {
@@ -232,7 +267,7 @@
             right: 24px;
             color: white;
             font-size: 2rem;
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(var(--ink), 0.1);
             border: none;
             width: 40px;
             height: 40px;
@@ -319,7 +354,7 @@
         }
 
         .cs-list-item {
-            background: rgba(255, 255, 255, 0.02);
+            background: rgba(var(--ink), 0.02);
             border: 1px solid var(--glass-border);
             border-radius: 12px;
             padding: 14px 16px;
@@ -387,7 +422,7 @@
         }
 
         .cs-list-badge.none {
-            background: rgba(255, 255, 255, 0.04);
+            background: rgba(var(--ink), 0.04);
             color: var(--text-muted);
             border: 1px solid var(--glass-border);
         }
@@ -404,7 +439,7 @@
             height: 32px;
             border-radius: 8px;
             border: 1px solid var(--glass-border);
-            background: rgba(255, 255, 255, 0.03);
+            background: rgba(var(--ink), 0.03);
             color: var(--text-muted);
             font-size: 0.9rem;
             cursor: pointer;
@@ -447,7 +482,7 @@
         }
 
         .cs-filter-btn.active {
-            background: rgba(255, 255, 255, 0.08);
+            background: rgba(var(--ink), 0.08);
             color: var(--accent-cyan);
             border-color: rgba(72, 202, 228, 0.3);
         }
@@ -465,7 +500,7 @@
             font-family: 'JetBrains Mono', monospace;
             font-size: 3rem;
             font-weight: 900;
-            color: rgba(255, 255, 255, 0.06);
+            color: rgba(var(--ink), 0.06);
             margin-bottom: 8px;
             line-height: 1;
         }
@@ -500,7 +535,7 @@
             padding: 20px 16px;
             border-radius: 16px;
             border: 2px solid var(--glass-border);
-            background: rgba(255, 255, 255, 0.03);
+            background: rgba(var(--ink), 0.03);
             cursor: pointer;
             transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
             display: flex;
@@ -535,7 +570,7 @@
             font-family: 'JetBrains Mono', monospace;
             color: var(--text-muted);
             padding: 2px 8px;
-            background: rgba(255, 255, 255, 0.04);
+            background: rgba(var(--ink), 0.04);
             border-radius: 4px;
         }
 
@@ -563,13 +598,13 @@
         }
 
         .cs-answer-btn.none {
-            border-color: rgba(255, 255, 255, 0.1);
+            border-color: rgba(var(--ink), 0.1);
         }
 
         .cs-answer-btn.none:hover,
         .cs-answer-btn.none.selected {
-            background: rgba(255, 255, 255, 0.06);
-            border-color: rgba(255, 255, 255, 0.2);
+            background: rgba(var(--ink), 0.06);
+            border-color: rgba(var(--ink), 0.2);
             color: var(--text-secondary);
         }
 
@@ -587,7 +622,7 @@
             padding: 12px 24px;
             border-radius: 12px;
             border: 1px solid var(--glass-border);
-            background: rgba(255, 255, 255, 0.04);
+            background: rgba(var(--ink), 0.04);
             color: var(--text-secondary);
             font-family: 'Inter', sans-serif;
             font-size: 0.85rem;
@@ -597,7 +632,7 @@
         }
 
         .cs-nav-btn:hover {
-            background: rgba(255, 255, 255, 0.08);
+            background: rgba(var(--ink), 0.08);
             color: var(--text-primary);
         }
 
@@ -608,7 +643,7 @@
 
         .cs-nav-btn.finish {
             background: linear-gradient(135deg, var(--accent-gold), #EAA112);
-            color: #0B2B26;
+            color: var(--on-accent);
             border: none;
             font-weight: 700;
             box-shadow: 0 4px 16px rgba(212, 175, 55, 0.2);
@@ -718,7 +753,7 @@
         .cs-modal select {
             width: 100%;
             padding: 12px 16px;
-            background: rgba(255, 255, 255, 0.04);
+            background: rgba(var(--ink), 0.04);
             border: 1px solid var(--glass-border);
             border-radius: 12px;
             color: var(--text-primary);
@@ -736,7 +771,7 @@
 
         .cs-modal select option {
             background: var(--bg-secondary);
-            color: white;
+            color: var(--text-primary);
         }
 
         .cs-modal-actions {

@@ -7,6 +7,7 @@ use App\Http\Controllers\LocalChecksheetController;
 use App\Http\Controllers\MolController;
 use App\Http\Controllers\PartRequestController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\StageTimeController;
 use App\Http\Controllers\StatusController;
 use App\Http\Controllers\UserManagementController;
 use Illuminate\Support\Facades\Route;
@@ -62,7 +63,14 @@ Route::middleware(['auth'])->group(function () {
         ->name('components.approveStage');
     Route::post('components/{component}/reject-stage', [ComponentController::class, 'rejectStage'])
         ->name('components.rejectStage');
-    // Stage 6 (Painting): dokumentasi foto hasil pengecatan
+    // Pelacakan waktu 3 dimensi (Calendar/Work/Man Hour) + crew mekanik
+    Route::get('components/{component}/time-metrics', [StageTimeController::class, 'metrics'])
+        ->name('components.timeMetrics');
+    Route::post('components/{component}/crew', [StageTimeController::class, 'addMechanic'])
+        ->name('components.crew.add');
+    Route::delete('components/{component}/crew/{log}', [StageTimeController::class, 'removeMechanic'])
+        ->name('components.crew.remove');
+    // Stage 5 (Test Performance & Painting): dokumentasi foto hasil pengecatan
     Route::post('components/{component}/painting/photos', [ComponentController::class, 'uploadPaintingPhotos'])
         ->name('components.painting.upload');
     Route::delete('components/{component}/painting/photos', [ComponentController::class, 'deletePaintingPhoto'])

@@ -53,9 +53,9 @@
                         2 => 'DIS Assembling',
                         3 => 'Machining',
                         4 => 'Assembly',
-                        5 => 'Test Perf.',
-                        6 => 'Painting',
-                        7 => 'RFU/Delivery',
+                        5 => 'Test & Paint',
+                        6 => 'Delivery',
+                        7 => 'RFU',
                     ];
                 @endphp
                 @foreach($stageDistribution as $stage => $count)
@@ -76,7 +76,7 @@
             font-family: 'JetBrains Mono', monospace;
             font-size: 1.4rem;
             font-weight: 800;
-            background: rgba(255,255,255,0.02);
+            background: rgba(var(--ink), 0.02);
             color: var(--text-muted);
             transition: all 0.4s;
         }

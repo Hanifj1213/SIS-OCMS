@@ -154,7 +154,7 @@
                 </div>
 
                 {{-- Core Category --}}
-                <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.05);">
+                <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid rgba(var(--ink), 0.05);">
                     <label class="ocms-label" style="font-size: 0.85rem; margin-bottom: 12px;">Evaluasi Core Category :</label>
                     <div style="display: flex; gap: 30px; flex-wrap: wrap;">
                         <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">

@@ -93,4 +93,9 @@ class Component extends Model
     {
         return $this->hasMany(ComponentChecksheet::class, 'comp_id', 'comp_id');
     }
+
+    public function mechanicLogs()
+    {
+        return $this->hasMany(StageMechanicLog::class, 'comp_id', 'comp_id');
+    }
 }

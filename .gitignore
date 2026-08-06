@@ -26,16 +26,31 @@ yarn-error.log
 # Excel lock / temp files
 **/~$*
 
-# Merged checksheet siap-upload (besar; sumber kebenaran di Google Sheets)
-CHECKSHEET FOR PROCESS DEVELOPMEN ROBBY/ENGINE/_SIAP_UPLOAD_GSHEET/
-
-# Data checksheet mentah & arsip (~1,4 GB, bukan bagian aplikasi).
-# Backup template dipegang lokal saja — lihat tools/restore_siap_from_backup.py
-CHECKSHEET FOR PROCESS DEVELOPMEN ROBBY/POWERTRAIN/
-CHECKSHEET FOR PROCESS DEVELOPMEN ROBBY/HASIL/
-CHECKSHEET FOR PROCESS DEVELOPMEN ROBBY/SIAP/
-CHECKSHEET FOR PROCESS DEVELOPMEN ROBBY/_SIAP_BACKUP/
+# Checksheet lokal besar (~GB) — TIDAK dibutuhkan saat aplikasi jalan.
+# Source of truth: Google Sheets (ID di config/checksheet_gsheets.php) + DB.
+# Folder ini hanya bahan upload/import offline (tools/).
+CHECKSHEET FOR PROCESS DEVELOPMEN ROBBY/
+002. CHECKSHEET KOMPONEN/
 FABRIKASI/
+
+# Data lokal / tool agent / artefak sesi — jangan ikut push
+/database/database.sqlite
+/database/database.sqlite-*
+/.aider.chat.history.md
+/.aider.input.history
+/.aider.tags.cache.v4/
+/.agents/
+/.claude/
+/data/
+/hyperagent-openai-gateway/
+/Presensi dan Logbook KP*
+storage/framework/sessions/
+storage/framework/views/
+storage/logs/
+*.ods
+**/~$*.xlsx
+**/~$*.xls
+**/~$*.docx
 
 # Python cache & output diagnostik yang dihasilkan ulang oleh tools/
 __pycache__/

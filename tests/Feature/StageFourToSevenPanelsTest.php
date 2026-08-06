@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Component;
 use App\Models\User;
+use Database\Seeders\ChecksheetTemplateSeeder;
 use Database\Seeders\DeliveryChecksheetTemplateSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -16,9 +17,9 @@ use Tests\TestCase;
  * Panel per-tahap untuk Stage 3-7:
  * - Stage 3: semua output FR ditampilkan langsung (PDF embed)
  * - Stage 4: checksheet Assembly dari GSheet (mirip Disassembly)
- * - Stage 5: checksheet Test Bench dari GSheet, Quality Gate manual hilang
- * - Stage 6: dokumentasi foto Painting (upload + galeri)
- * - Stage 7: checksheet Delivery internal (mirip Receiving)
+ * - Stage 5: checksheet Test Bench dari GSheet + dokumentasi foto Painting
+ * - Stage 6: checksheet Delivery internal (mirip Receiving)
+ * - Stage 7: panel penutup RFU (seluruh tahapan selesai)
  */
 class StageFourToSevenPanelsTest extends TestCase
 {
@@ -165,12 +166,12 @@ class StageFourToSevenPanelsTest extends TestCase
             ->assertSessionHasErrors('oil_pressure');
     }
 
-    // ===== Stage 6 =====
+    // ===== Stage 5: Painting (digabung dengan Test Performance) =====
 
-    public function test_stage_6_upload_dan_hapus_foto_painting(): void
+    public function test_stage_5_upload_dan_hapus_foto_painting(): void
     {
         Storage::fake('public');
-        $component = $this->makeComponent(6);
+        $component = $this->makeComponent(5);
         $user = $this->mechanic();
 
         $show = $this->actingAs($user)->get(route('components.show', $component->comp_id));
@@ -201,31 +202,65 @@ class StageFourToSevenPanelsTest extends TestCase
         $this->assertCount(1, $component->fresh()->painting_images);
     }
 
-    public function test_panel_painting_tidak_muncul_di_stage_5(): void
+    public function test_panel_painting_tidak_muncul_di_stage_6(): void
     {
         $response = $this->actingAs($this->mechanic())
-            ->get(route('components.show', $this->makeComponent(5)->comp_id));
+            ->get(route('components.show', $this->makeComponent(6)->comp_id));
 
         $response->assertOk();
         $response->assertDontSee('id="painting-panel"', false);
     }
 
-    // ===== Stage 7 =====
+    // ===== Stage 6: Delivery =====
 
-    public function test_stage_7_menampilkan_checksheet_delivery_dari_template(): void
+    public function test_stage_6_menampilkan_checksheet_delivery_dari_template(): void
     {
         $this->seed(DeliveryChecksheetTemplateSeeder::class);
-        $component = $this->makeComponent(7, ['status' => 'Ready for Use']);
+        $component = $this->makeComponent(6);
 
         $response = $this->actingAs($this->mechanic())
             ->get(route('components.show', $component->comp_id));
 
         $response->assertOk();
         // Snapshot checksheet dibuat dari template Delivery SA12V140E-1
-        $checksheet = $component->fresh()->checksheets->where('stage_number', 7)->first();
+        $checksheet = $component->fresh()->checksheets->where('stage_number', 6)->first();
         $this->assertNotNull($checksheet);
         $this->assertCount(55, $checksheet->items);
         $response->assertSee('Flywheel housing');
         $response->assertSee('R.H. View');
+    }
+
+    public function test_stage_6_kategori_lain_memakai_clone_template_receiving(): void
+    {
+        $this->seed(ChecksheetTemplateSeeder::class);
+        $this->seed(DeliveryChecksheetTemplateSeeder::class);
+        $component = $this->makeComponent(6, [
+            'egi' => 'HD785-7',
+            'model_type' => 'HD785-7',
+            'major_category' => 'TC/Transmission',
+        ]);
+
+        $this->actingAs($this->mechanic())
+            ->get(route('components.show', $component->comp_id))
+            ->assertOk();
+
+        $checksheet = $component->fresh()->checksheets->where('stage_number', 6)->first();
+        $this->assertNotNull($checksheet);
+        $this->assertNotEmpty($checksheet->items);
+    }
+
+    // ===== Stage 7: RFU =====
+
+    public function test_stage_7_menampilkan_panel_penutup_rfu(): void
+    {
+        $component = $this->makeComponent(7, ['status' => 'Ready for Use']);
+
+        $response = $this->actingAs($this->mechanic())
+            ->get(route('components.show', $component->comp_id));
+
+        $response->assertOk();
+        $response->assertSee('id="rfu-panel"', false);
+        $response->assertSee('Ready for Use (RFU)');
+        $response->assertSee('Overhaul selesai');
     }
 }

@@ -127,6 +127,11 @@ return array_merge([
       'D375' => '1dTEG8f4vRWa4tZMyVrpld47C4GtpAO-qELz2ZVh_UQU',
       'PC1250-8' => '1dTEG8f4vRWa4tZMyVrpld47C4GtpAO-qELz2ZVh_UQU',
       'WA800-3' => '1VQ-Z7g_kR9XXApRWbjG7lzC0zCzHnVquyxjzEyHG12w',
+      'SA6D140E-2' => '11bff8oj1i6rZvF4fILZgzdwSM-B7JShoPO2hfCzoKYU',
+      'GD825A-2' => '11bff8oj1i6rZvF4fILZgzdwSM-B7JShoPO2hfCzoKYU',
+      'GD825A' => '11bff8oj1i6rZvF4fILZgzdwSM-B7JShoPO2hfCzoKYU',
+      'SAA12V140E-3' => '1x_rSXV1Dmafy8vGE7SFTsA5OE-ikmaj2XUMC7Z5sXVw',
+      'PC2000-8' => '1x_rSXV1Dmafy8vGE7SFTsA5OE-ikmaj2XUMC7Z5sXVw',
     ),
     'Control Valve' => 
     array (
@@ -167,6 +172,9 @@ return array_merge([
       'D375' => '1Qh-3Sw6DyJbePO_ITg_hf7EpAQt5Nt5p4OtUmiktVwI',
       'PC1250-8' => '1Qh-3Sw6DyJbePO_ITg_hf7EpAQt5Nt5p4OtUmiktVwI',
       'WA800-3' => '1BH9RDpm_tHnxTQgcrws8WxAuBDHxzycuMIbdrvnF9YM',
+      'SA6D140E-2' => '1Bq_Se0YHTMVnHZ9o8ST-sXhnnlnUC48UfRSSx_ut4a8',
+      'GD825A-2' => '1Bq_Se0YHTMVnHZ9o8ST-sXhnnlnUC48UfRSSx_ut4a8',
+      'GD825A' => '1Bq_Se0YHTMVnHZ9o8ST-sXhnnlnUC48UfRSSx_ut4a8',
     ),
     'Control Valve' => 
     array (

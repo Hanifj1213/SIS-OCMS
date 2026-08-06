@@ -12,9 +12,8 @@ use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
 /**
- * Panel FR/MOL hanya boleh tampil untuk Stage 2 ke atas dan harus mengikuti
- * TAHAP YANG SEDANG DILIHAT. Sebelumnya panel memakai current_stage, sehingga
- * saat mekanik me-review Stage 1 panel Stage 2 tetap muncul.
+ * Panel FR/MOL (scan + daftar) hanya Stage 2 & 3, dan mengikuti tahap yang
+ * sedang dilihat (review_stage). Stage 4+ memakai panel Assembly/Test Bench.
  */
 class FrPanelStageVisibilityTest extends TestCase
 {
@@ -67,9 +66,9 @@ class FrPanelStageVisibilityTest extends TestCase
     public function test_panel_fr_tersembunyi_saat_mereview_stage_1(): void
     {
         $user = $this->mechanic();
-        $component = $this->makeComponent(4);
+        $component = $this->makeComponent(3);
 
-        // Tanpa review: panel tampil
+        // Tanpa review (stage 3): panel tampil
         $this->actingAs($user)
             ->get(route('components.show', $component->comp_id))
             ->assertSee('id="fr-panel"', false);
@@ -79,6 +78,16 @@ class FrPanelStageVisibilityTest extends TestCase
             ->get(route('components.show', ['component' => $component->comp_id, 'review_stage' => 1]))
             ->assertOk()
             ->assertDontSee('id="fr-panel"', false);
+    }
+
+    public function test_panel_fr_tidak_muncul_di_stage_4(): void
+    {
+        $response = $this->actingAs($this->mechanic())
+            ->get(route('components.show', $this->makeComponent(4)->comp_id));
+
+        $response->assertOk();
+        $response->assertDontSee('id="fr-panel"', false);
+        $response->assertDontSee('id="fr-scan-btn"', false);
     }
 
     public function test_tanpa_gate_approval_tombol_scan_langsung_tersedia_di_stage_2(): void

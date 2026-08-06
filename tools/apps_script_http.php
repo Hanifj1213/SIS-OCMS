@@ -14,6 +14,8 @@ function postToAppsScript(string $url, array $payload, int $timeout = 180): \Ill
     $json = json_encode($payload);
     $connectTimeout = min(60, max(15, (int) ceil($timeout / 5)));
 
+    // force_ip_resolve v4: resolusi IPv6 ke *.googleusercontent.com kadang
+    // menggantung ±21 detik di Windows lalu gagal (cURL error 28).
     $first = Illuminate\Support\Facades\Http::timeout($timeout)
         ->connectTimeout($connectTimeout)
         ->withHeaders([
@@ -21,7 +23,7 @@ function postToAppsScript(string $url, array $payload, int $timeout = 180): \Ill
             'Content-Type' => 'application/json',
         ])
         ->withBody($json, 'application/json')
-        ->withOptions(['allow_redirects' => false])
+        ->withOptions(['allow_redirects' => false, 'force_ip_resolve' => 'v4'])
         ->post($url);
 
     if (!in_array($first->status(), [301, 302, 303, 307, 308], true)) {
@@ -38,10 +40,12 @@ function postToAppsScript(string $url, array $payload, int $timeout = 180): \Ill
         $location = ($parts['scheme'] ?? 'https') . '://' . ($parts['host'] ?? '') . $location;
     }
 
-    // Penting: echo URL diikuti dengan GET — body POST sudah diproses di langkah 1
+    // Penting: echo URL diikuti dengan GET — body POST sudah diproses di
+    // langkah 1, jadi GET ini AMAN di-retry tanpa membuat upload ganda.
     return Illuminate\Support\Facades\Http::timeout($timeout)
         ->connectTimeout($connectTimeout)
+        ->retry(4, 3000, throw: false)
         ->withHeaders(['Accept' => 'application/json'])
-        ->withOptions(['allow_redirects' => false])
+        ->withOptions(['allow_redirects' => false, 'force_ip_resolve' => 'v4'])
         ->get($location);
 }

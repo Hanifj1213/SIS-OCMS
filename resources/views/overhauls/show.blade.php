@@ -35,28 +35,28 @@
             <div class="section-title" style="margin-bottom: 16px;">📋 Damage Core — Informasi Komponen</div>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0;">
                 {{-- Left Column --}}
-                <div style="border-right: 1px solid rgba(255,255,255,0.04);">
-                    <div style="display: flex; padding: 10px 16px 10px 0; border-bottom: 1px solid rgba(255,255,255,0.03);">
+                <div style="border-right: 1px solid rgba(var(--ink), 0.04);">
+                    <div style="display: flex; padding: 10px 16px 10px 0; border-bottom: 1px solid rgba(var(--ink), 0.03);">
                         <span style="color: var(--text-muted); width: 40%; font-size: 0.8rem;">EGI</span>
                         <span class="mono" style="font-size: 0.85rem; font-weight: 600;">{{ $comp->egi ?? '-' }}</span>
                     </div>
-                    <div style="display: flex; padding: 10px 16px 10px 0; border-bottom: 1px solid rgba(255,255,255,0.03);">
+                    <div style="display: flex; padding: 10px 16px 10px 0; border-bottom: 1px solid rgba(var(--ink), 0.03);">
                         <span style="color: var(--text-muted); width: 40%; font-size: 0.8rem;">Unit Code</span>
                         <span class="mono" style="font-size: 0.85rem;">{{ $comp->unit_code ?? '-' }}</span>
                     </div>
-                    <div style="display: flex; padding: 10px 16px 10px 0; border-bottom: 1px solid rgba(255,255,255,0.03);">
+                    <div style="display: flex; padding: 10px 16px 10px 0; border-bottom: 1px solid rgba(var(--ink), 0.03);">
                         <span style="color: var(--text-muted); width: 40%; font-size: 0.8rem;">Unit Serial No.</span>
                         <span class="mono" style="font-size: 0.85rem;">{{ $comp->unit_serial_no ?? '-' }}</span>
                     </div>
-                    <div style="display: flex; padding: 10px 16px 10px 0; border-bottom: 1px solid rgba(255,255,255,0.03);">
+                    <div style="display: flex; padding: 10px 16px 10px 0; border-bottom: 1px solid rgba(var(--ink), 0.03);">
                         <span style="color: var(--text-muted); width: 40%; font-size: 0.8rem;">Site / District</span>
                         <span style="font-size: 0.85rem;">{{ $comp->site_district ?? '-' }}</span>
                     </div>
-                    <div style="display: flex; padding: 10px 16px 10px 0; border-bottom: 1px solid rgba(255,255,255,0.03);">
+                    <div style="display: flex; padding: 10px 16px 10px 0; border-bottom: 1px solid rgba(var(--ink), 0.03);">
                         <span style="color: var(--text-muted); width: 40%; font-size: 0.8rem;">SMR</span>
                         <span class="mono" style="font-size: 0.85rem; font-weight: 600; color: var(--accent-cyan);">{{ $comp->smr ? number_format($comp->smr) : '-' }}</span>
                     </div>
-                    <div style="display: flex; padding: 10px 16px 10px 0; border-bottom: 1px solid rgba(255,255,255,0.03);">
+                    <div style="display: flex; padding: 10px 16px 10px 0; border-bottom: 1px solid rgba(var(--ink), 0.03);">
                         <span style="color: var(--text-muted); width: 40%; font-size: 0.8rem;">Manifest</span>
                         <span style="font-size: 0.85rem;">{{ $comp->manifest ?? '-' }}</span>
                     </div>
@@ -67,19 +67,19 @@
                 </div>
                 {{-- Right Column --}}
                 <div style="padding-left: 16px;">
-                    <div style="display: flex; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.03);">
+                    <div style="display: flex; padding: 10px 0; border-bottom: 1px solid rgba(var(--ink), 0.03);">
                         <span style="color: var(--text-muted); width: 45%; font-size: 0.8rem;">Component Model</span>
                         <span style="font-size: 0.85rem;"><span class="badge badge-cyan">{{ $comp->major_category }}</span></span>
                     </div>
-                    <div style="display: flex; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.03);">
+                    <div style="display: flex; padding: 10px 0; border-bottom: 1px solid rgba(var(--ink), 0.03);">
                         <span style="color: var(--text-muted); width: 45%; font-size: 0.8rem;">Comp Serial No.</span>
                         <span class="mono" style="font-size: 0.85rem; font-weight: 600;">{{ $comp->serial_number }}</span>
                     </div>
-                    <div style="display: flex; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.03);">
+                    <div style="display: flex; padding: 10px 0; border-bottom: 1px solid rgba(var(--ink), 0.03);">
                         <span style="color: var(--text-muted); width: 45%; font-size: 0.8rem;">P/N Assy</span>
                         <span class="mono" style="font-size: 0.85rem;">{{ $comp->pn_assy ?? '-' }}</span>
                     </div>
-                    <div style="display: flex; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.03);">
+                    <div style="display: flex; padding: 10px 0; border-bottom: 1px solid rgba(var(--ink), 0.03);">
                         <span style="color: var(--text-muted); width: 45%; font-size: 0.8rem;">Status OVH</span>
                         <span>
                             @if($comp->status_ovh == 'SCHEDULE')
@@ -91,7 +91,7 @@
                             @endif
                         </span>
                     </div>
-                    <div style="display: flex; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.03);">
+                    <div style="display: flex; padding: 10px 0; border-bottom: 1px solid rgba(var(--ink), 0.03);">
                         <span style="color: var(--text-muted); width: 45%; font-size: 0.8rem;">Core Category</span>
                         <span style="font-size: 0.85rem;">
                             @if($comp->core_category == 'A')
@@ -105,11 +105,11 @@
                             @endif
                         </span>
                     </div>
-                    <div style="display: flex; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.03);">
+                    <div style="display: flex; padding: 10px 0; border-bottom: 1px solid rgba(var(--ink), 0.03);">
                         <span style="color: var(--text-muted); width: 45%; font-size: 0.8rem;">Life Time</span>
                         <span class="mono" style="font-size: 0.85rem; font-weight: 600; color: var(--accent-cyan);">{{ $comp->life_time ? number_format($comp->life_time) : '-' }}</span>
                     </div>
-                    <div style="display: flex; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.03);">
+                    <div style="display: flex; padding: 10px 0; border-bottom: 1px solid rgba(var(--ink), 0.03);">
                         <span style="color: var(--text-muted); width: 45%; font-size: 0.8rem;">Date Received</span>
                         <span style="font-size: 0.85rem;">{{ $comp->date_defitted ? $comp->date_defitted->format('d M Y') : '-' }}</span>
                     </div>
@@ -131,7 +131,7 @@
             @if($comp->qr_code_path)
                 <img src="{{ asset($comp->qr_code_path) }}" alt="QR" style="width: 140px; height: 140px; border-radius: 12px; border: 1px solid var(--glass-border); padding: 6px; background: white; margin-top: 8px;">
             @else
-                <div style="width: 140px; height: 140px; border-radius: 12px; background: rgba(255,255,255,0.03); display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 0.75rem; margin-top: 8px;">N/A</div>
+                <div style="width: 140px; height: 140px; border-radius: 12px; background: rgba(var(--ink), 0.03); display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 0.75rem; margin-top: 8px;">N/A</div>
             @endif
         </div>
     </div>
@@ -149,6 +149,92 @@
         .stage-node.reviewing {
             outline: 2px solid var(--accent-gold);
             outline-offset: 2px;
+        }
+
+        /* === Waktu 3 Dimensi (Calendar / Work / Man Hour) === */
+        .time3d-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 10px;
+            margin-top: 12px;
+        }
+        .time3d-tile {
+            position: relative;
+            overflow: hidden;
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 10px 14px;
+            background: rgba(var(--ink), 0.02);
+        }
+        .time3d-tile::before {
+            content: '';
+            position: absolute;
+            inset: 0 auto 0 0;
+            width: 3px;
+            background: var(--tile-accent, var(--accent-cyan));
+            opacity: 0.7;
+        }
+        .time3d-tile[data-metric="calendar"] { --tile-accent: var(--accent-cyan); }
+        .time3d-tile[data-metric="work"]     { --tile-accent: var(--accent-gold); }
+        .time3d-tile[data-metric="man"]      { --tile-accent: var(--accent-green); }
+        .t3-label {
+            font-size: 0.6rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .t3-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1rem;
+            font-weight: 700;
+            margin-top: 4px;
+            color: var(--text-primary);
+            font-variant-numeric: tabular-nums;
+        }
+        .time3d-grid[data-running="1"] .t3-value { color: var(--tile-accent, var(--accent-cyan)); }
+        .t3-sub {
+            font-size: 0.62rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+        .t3-pulse {
+            width: 6px; height: 6px; border-radius: 50%;
+            background: var(--accent-cyan);
+            animation: t3blink 1.2s ease-in-out infinite;
+            display: none;
+        }
+        .time3d-grid[data-running="1"] .t3-pulse { display: inline-block; }
+        @keyframes t3blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
+
+        .crew-panel {
+            margin-top: 12px;
+            border: 1px dashed var(--glass-border-light);
+            border-radius: 12px;
+            padding: 12px 14px;
+            background: rgba(var(--ink), 0.015);
+        }
+        .crew-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 999px;
+            background: rgba(var(--ink), 0.05);
+            border: 1px solid var(--glass-border-light);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        .crew-chip:hover {
+            color: #f87171;
+            border-color: rgba(248, 113, 113, 0.5);
+            background: rgba(248, 113, 113, 0.08);
         }
     </style>
 
@@ -192,7 +278,7 @@
         <div class="section-title fade-up">Riwayat Pengerjaan</div>
         <div class="glass-card fade-up">
             @forelse($comp->overhaulLogs->sortBy('stage_number') as $log)
-            <div style="display: flex; gap: 16px; padding: 16px 0; border-bottom: 1px solid rgba(255,255,255,0.03); {{ $loop->last ? 'border: none;' : '' }}">
+            <div style="display: flex; gap: 16px; padding: 16px 0; border-bottom: 1px solid rgba(var(--ink), 0.03); {{ $loop->last ? 'border: none;' : '' }}">
                 <div style="width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.8rem; flex-shrink: 0;
                     {{ $log->end_time ? 'background: var(--accent-green-dim); color: var(--accent-green);' : 'background: var(--accent-cyan-dim); color: var(--accent-cyan);' }}
                 ">{{ $log->stage_number }}</div>
@@ -215,6 +301,73 @@
                     @if($log->notes)
                         <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 4px; font-style: italic;">"{{ $log->notes }}"</div>
                     @endif
+
+                    {{-- Waktu 3 Dimensi: Calendar / Work / Man Hour --}}
+                    @php $tm = $stageTimeMetrics[$log->stage_number] ?? null; @endphp
+                    @if($tm)
+                    <div class="time3d-grid"
+                         data-stage="{{ $log->stage_number }}"
+                         data-running="{{ $tm['running'] ? 1 : 0 }}"
+                         data-active-crew="{{ $tm['active_crew'] }}">
+                        <div class="time3d-tile" data-metric="calendar" data-seconds="{{ $tm['calendar_seconds'] }}">
+                            <div class="t3-label">🗓 Calendar Hour <span class="t3-pulse"></span></div>
+                            <div class="t3-value">{{ \App\Services\StageTimeService::formatHours($tm['calendar_seconds']) }}</div>
+                            <div class="t3-sub">Waktu absolut 24/7</div>
+                        </div>
+                        <div class="time3d-tile" data-metric="work" data-seconds="{{ $tm['work_seconds'] }}">
+                            <div class="t3-label">🔧 Work Hour <span class="t3-pulse"></span></div>
+                            <div class="t3-value">{{ \App\Services\StageTimeService::formatHours($tm['work_seconds']) }}</div>
+                            <div class="t3-sub">Jam operasional bengkel ({{ config('worktime.open_label') }})</div>
+                        </div>
+                        <div class="time3d-tile" data-metric="man" data-seconds="{{ $tm['man_seconds'] }}">
+                            <div class="t3-label">👥 Man Hour <span class="t3-pulse"></span></div>
+                            <div class="t3-value">{{ \App\Services\StageTimeService::formatHours($tm['man_seconds']) }}</div>
+                            <div class="t3-sub">Crew aktif: <span class="t3-crew-count">{{ $tm['active_crew'] }}</span> mekanik · jeda istirahat otomatis</div>
+                        </div>
+                    </div>
+
+                    {{-- Crew aktif: daftar chip nama. Tambah nama = multiplier Man Hour naik,
+                         klik nama = konfirmasi lalu keluar. Tanpa start/stop — jam kerja &
+                         istirahat dipotong otomatis dari config/worktime.php. --}}
+                    @php
+                        $isCurrentActiveStage = !$log->end_time && $log->stage_number == $comp->current_stage;
+                        $canManageCrew = auth()->user()->hasAnyRole(['Mechanic', 'Supervisor', 'SuperAdmin']);
+                    @endphp
+                    @if($isCurrentActiveStage && (count($tm['crew']) > 0 || $canManageCrew))
+                    <div class="crew-panel" style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                        <span style="font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted);">
+                            👥 Crew Aktif
+                        </span>
+                        @forelse($tm['crew'] as $crew)
+                            @if($canManageCrew)
+                                <form method="POST" action="{{ route('components.crew.remove', [$comp->comp_id, $crew['log_id']]) }}"
+                                      onsubmit="return confirm('Keluarkan {{ $crew['name'] }} dari crew?\nMan Hour yang sudah berjalan tetap tersimpan.');"
+                                      style="display: inline;">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="crew-chip" title="Sejak {{ $crew['since'] }} — klik untuk keluarkan">
+                                        👤 {{ $crew['name'] }} <span style="opacity: 0.55;">✕</span>
+                                    </button>
+                                </form>
+                            @else
+                                <span class="crew-chip" style="cursor: default;" title="Sejak {{ $crew['since'] }}">👤 {{ $crew['name'] }}</span>
+                            @endif
+                        @empty
+                            <span style="font-size: 0.72rem; color: var(--text-muted);">Belum ada crew — Man Hour belum berjalan.</span>
+                        @endforelse
+
+                        @if($canManageCrew)
+                            <form method="POST" action="{{ route('components.crew.add', $comp->comp_id) }}"
+                                  style="display: flex; gap: 6px; margin-left: auto;">
+                                @csrf
+                                <input type="text" name="name" required maxlength="100" placeholder="Nama mekanik…"
+                                       style="width: 160px; background: var(--select-option-bg); color: var(--text-primary); border: 1px solid var(--glass-border-light); border-radius: 999px; padding: 5px 12px; font-size: 0.72rem;">
+                                <button type="submit" class="btn-primary" style="padding: 5px 14px; font-size: 0.72rem; border-radius: 999px;">＋ Tambah</button>
+                            </form>
+                        @endif
+                    </div>
+                    @endif
+                    @endif
                 </div>
             </div>
             @empty
@@ -222,6 +375,81 @@
             @endforelse
         </div>
     </div>
+
+    {{-- Live timer Waktu 3 Dimensi: tick per detik di browser, resink ke server tiap 60 detik --}}
+    <script>
+    (function () {
+        const offWindows = @json(config('worktime.off_windows', []));
+        const breakWindows = @json(config('worktime.breaks', []));
+        const metricsUrl = @json(route('components.timeMetrics', $comp->comp_id));
+
+        function inWindows(d, windows) {
+            const mins = d.getHours() * 60 + d.getMinutes();
+            return windows.some(w => {
+                const [sh, sm] = w.start.split(':').map(Number);
+                const [eh, em] = (w.end === '24:00' ? [24, 0] : w.end.split(':').map(Number));
+                return mins >= sh * 60 + sm && mins < eh * 60 + em;
+            });
+        }
+
+        // Work Hour berjalan di jam buka; Man Hour ikut berhenti saat istirahat
+        function isWorkshopOpen(d) { return !inWindows(d, offWindows); }
+        function isCrewWorking(d) { return isWorkshopOpen(d) && !inWindows(d, breakWindows); }
+
+        function fmt(sec) {
+            sec = Math.max(0, Math.floor(sec));
+            const h = Math.floor(sec / 3600);
+            const m = Math.floor((sec % 3600) / 60);
+            const s = sec % 60;
+            return h + 'j ' + String(m).padStart(2, '0') + 'm ' + String(s).padStart(2, '0') + 's';
+        }
+
+        function render() {
+            document.querySelectorAll('.time3d-tile').forEach(tile => {
+                tile.querySelector('.t3-value').textContent = fmt(parseFloat(tile.dataset.seconds || 0));
+            });
+        }
+
+        setInterval(function () {
+            const now = new Date();
+            const open = isWorkshopOpen(now);
+            const crewWorking = isCrewWorking(now);
+            document.querySelectorAll('.time3d-grid[data-running="1"]').forEach(grid => {
+                const activeCrew = parseInt(grid.dataset.activeCrew || '0', 10);
+                grid.querySelectorAll('.time3d-tile').forEach(tile => {
+                    let inc = 0;
+                    if (tile.dataset.metric === 'calendar') inc = 1;
+                    else if (tile.dataset.metric === 'work') inc = open ? 1 : 0;
+                    else if (tile.dataset.metric === 'man') inc = crewWorking ? activeCrew : 0;
+                    tile.dataset.seconds = parseFloat(tile.dataset.seconds || 0) + inc;
+                });
+            });
+            render();
+        }, 1000);
+        render();
+
+        // Resink dari server: koreksi drift + tangkap clock-in/out user lain
+        setInterval(async function () {
+            try {
+                const res = await fetch(metricsUrl, { headers: { 'Accept': 'application/json' } });
+                if (!res.ok) return;
+                const data = await res.json();
+                Object.values(data.stages).forEach(st => {
+                    const grid = document.querySelector('.time3d-grid[data-stage="' + st.stage + '"]');
+                    if (!grid) return;
+                    grid.dataset.running = st.running ? '1' : '0';
+                    grid.dataset.activeCrew = st.active_crew;
+                    grid.querySelector('[data-metric="calendar"]').dataset.seconds = st.calendar_seconds;
+                    grid.querySelector('[data-metric="work"]').dataset.seconds = st.work_seconds;
+                    grid.querySelector('[data-metric="man"]').dataset.seconds = st.man_seconds;
+                    const crewCount = grid.querySelector('.t3-crew-count');
+                    if (crewCount) crewCount.textContent = st.active_crew;
+                });
+                render();
+            } catch (e) { /* offline sesaat: timer lokal tetap jalan */ }
+        }, 60000);
+    })();
+    </script>
 
     {{-- Inspection Results --}}
     @if($comp->inspectionDetails->count() > 0)
@@ -258,8 +486,9 @@
     </div>
     @endif
 
-    {{-- FR & MOL Panel — Stage 2+ dengan Tab Toggle --}}
-    @if($viewedStage >= 2)
+    {{-- FR & MOL Panel (scan + daftar) — hanya Stage 2 (Disassembly) & 3 (Machining).
+         Stage 4+ memakai panel Assembly / Test Bench / Painting / Delivery sendiri. --}}
+    @if(in_array($viewedStage, [2, 3], true))
     <div class="section" id="fr-panel">
         <div class="section-title fade-up">Dokumen FR & MOL</div>
         <div class="glass-card fade-up">
@@ -286,7 +515,7 @@
             @endrole
 
             {{-- Tab Toggle Buttons --}}
-            <div style="display: flex; gap: 0; margin-bottom: 0; border-bottom: 2px solid rgba(255,255,255,0.06);">
+            <div style="display: flex; gap: 0; margin-bottom: 0; border-bottom: 2px solid rgba(var(--ink), 0.06);">
                 <button type="button" id="tab-fr-btn" class="btn-primary" style="border-radius: 8px 8px 0 0; padding: 8px 24px; font-size: 0.85rem;">
                     📋 Fabrication Request ({{ $comp->fabricationRequests->count() }})
                 </button>
@@ -351,7 +580,7 @@
             <div id="tab-mol-content" style="display: none; padding-top: 16px;">
                 {{-- Upload Dokumen MOL --}}
                 @role('Mechanic|Supervisor|SuperAdmin')
-                <div style="margin-bottom: 16px; padding: 12px; border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; background: rgba(0,0,0,0.1);">
+                <div style="margin-bottom: 16px; padding: 12px; border: 1px solid rgba(var(--ink), 0.08); border-radius: 10px; background: rgba(0,0,0,0.1);">
                     <div style="font-weight: 600; font-size: 0.85rem; margin-bottom: 8px;">📄 Dokumen MOL</div>
                     @if($comp->mol_document_path)
                         <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
@@ -438,7 +667,7 @@
         <div class="section-title fade-up">🛠 Machining & Fabrication — Output FR ({{ $comp->fabricationRequests->count() }})</div>
         @forelse($comp->fabricationRequests as $fr)
         <div class="glass-card fade-up" style="margin-bottom: 16px; padding: 0; overflow: hidden;">
-            <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; padding: 14px 18px; border-bottom: 1px solid rgba(255,255,255,0.06);">
+            <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; padding: 14px 18px; border-bottom: 1px solid rgba(var(--ink), 0.06);">
                 <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
                     <span class="mono" style="font-size: 0.75rem; color: var(--accent-cyan);">{{ $fr->fr_number }}</span>
                     <strong style="font-size: 0.9rem;">{{ $fr->part_name }}</strong>
@@ -497,8 +726,8 @@
     </script>
     @endif
 
-    {{-- Stage 6: Painting — dokumentasi foto hasil pengecatan --}}
-    @if($viewedStage == 6)
+    {{-- Stage 5 (Test Performance & Painting): dokumentasi foto hasil pengecatan --}}
+    @if($viewedStage == 5)
     @php $paintingImages = array_values($comp->painting_images ?? []); @endphp
     <div class="section" id="painting-panel">
         <div class="section-title fade-up">🎨 Painting — Dokumentasi Foto ({{ count($paintingImages) }})</div>
@@ -509,7 +738,7 @@
 
             @role('Mechanic|Supervisor|SuperAdmin')
             <form action="{{ route('components.painting.upload', $comp->comp_id) }}" method="POST" enctype="multipart/form-data"
-                  style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 20px; padding: 12px; border: 1px dashed rgba(255,255,255,0.15); border-radius: 10px;">
+                  style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 20px; padding: 12px; border: 1px dashed rgba(var(--ink), 0.15); border-radius: 10px;">
                 @csrf
                 <input type="file" name="photos[]" accept=".jpg,.jpeg,.png,.webp" multiple required style="font-size: 0.75rem; max-width: 320px;">
                 <button type="submit" class="btn-primary" style="padding: 8px 16px; font-size: 0.8rem;">📤 Upload Foto</button>
@@ -520,7 +749,7 @@
             @if(count($paintingImages) > 0)
             <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px;">
                 @foreach($paintingImages as $idx => $img)
-                <div style="border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; overflow: hidden; background: rgba(0,0,0,0.15);">
+                <div style="border: 1px solid rgba(var(--ink), 0.08); border-radius: 12px; overflow: hidden; background: rgba(0,0,0,0.15);">
                     <a href="{{ asset($img['path']) }}" target="_blank" title="Buka ukuran penuh">
                         <img src="{{ asset($img['path']) }}" alt="Foto painting {{ $idx + 1 }}"
                              style="display: block; width: 100%; height: 170px; object-fit: cover;">
@@ -551,6 +780,51 @@
     </div>
     @endif
 
+    {{-- Stage 7: RFU — halaman penutup, seluruh tahapan selesai --}}
+    @if($viewedStage == 7)
+    @php
+        $firstLog = $comp->overhaulLogs->sortBy('start_time')->first();
+        $lastLog = $comp->overhaulLogs->sortByDesc('end_time')->first();
+        $rfuStart = $firstLog?->start_time ? \Carbon\Carbon::parse($firstLog->start_time) : null;
+        $rfuEnd = $lastLog?->end_time ? \Carbon\Carbon::parse($lastLog->end_time) : null;
+        $rfuDays = ($rfuStart && $rfuEnd) ? $rfuStart->diffInDays($rfuEnd) : null;
+    @endphp
+    <div class="section" id="rfu-panel">
+        <div class="glass-card fade-up" style="text-align: center; padding: 56px 32px; border-color: rgba(52, 211, 153, 0.25);">
+            <div style="font-size: 3.5rem; margin-bottom: 12px;">✅</div>
+            <h2 style="font-size: 1.6rem; font-weight: 800; letter-spacing: -0.02em; color: var(--accent-green); margin-bottom: 8px;">
+                Ready for Use (RFU)
+            </h2>
+            <p style="font-size: 0.95rem; color: var(--text-secondary); max-width: 520px; margin: 0 auto 28px;">
+                Seluruh tahapan overhaul komponen <strong style="color: var(--text-primary);">{{ $comp->major_category }} — {{ $comp->serial_number }}</strong>
+                telah selesai. Komponen siap dikirim / digunakan kembali.
+            </p>
+            <div style="display: flex; justify-content: center; gap: 32px; flex-wrap: wrap; margin-bottom: 28px;">
+                <div>
+                    <div style="font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin-bottom: 4px;">Mulai</div>
+                    <div class="mono" style="font-size: 0.9rem; font-weight: 600;">{{ $rfuStart ? $rfuStart->format('d M Y') : '-' }}</div>
+                </div>
+                <div>
+                    <div style="font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin-bottom: 4px;">Selesai</div>
+                    <div class="mono" style="font-size: 0.9rem; font-weight: 600;">{{ $rfuEnd ? $rfuEnd->format('d M Y') : '-' }}</div>
+                </div>
+                <div>
+                    <div style="font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin-bottom: 4px;">Durasi</div>
+                    <div class="mono" style="font-size: 0.9rem; font-weight: 600; color: var(--accent-cyan);">{{ $rfuDays !== null ? $rfuDays . ' hari' : '-' }}</div>
+                </div>
+                <div>
+                    <div style="font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin-bottom: 4px;">Tahap Dilalui</div>
+                    <div class="mono" style="font-size: 0.9rem; font-weight: 600;">7 / 7</div>
+                </div>
+            </div>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 20px;">
+                Terima kasih kepada seluruh tim yang terlibat. Riwayat lengkap tiap tahap dapat dibuka lewat stage bar di atas.
+            </p>
+            <a href="{{ route('components.printPdf', $comp->comp_id) }}" target="_blank" class="btn-primary" style="text-decoration: none;">🖨 Cetak Berita Acara (PDF)</a>
+        </div>
+    </div>
+    @endif
+
     {{-- Checksheet Section (Inline Interactive / Review) --}}
     @php
         $checksheetStage = $reviewStage ?? $comp->current_stage;
@@ -564,7 +838,7 @@
             <div class="section-title" style="margin-bottom:12px;">Riwayat Tahap</div>
             @php $reviewLogs = $comp->overhaulLogs->where('stage_number', $checksheetStage)->sortBy('start_time'); @endphp
             @forelse($reviewLogs as $log)
-                <div style="padding:14px 0; border-bottom:1px solid rgba(255,255,255,0.05);">
+                <div style="padding:14px 0; border-bottom:1px solid rgba(var(--ink), 0.05);">
                     <div style="display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap;">
                         <strong style="font-size:0.85rem;">{{ $stageNames[$checksheetStage] ?? 'Tahap '.$checksheetStage }}</strong>
                         <span class="badge {{ $log->end_time ? 'badge-green' : 'badge-cyan' }}">{{ $log->end_time ? 'Selesai' : 'Aktif' }}</span>
@@ -635,7 +909,7 @@
             gap: 4px;
             padding: 4px;
             border-radius: 10px;
-            background: rgba(255,255,255,0.04);
+            background: rgba(var(--ink), 0.04);
             border: 1px solid var(--glass-border-light);
             margin: 0 0 12px;
         }
@@ -658,7 +932,7 @@
         }
         .cs-scope-toggle button:hover:not(.active) {
             color: var(--text-primary);
-            background: rgba(255,255,255,0.04);
+            background: rgba(var(--ink), 0.04);
         }
     </style>
     {{--
@@ -692,7 +966,7 @@
             $cropBottom = $gsheetEmbedUrl ? $disassyCropMainlineBottom : 0;
             $disassySrc = $gsheetEmbedUrl ?: $gsheetSubassyDisassyEmbedUrl;
         @endphp
-        <div class="glass-card fade-up" style="padding: 0; overflow: hidden; height: 90vh; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); position: relative;">
+        <div class="glass-card fade-up" style="padding: 0; overflow: hidden; height: 90vh; border-radius: 12px; border: 1px solid rgba(var(--ink), 0.1); position: relative;">
             <iframe id="gsheet-iframe" class="gsheet-embed"
                 data-src="{{ $disassySrc }}"
                 data-crop-mainline="{{ $disassyCropMainlineLeft }},25,{{ $disassyCropMainlineBottom }}"
@@ -727,7 +1001,7 @@
             $mCropTop = 25;
             $measureSrc = $gsheetMeasurementEmbedUrl ?: $gsheetSubassyMeasureEmbedUrl;
         @endphp
-        <div class="glass-card fade-up" style="padding: 0; overflow: hidden; height: 90vh; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); position: relative;">
+        <div class="glass-card fade-up" style="padding: 0; overflow: hidden; height: 90vh; border-radius: 12px; border: 1px solid rgba(var(--ink), 0.1); position: relative;">
             <iframe id="gsheet-iframe-measure" class="gsheet-embed"
                 data-src="{{ $measureSrc }}"
                 data-crop-mainline="46,25,0"
@@ -739,33 +1013,65 @@
     </div>
     @endif
 
-    @if($gsheetAssemblyEmbedUrl)
-    {{-- Stage 4: checksheet Assembly dari salinan GSheet (mirip Disassembly).
-         Crop kiri tipis (hanya kolom nomor baris) supaya tidak ada konten
-         terpotong; bar tab bawah dibiarkan terlihat. --}}
-    <div class="section" id="checksheet-review">
+    @if($checksheetStage == 4)
+    <div class="section" id="checksheet-assembly">
         <div class="section-title fade-up">🔩 Assembly — Checksheet</div>
-        <div class="glass-card fade-up" style="padding: 0; overflow: hidden; height: 90vh; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); position: relative;">
+        @if($gsheetAssemblyEmbedUrl)
+        <div class="glass-card fade-up" style="padding: 0; overflow: hidden; height: 90vh; border-radius: 12px; border: 1px solid rgba(var(--ink), 0.1); position: relative;">
             <iframe id="gsheet-iframe-assembly" class="gsheet-embed"
                 data-src="{{ $gsheetAssemblyEmbedUrl }}"
                 style="position: absolute; top: -25px; left: -46px; width: calc(100% + 46px); height: calc(100% + 25px); border: none;"
                 allowfullscreen>
             </iframe>
         </div>
+        @else
+        <div class="glass-card fade-up" style="padding: 24px; text-align: center;">
+            @if(!empty($assemblyTemplateAvailable))
+                <p style="font-weight: 700; color: var(--accent-gold); margin-bottom: 8px;">⏳ Salinan Assembly sedang disiapkan</p>
+                <p style="font-size: 0.85rem; color: var(--text-secondary);">
+                    Template sudah ada di Google Sheets. Duplikasi berjalan di latar belakang
+                    (butuh <code>php artisan queue:work</code>). Refresh halaman dalam 1–2 menit.
+                </p>
+            @else
+                <p style="font-weight: 700; color: var(--text-muted); margin-bottom: 8px;">Belum ada template Assembly</p>
+                <p style="font-size: 0.85rem; color: var(--text-secondary);">
+                    EGI <strong>{{ $comp->egi }}</strong> / {{ $comp->major_category }} belum punya
+                    template Assembly di config (file lokal .doc atau belum diupload).
+                </p>
+            @endif
+        </div>
+        @endif
     </div>
     @endif
 
-    @if($gsheetTestbenchEmbedUrl)
-    {{-- Stage 5: checksheet Test Bench dari salinan GSheet --}}
-    <div class="section" id="checksheet-review">
+    @if($checksheetStage == 5)
+    <div class="section" id="checksheet-testbench">
         <div class="section-title fade-up">🧪 Test Bench — Checksheet</div>
-        <div class="glass-card fade-up" style="padding: 0; overflow: hidden; height: 90vh; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); position: relative;">
+        @if($gsheetTestbenchEmbedUrl)
+        <div class="glass-card fade-up" style="padding: 0; overflow: hidden; height: 90vh; border-radius: 12px; border: 1px solid rgba(var(--ink), 0.1); position: relative;">
             <iframe id="gsheet-iframe-testbench" class="gsheet-embed"
                 data-src="{{ $gsheetTestbenchEmbedUrl }}"
                 style="position: absolute; top: -25px; left: -46px; width: calc(100% + 46px); height: calc(100% + 25px); border: none;"
                 allowfullscreen>
             </iframe>
         </div>
+        @else
+        <div class="glass-card fade-up" style="padding: 24px; text-align: center;">
+            @if(!empty($testbenchTemplateAvailable))
+                <p style="font-weight: 700; color: var(--accent-gold); margin-bottom: 8px;">⏳ Salinan Test Bench sedang disiapkan</p>
+                <p style="font-size: 0.85rem; color: var(--text-secondary);">
+                    Template sudah ada di Google Sheets. Duplikasi berjalan di latar belakang
+                    (butuh <code>php artisan queue:work</code>). Refresh halaman dalam 1–2 menit.
+                </p>
+            @else
+                <p style="font-weight: 700; color: var(--text-muted); margin-bottom: 8px;">Belum ada template Test Bench</p>
+                <p style="font-size: 0.85rem; color: var(--text-secondary);">
+                    EGI <strong>{{ $comp->egi }}</strong> / {{ $comp->major_category }} belum punya
+                    template Test Bench di config (contoh: Engine GD825A memang tidak ada file-nya).
+                </p>
+            @endif
+        </div>
+        @endif
     </div>
     @endif
 
@@ -1004,7 +1310,7 @@
                     <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 8px;" id="csProgressText">
                         {{ count($currentChecksheet->answers ?? []) }} dari {{ count($currentChecksheet->items) }} item diperiksa
                     </div>
-                    <div style="width: 100%; height: 6px; background: rgba(255,255,255,0.06); border-radius: 3px; overflow: hidden;">
+                    <div style="width: 100%; height: 6px; background: rgba(var(--ink), 0.06); border-radius: 3px; overflow: hidden;">
                         <div id="csProgressBar" style="height: 100%; width: {{ $currentChecksheet->progress }}%; background: linear-gradient(90deg, var(--accent-cyan), var(--accent-green)); border-radius: 3px; transition: width 0.4s;"></div>
                     </div>
                 </div>
@@ -1065,7 +1371,7 @@
 
     {{-- Image Lightbox --}}
     <div id="csLightbox" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.9); backdrop-filter:blur(12px); z-index:1100; align-items:center; justify-content:center; padding:24px; cursor:zoom-out;" onclick="csCloseLightbox()">
-        <button onclick="csCloseLightbox()" style="position:fixed; top:20px; right:24px; color:white; font-size:2rem; background:rgba(255,255,255,0.1); border:none; width:40px; height:40px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; z-index:1101;">×</button>
+        <button onclick="csCloseLightbox()" style="position:fixed; top:20px; right:24px; color:white; font-size:2rem; background:rgba(var(--ink), 0.1); border:none; width:40px; height:40px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; z-index:1101;">×</button>
         <img id="csLightboxImg" src="" alt="" style="max-width:95%; max-height:90vh; object-fit:contain; border-radius:8px; box-shadow:0 16px 64px rgba(0,0,0,0.5);">
         <div id="csLightboxLabel" style="position:fixed; bottom:24px; left:50%; transform:translateX(-50%); color:var(--accent-gold); font-size:0.85rem; font-weight:700; background:rgba(0,0,0,0.6); padding:8px 20px; border-radius:8px;"></div>
     </div>
@@ -1073,18 +1379,18 @@
     <style>
         .cs-view-btn {
             padding: 8px 14px; border-radius: 10px; border: 1px solid var(--glass-border);
-            background: rgba(255,255,255,0.03); color: var(--text-muted); font-family: 'Inter', sans-serif;
+            background: rgba(var(--ink), 0.03); color: var(--text-muted); font-family: 'Inter', sans-serif;
             font-size: 0.75rem; font-weight: 600; cursor: pointer; transition: all 0.2s;
         }
-        .cs-view-btn:hover { background: rgba(255,255,255,0.06); color: var(--text-secondary); }
+        .cs-view-btn:hover { background: rgba(var(--ink), 0.06); color: var(--text-secondary); }
         .cs-view-active { background: var(--accent-cyan-dim) !important; color: var(--accent-cyan) !important; border-color: rgba(72,202,228,0.3) !important; }
 
         .cs-nav-btn {
             padding: 10px 20px; border-radius: 10px; border: 1px solid var(--glass-border);
-            background: rgba(255,255,255,0.04); color: var(--text-secondary); font-family: 'Inter', sans-serif;
+            background: rgba(var(--ink), 0.04); color: var(--text-secondary); font-family: 'Inter', sans-serif;
             font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s;
         }
-        .cs-nav-btn:hover { background: rgba(255,255,255,0.08); color: var(--text-primary); }
+        .cs-nav-btn:hover { background: rgba(var(--ink), 0.08); color: var(--text-primary); }
         .cs-nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
 
         .cs-add-btn {
@@ -1103,10 +1409,10 @@
 
         .cs-filter-btn {
             padding: 6px 14px; border-radius: 8px; border: 1px solid var(--glass-border);
-            background: rgba(255,255,255,0.03); color: var(--text-muted); font-family: 'Inter', sans-serif;
+            background: rgba(var(--ink), 0.03); color: var(--text-muted); font-family: 'Inter', sans-serif;
             font-size: 0.7rem; font-weight: 600; cursor: pointer; transition: all 0.2s;
         }
-        .cs-filter-btn:hover { color: var(--text-secondary); background: rgba(255,255,255,0.06); }
+        .cs-filter-btn:hover { color: var(--text-secondary); background: rgba(var(--ink), 0.06); }
         .cs-filter-active { background: var(--accent-gold-dim) !important; color: var(--accent-gold) !important; border-color: rgba(212,175,55,0.3) !important; }
 
         .cs-answer-btn {
@@ -1132,18 +1438,18 @@
             box-shadow: 0 8px 28px rgba(248,113,113,0.2);
         }
         .cs-answer-btn.none {
-            background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.15); color: rgba(255,255,255,0.5);
+            background: rgba(var(--ink), 0.06); border-color: rgba(var(--ink), 0.15); color: rgba(var(--ink), 0.5);
         }
         .cs-answer-btn.none:hover, .cs-answer-btn.none.selected {
-            background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.3); color: rgba(255,255,255,0.7);
-            box-shadow: 0 8px 28px rgba(255,255,255,0.05);
+            background: rgba(var(--ink), 0.12); border-color: rgba(var(--ink), 0.3); color: rgba(var(--ink), 0.7);
+            box-shadow: 0 8px 28px rgba(var(--ink), 0.05);
         }
 
         .cs-list-item {
             display: flex; align-items: center; gap: 12px; padding: 12px 16px;
-            border-bottom: 1px solid rgba(255,255,255,0.03); cursor: pointer; transition: background 0.15s;
+            border-bottom: 1px solid rgba(var(--ink), 0.03); cursor: pointer; transition: background 0.15s;
         }
-        .cs-list-item:hover { background: rgba(255,255,255,0.04); }
+        .cs-list-item:hover { background: rgba(var(--ink), 0.04); }
         .cs-list-item:last-child { border-bottom: none; }
         .cs-list-num {
             font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; font-weight: 700;
@@ -1404,7 +1710,7 @@
                 const pageHeight = multiplePages ? '250px' : (tall ? 'min(58vh, 560px)' : '340px');
                 const imageHtml = refImg.images.map(image => `
                     <div style="text-align:center; min-width:0;">
-                        <img src="${image.src}" alt="${image.label}" style="width:${pageWidth}; max-width:100%; height:${pageHeight}; object-fit:contain; border-radius:10px; border:1px solid rgba(212,175,55,0.3); cursor:zoom-in; opacity:0.9; transition:all 0.25s; background:rgba(255,255,255,0.02);" onclick="csOpenLightbox('${image.src}', '${image.label}')" title="📷 ${image.label}" onerror="this.parentElement.style.display='none'" onmouseover="this.style.opacity=1;this.style.borderColor='var(--accent-gold)'" onmouseout="this.style.opacity=0.9;this.style.borderColor='rgba(212,175,55,0.3)'">
+                        <img src="${image.src}" alt="${image.label}" style="width:${pageWidth}; max-width:100%; height:${pageHeight}; object-fit:contain; border-radius:10px; border:1px solid rgba(212,175,55,0.3); cursor:zoom-in; opacity:0.9; transition:all 0.25s; background:rgba(var(--ink), 0.02);" onclick="csOpenLightbox('${image.src}', '${image.label}')" title="📷 ${image.label}" onerror="this.parentElement.style.display='none'" onmouseover="this.style.opacity=1;this.style.borderColor='var(--accent-gold)'" onmouseout="this.style.opacity=0.9;this.style.borderColor='rgba(212,175,55,0.3)'">
                         <div style="font-size:0.52rem; font-weight:600; color:var(--accent-gold); text-transform:uppercase; letter-spacing:0.08em; margin-top:4px;">📷 ${image.label}</div>
                     </div>
                 `).join('');
@@ -1417,7 +1723,7 @@
             el.innerHTML = `
                 ${refHtml}
                 <div style="font-size:0.6rem; font-weight:700; text-transform:uppercase; letter-spacing:0.12em; color:var(--accent-gold); margin-bottom:8px;">${item.group || ''}</div>
-                <div style="font-family:'JetBrains Mono'; font-size:2.2rem; font-weight:900; color:rgba(255,255,255); line-height:1; margin-bottom:6px;">#${String(csGetItemNumber(item, currentIndex)).padStart(2,'0')}</div>
+                <div style="font-family:'JetBrains Mono'; font-size:2.2rem; font-weight:900; color:var(--text-primary); line-height:1; margin-bottom:6px;">#${String(csGetItemNumber(item, currentIndex)).padStart(2,'0')}</div>
                 <div style="font-size:1.15rem; font-weight:700; color:var(--text-primary); margin-bottom:4px; line-height:1.3;">${item.label}</div>
                 ${item.standard ? `<div style="font-size:0.78rem; color:var(--text-secondary); line-height:1.45; max-width:620px; margin:0 auto 8px;">${item.standard}</div>` : ''}
                 <div style="font-size:0.65rem; color:var(--text-muted); margin-bottom:24px;">${item.custom ? '⚡ Custom' : 'Item standar SOP'}${item.source ? ' · ' + item.source : ''}</div>
@@ -1526,11 +1832,11 @@
                         statusHtml = '<span class="cs-list-status" style="background:var(--accent-red-dim); color:var(--accent-red);">✗ Bad</span>';
                         numStyle = 'background:var(--accent-red-dim); color:var(--accent-red);';
                     } else if (ans === 'none') {
-                        statusHtml = '<span class="cs-list-status" style="background:rgba(255,255,255,0.04); color:var(--text-muted);">— N/A</span>';
-                        numStyle = 'background:rgba(255,255,255,0.04); color:var(--text-muted);';
+                        statusHtml = '<span class="cs-list-status" style="background:rgba(var(--ink), 0.04); color:var(--text-muted);">— N/A</span>';
+                        numStyle = 'background:rgba(var(--ink), 0.04); color:var(--text-muted);';
                     } else {
-                        statusHtml = '<span class="cs-list-status" style="background:rgba(255,255,255,0.03); color:var(--text-muted);">Belum</span>';
-                        numStyle = 'background:rgba(255,255,255,0.04); color:var(--text-muted);';
+                        statusHtml = '<span class="cs-list-status" style="background:rgba(var(--ink), 0.03); color:var(--text-muted);">Belum</span>';
+                        numStyle = 'background:rgba(var(--ink), 0.04); color:var(--text-muted);';
                     }
 
                     const delBtn = CAN_INTERACT ?
@@ -1785,12 +2091,10 @@
                     </form>
                 @endif
             @else
-                <div style="background: var(--accent-green-dim); border: 1px solid rgba(52, 211, 153, 0.15); border-radius: 14px; padding: 24px; margin-bottom: 24px; text-align: center;">
-                    <p style="font-size: 1rem; font-weight: 700; color: var(--accent-green);">🎉 Komponen telah selesai overhaul — Ready for Use (RFU)</p>
-                </div>
+                {{-- Stage 7 (RFU): panel penutup ada di atas; di sini hanya navigasi --}}
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                     <a href="{{ route('components.index') }}" class="btn-secondary">← Kembali</a>
-                    <a href="{{ route('components.printPdf', $comp->comp_id) }}" target="_blank" class="btn-danger">🖨 Cetak Berita Acara (PDF)</a>
+                    <span style="font-size: 0.8rem; color: var(--accent-green); font-weight: 600;">🎉 Overhaul selesai — komponen berstatus RFU</span>
                 </div>
             @endif
         </div>
@@ -1798,7 +2102,7 @@
     @endif
 
     {{-- Skrip panel FR & MOL (Tab toggle, auto-scan, upload MOL) --}}
-    @if($viewedStage >= 2)
+    @if(in_array($viewedStage, [2, 3], true))
     <script>
     (function() {
         const compId = @json($comp->comp_id);

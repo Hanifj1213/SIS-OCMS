@@ -23,9 +23,9 @@ class ComponentController extends Controller
         2 => 'DIS Assembling (Pembongkaran, Pencucian & Pengukuran)',
         3 => 'Machining & Fabrication (Perbaikan)',
         4 => 'Assembly (Perakitan)',
-        5 => 'Test Performance (Uji Fungsi)',
-        6 => 'Painting (Pengecatan)',
-        7 => 'RFU/Delivery (Siap Kirim)',
+        5 => 'Test Performance & Painting (Uji Fungsi & Pengecatan)',
+        6 => 'Delivery (Serah Terima)',
+        7 => 'RFU (Ready for Use)',
     ];
 
     /**
@@ -238,15 +238,21 @@ class ComponentController extends Controller
         // Retry duplikasi GSheet untuk komponen lama / yang gagal saat daftar.
         // Dikerjakan di latar belakang: memanggil Apps Script langsung di sini
         // membuat halaman detail menggantung sampai belasan detik.
-        if ($component->current_stage >= 2
-            && app(ChecksheetGsheetService::class)->hasPendingDuplication($component)) {
+        $gsheetService = app(ChecksheetGsheetService::class);
+        if ($gsheetService->hasPendingDuplication($component)) {
             DuplicateChecksheetGsheets::dispatch($component->comp_id);
         }
+
+        // Metrik waktu 3 dimensi (Calendar/Work/Man Hour) per tahap
+        $stageTimeMetrics = app(\App\Services\StageTimeService::class)->metricsFor($component);
 
         return view('overhauls.show', [
             'comp' => $component,
             'stageNames' => $stageNames,
             'reviewStage' => $reviewStage,
+            'assemblyTemplateAvailable' => (bool) $gsheetService->templateIdFor($component, 'assembly'),
+            'testbenchTemplateAvailable' => (bool) $gsheetService->templateIdFor($component, 'testbench'),
+            'stageTimeMetrics' => $stageTimeMetrics,
         ]);
     }
 
@@ -264,7 +270,7 @@ class ComponentController extends Controller
 
         // Cegah stage melebihi 7
         if ($currentStage >= 7) {
-            return back()->withErrors(['stage' => 'Komponen sudah mencapai tahap akhir (RFU/Delivery).']);
+            return back()->withErrors(['stage' => 'Komponen sudah mencapai tahap akhir (RFU).']);
         }
 
         if ($component->is_waiting_approval) {
@@ -406,11 +412,11 @@ class ComponentController extends Controller
                 'notes' => 'Memulai: ' . $stageNote,
             ];
 
-            // Jika sudah tahap akhir (RFU/Delivery), langsung tutup lognya
-            if ($isFinalCompleted) {
-                $logData['end_time'] = now();
-                $logData['notes'] = 'RFU/Delivery selesai - Komponen Ready for Use (RFU)';
-            }
+        // Jika sudah tahap akhir (RFU), langsung tutup lognya
+        if ($isFinalCompleted) {
+            $logData['end_time'] = now();
+            $logData['notes'] = 'Seluruh tahapan overhaul selesai — Komponen Ready for Use (RFU)';
+        }
 
             $component->overhaulLogs()->create($logData);
 
@@ -464,13 +470,19 @@ class ComponentController extends Controller
             'notes' => 'Memulai: ' . $stageNote . ' (Approved)',
         ];
 
-        // Jika sudah tahap akhir (RFU/Delivery), langsung tutup lognya
+        // Jika sudah tahap akhir (RFU), langsung tutup lognya
         if ($isFinalCompleted) {
             $logData['end_time'] = now();
-            $logData['notes'] = 'RFU/Delivery selesai - Komponen Ready for Use (RFU) (Approved)';
+            $logData['notes'] = 'Seluruh tahapan overhaul selesai — Komponen Ready for Use (RFU) (Approved)';
         }
 
         $component->overhaulLogs()->create($logData);
+
+        // Saat masuk stage 4/5 (atau tahap lain yang butuh GSheet), pastikan
+        // salinan template dijadwalkan — komponen lama sering belum punya URL.
+        if (app(ChecksheetGsheetService::class)->hasPendingDuplication($component->fresh())) {
+            DuplicateChecksheetGsheets::dispatch($component->comp_id);
+        }
 
         return redirect()->route('components.show', $component->comp_id)
             ->with('success', 'Approval berhasil! Komponen berlanjut ke ' . ($isFinalCompleted ? 'status Ready for Use (RFU)' : 'Tahap ' . $nextStage));
@@ -498,7 +510,7 @@ class ComponentController extends Controller
     }
 
     /**
-     * Stage 6 (Painting): unggah foto dokumentasi hasil pengecatan.
+     * Stage 5 (Test Performance & Painting): unggah foto dokumentasi hasil pengecatan.
      */
     public function uploadPaintingPhotos(Request $request, Component $component)
     {
@@ -529,7 +541,7 @@ class ComponentController extends Controller
     }
 
     /**
-     * Stage 6 (Painting): hapus satu foto dokumentasi.
+     * Stage 5 (Test Performance & Painting): hapus satu foto dokumentasi.
      */
     public function deletePaintingPhoto(Request $request, Component $component)
     {

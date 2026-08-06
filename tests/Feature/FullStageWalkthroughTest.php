@@ -12,8 +12,10 @@ use Tests\TestCase;
 
 /**
  * E2E: jalankan satu komponen SA12V140E-1 dari Stage 1 (Receiving) sampai
- * Stage 7 (RFU/Delivery) lewat endpoint yang sama dengan yang dipakai UI:
+ * Stage 7 (RFU) lewat endpoint yang sama dengan yang dipakai UI:
  * updateStage (Mechanic) + approveStage (Management).
+ * Stage 5 = Test Performance & Painting, Stage 6 = Delivery (checksheet
+ * internal seperti Receiving), Stage 7 = RFU (halaman penutup).
  */
 class FullStageWalkthroughTest extends TestCase
 {
@@ -121,7 +123,23 @@ class FullStageWalkthroughTest extends TestCase
         $component->refresh();
         $this->assertSame(6, $component->current_stage);
 
-        // === Stage 6 → 7: Painting selesai, tanpa approval, langsung RFU ===
+        // === Stage 6 (Delivery): checksheet internal dibuat dari template ===
+        $deliveryChecksheet = $component->checksheets()->where('stage_number', 6)->first();
+        $this->assertNotNull($deliveryChecksheet);
+        $this->assertCount(55, $deliveryChecksheet->items);
+
+        // Belum lengkap → tidak boleh menutup tahap Delivery
+        $this->actingAs($this->mechanic)
+            ->post(route('components.updateStage', $component->comp_id))
+            ->assertSessionHasErrors('stage');
+
+        // Isi semua item checksheet Delivery
+        $answers = collect($deliveryChecksheet->items)->mapWithKeys(
+            fn ($item) => [$item['id'] => 'good']
+        )->all();
+        $deliveryChecksheet->update(['answers' => $answers, 'completed_at' => now()]);
+
+        // === Stage 6 → 7: Delivery selesai, tanpa approval, langsung RFU ===
         $this->actingAs($this->mechanic)
             ->post(route('components.updateStage', $component->comp_id))
             ->assertSessionHasNoErrors();
@@ -135,11 +153,12 @@ class FullStageWalkthroughTest extends TestCase
         $this->assertNotNull($finalLog);
         $this->assertNotNull($finalLog->end_time);
 
-        // Halaman stage 7 menampilkan checksheet Delivery dari template
+        // Halaman stage 7 menampilkan panel penutup RFU
         $this->actingAs($this->mechanic)
             ->get(route('components.show', $component->comp_id))
             ->assertOk()
-            ->assertSee('Flywheel housing');
+            ->assertSee('id="rfu-panel"', false)
+            ->assertSee('Ready for Use (RFU)');
 
         // Stage 7 final: tidak bisa maju lagi
         $this->actingAs($this->mechanic)
