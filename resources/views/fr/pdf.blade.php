@@ -17,20 +17,27 @@
     $grand = $amount + $labour;
     // Form asli membiarkan kolom biaya KOSONG bila belum ada nilai (bukan "0").
     $num = fn ($v) => $v > 0 ? number_format((float) $v, 0, ',', '.') : '';
-    $dShort = fn ($v) => $v ? \Carbon\Carbon::parse($v)->format('j-M-y') : '';
-    $dSlash = fn ($v) => $v ? \Carbon\Carbon::parse($v)->format('d/m/Y') : '';
+    // Samakan dengan tampilan input date browser pada form (MM/DD/YYYY).
+    $dShort = fn ($v) => $v ? \Carbon\Carbon::parse($v)->format('m/d/Y') : '';
+    $dSlash = fn ($v) => $v ? \Carbon\Carbon::parse($v)->format('m/d/Y') : '';
     $logo = public_path('images/brand/alamtri-logo.png');
     $roles = App\Models\FabricationRequest::SIGNATURE_ROLES;
+    $approvalWidths = [
+        'received_by' => '13.99%',
+        'sent_by' => '14.81%',
+        'approved_by' => '12.77%',
+        'checked_by' => '12.77%',
+        'ordered_by' => '17.12%',
+    ];
 
-    // Daftar gambar "Gambar & Dimensi" beserta posisi/ukurannya (persen).
-    // Hanya file yang benar-benar ada di disk yang dirender.
-    $images = [];
-    foreach ($fr->imageList() as $img) {
-        $file = public_path($img['path']);
-        if (is_file($file)) {
-            $images[] = ['file' => $file] + $img;
-        }
-    }
+    // Daftar gambar "Gambar & Dimensi" — hanya file milik FR yang lolos resolver.
+    $images = $pdfImages ?? [];
+
+    // DomPDF tidak konsisten merender SVG inline yang diposisikan absolut.
+    // Renderer ini menghasilkan satu SVG data-URI yang aman dipakai sebagai
+    // image layer, dengan koordinat 0..100 yang sama seperti editor web.
+    $annotationSvg = app(\App\Services\FrAnnotationRenderer::class)
+        ->dataUri($fr->annotationList());
 @endphp
 <!DOCTYPE html>
 <html lang="id">
@@ -40,10 +47,41 @@
     <style>
         /* Margin dibuat rata supaya lembar tercetak di tengah dengan
            ruang putih yang konsisten di semua sisi. */
-        @page { margin: 20pt 49pt; }
+        @page { margin: 10pt 10pt; }
         body { margin: 0; padding: 0; }
     </style>
     @include('fr._form_style')
+    <style>
+        /* Override khusus DomPDF. Width dipasang juga langsung pada sel karena
+           renderer sering mengabaikan colgroup pada tabel bertingkat. */
+        .fr-sheet { font-size: 8px; line-height: 1.1; }
+        .fr-sheet .fr-title { font-size: 22px; }
+        .fr-sheet .fr-frno { font-size: 10.5px; }
+        .fr-sheet .fr-code { height: 38pt; }
+        .fr-sheet .fr-code td {
+            height: 9pt; min-height: 9pt; max-height: 9pt;
+            font-size: 7px; line-height: 1; vertical-align: middle;
+            padding: 0 3px;
+        }
+        .fr-sheet .fr-mat-title { height: 10pt; vertical-align: middle; }
+        .fr-sheet .fr-mat th {
+            height: 17pt; line-height: 1.05; vertical-align: middle;
+        }
+        .fr-sheet .fr-mat .fr-mat-width-row td {
+            border: none; padding: 0; height: 0; line-height: 0; font-size: 0;
+        }
+        .fr-sheet .fr-mat-data td {
+            height: 10pt; line-height: 1.05; vertical-align: middle;
+        }
+        .fr-sheet .fr-total td {
+            height: 10pt; min-height: 10pt; font-size: 7.5px;
+            line-height: 1.05; vertical-align: middle; padding: 1pt 3px;
+        }
+        .fr-sheet .fr-legend td {
+            height: 9pt; min-height: 9pt; font-size: 7.5px;
+            line-height: 1.05; vertical-align: middle; padding: 1pt 3px;
+        }
+    </style>
 </head>
 <body class="fr-sheet">
 
@@ -51,24 +89,24 @@
     <table>
         <colgroup><col style="width:13.45%"><col style="width:61.01%"><col style="width:25.54%"></colgroup>
         <tr>
-            <td style="vertical-align:middle; text-align:center; height:44pt;">
+            <td width="13.45%" style="width:13.45%; vertical-align:middle; text-align:center; height:38pt;">
                 @if(file_exists($logo))
-                    <img src="{{ $logo }}" style="height:32pt;">
+                    <img src="{{ $logo }}" style="height:23pt;">
                 @else
                     <strong style="font-size:15px;">AlamTri</strong>
                 @endif
             </td>
-            <td style="vertical-align:middle;">
+            <td width="61.01%" style="width:61.01%; vertical-align:middle;">
                 <div class="fr-title">FABRICATION REQUEST</div>
                 <div class="fr-frno">{{ $fr->fr_number }}</div>
             </td>{{-- nomor FR selalu terisi di PDF --}}
-            <td style="padding:0; vertical-align:top;">
+            <td width="25.54%" style="width:25.54%; padding:0; vertical-align:top;">
                 <table class="fr-code">
                     <colgroup><col style="width:54%"><col style="width:46%"></colgroup>
-                    <tr><td>No. Formulir / Form No.</td><td>{{ $fr->formCode('form_no') }}</td></tr>
-                    <tr><td>No. SOP / SOP No.</td><td>{{ $fr->formCode('sop_no') }}</td></tr>
-                    <tr><td>Pemilik / Owner</td><td>{{ $fr->formCode('form_owner') }}</td></tr>
-                    <tr><td>Revisi Ke / Revision To</td><td>{{ $fr->formCode('form_revision') }}</td></tr>
+                    <tr><td width="54%" style="width:54%;">No. Formulir / Form No.</td><td width="46%" style="width:46%;">{{ $fr->formCode('form_no') }}</td></tr>
+                    <tr><td width="54%" style="width:54%;">No. SOP / SOP No.</td><td width="46%" style="width:46%;">{{ $fr->formCode('sop_no') }}</td></tr>
+                    <tr><td width="54%" style="width:54%;">Pemilik / Owner</td><td width="46%" style="width:46%;">{{ $fr->formCode('form_owner') }}</td></tr>
+                    <tr><td width="54%" style="width:54%;">Revisi Ke / Revision To</td><td width="46%" style="width:46%;">{{ $fr->formCode('form_revision') }}</td></tr>
                 </table>
             </td>
         </tr>
@@ -76,7 +114,7 @@
 
     {{-- Celah kosong antara header dan blok Sent To (form asli: 8pt,
          garis y=69 → 77). --}}
-    <div style="height:8pt;"></div>
+    <div style="height:7pt;"></div>
 
     {{-- ============ IDENTITAS + APPROVAL — 172pt ============ --}}
     <table>
@@ -87,36 +125,40 @@
         </colgroup>
 
         <tr>
-            <td class="fr-lbl" style="height:9pt;">Sent To</td>
-            <td class="fr-val">{{ $fr->sent_to }}</td>
-            @foreach($roles as $meta)
-            <td class="fr-sh">{{ $meta['label'] }}</td>
+            <td width="13.45%" class="fr-lbl" style="width:13.45%; height:9pt;">Sent To</td>
+            <td width="15.08%" class="fr-val" style="width:15.08%;">{{ $fr->sent_to }}</td>
+            @foreach($roles as $key => $meta)
+            <td width="{{ $approvalWidths[$key] }}" class="fr-sh"
+                style="width:{{ $approvalWidths[$key] }};">{{ $meta['label'] }}</td>
             @endforeach
         </tr>
         <tr>
-            <td class="fr-lbl" style="height:16pt;">Address</td>
-            <td class="fr-val">{{ $fr->address }}</td>
+            <td width="13.45%" class="fr-lbl" style="width:13.45%; height:16pt;">Address</td>
+            <td width="15.08%" class="fr-val" style="width:15.08%;">{{ $fr->address }}</td>
             {{-- Tanpa garis bawah: pada form asli baris jabatan menyatu
                  dengan ruang tanda tangan di bawahnya. --}}
-            @foreach($roles as $meta)
-            <td class="fr-sh" style="vertical-align:top; border-bottom:none;">{{ $meta['sub'] }}</td>
+            @foreach($roles as $key => $meta)
+            <td width="{{ $approvalWidths[$key] }}" class="fr-sh"
+                style="width:{{ $approvalWidths[$key] }}; vertical-align:top; border-bottom:none;">{{ $meta['sub'] }}</td>
             @endforeach
         </tr>
 
         {{-- Requirement Date disorot kuning — satu-satunya sel berwarna.
              Ruang tanda tangan membentang sembilan baris data di sebelahnya. --}}
         <tr>
-            <td class="fr-lbl" style="background:#ffff00; height:9pt;">Requirement Date</td>
-            <td class="fr-val" style="background:#ffff00;">{{ $dShort($fr->estimation_date) }}</td>
+            <td width="13.45%" class="fr-lbl" style="width:13.45%; background:#ffff00; height:9pt;">Requirement Date</td>
+            <td width="15.08%" class="fr-val" style="width:15.08%; background:#ffff00;">{{ $dShort($fr->estimation_date) }}</td>
             @foreach($roles as $key => $meta)
             @php $sig = $fr->signature($key); @endphp
             {{-- Gambar tanda tangan diposisikan bebas (hasil geser/resize di
                  form), dalam persen terhadap kotak approval. --}}
-            <td class="fr-sign-cell" rowspan="9" style="height:81pt; border-top:none; padding:0;">
-                @if($sig['image'] && is_file(public_path($sig['image'])))
+            <td width="{{ $approvalWidths[$key] }}" class="fr-sign-cell" rowspan="9"
+                style="width:{{ $approvalWidths[$key] }}; height:92pt; border-top:none; padding:0;">
+                @php $sigFile = $signatureFiles[$key] ?? null; @endphp
+                @if($sigFile && is_file($sigFile))
                 @php $sbox = $fr->signatureBox($key); @endphp
-                <div style="position:relative; width:100%; height:80pt;">
-                    <img src="{{ public_path($sig['image']) }}"
+                <div style="position:relative; width:100%; height:91pt;">
+                    <img src="{{ $sigFile }}"
                          style="position:absolute;
                                 left:{{ $sbox['x'] }}%; top:{{ $sbox['y'] }}%;
                                 width:{{ $sbox['w'] }}%;">
@@ -145,12 +187,13 @@
             @foreach($roles as $key => $meta)
             {{-- Isi didorong ke dasar sel supaya nama + garis titik rapat ke
                  baris Date di bawahnya, tanpa ruang kosong menggantung. --}}
-            <td class="fr-c" rowspan="2" style="vertical-align:bottom; padding:1pt 3px 0;">
+            <td width="{{ $approvalWidths[$key] }}" class="fr-c" rowspan="2"
+                style="width:{{ $approvalWidths[$key] }}; vertical-align:bottom; padding:1pt 3px 0; overflow:hidden;">
                 <div class="fr-sign-name">{{ $fr->signature($key)['name'] }}</div>
-                <table class="fr-dotline" style="margin-top:1pt;">
+                <table class="fr-dotline" style="margin-top:1px;">
                     <tr>
                         <td class="fr-dotline-edge">(</td>
-                        <td class="fr-dotline-fill">{{ str_repeat('.', 60) }}</td>
+                        <td class="fr-dotline-fill"><span>{{ str_repeat('.', 60) }}</span></td>
                         <td class="fr-dotline-edge">)</td>
                     </tr>
                 </table>
@@ -176,28 +219,31 @@
         <tr>
             <td colspan="2" style="height:8pt;"></td>
             @foreach($roles as $key => $meta)
-            <td class="fr-date">Date : {{ $dSlash($fr->signature($key)['date']) }}</td>
+            <td width="{{ $approvalWidths[$key] }}" class="fr-date"
+                style="width:{{ $approvalWidths[$key] }}; overflow:hidden; white-space:nowrap;">
+                Date : {{ $dSlash($fr->signature($key)['date']) }}
+            </td>
             @endforeach
         </tr>
     </table>
 
     {{-- Celah antara baris Date dan blok DETAIL INSTRUCTION
          (form asli: 9pt, garis y=229 → 238). --}}
-    <div style="height:8pt;"></div>
+    <div style="height:7pt;"></div>
 
     {{-- ============ DETAIL · MATERIAL · GAMBAR — 264pt ============ --}}
     <table>
         <colgroup><col style="width:53.53%"><col style="width:46.47%"></colgroup>
         <tr>
-            <td class="fr-hdr">DETAIL INSTRUCTION</td>
-            <td class="fr-hdr">GAMBAR &amp; DIMENSI (BILA PERLU DIGAMBAR SESUAI UKURAN YANG DIKEHENDAKI)</td>
+            <td width="53.53%" class="fr-hdr" style="width:53.53%;">DETAIL INSTRUCTION</td>
+            <td width="46.47%" class="fr-hdr" style="width:46.47%;">GAMBAR &amp; DIMENSI (BILA PERLU DIGAMBAR SESUAI UKURAN YANG DIKEHENDAKI)</td>
         </tr>
         <tr>
             {{-- kiri: instruksi rata tengah + tabel material --}}
-            <td style="padding:0; vertical-align:top;">
+            <td width="53.53%" style="width:53.53%; padding:0; vertical-align:top;">
                 <table class="nb">
                     <tr>
-                        <td class="fr-instr" style="height:74pt; padding:4px 10px;">
+                        <td class="fr-instr" style="height:62pt; padding:4px 10px;">
                             {!! nl2br(e($fr->instruction)) !!}
                         </td>
                     </tr>
@@ -205,30 +251,49 @@
 
                 <table class="fr-mat" style="border-left:none; border-right:none; border-bottom:none;">
                     <colgroup>
-                        <col style="width:31.22%"><col style="width:31.22%"><col style="width:7.87%">
-                        <col style="width:9.14%"><col style="width:11.68%"><col style="width:8.87%">
+                        {{-- DomPDF mengabaikan persentase pada colgroup ketika
+                             baris pertama memakai colspan. Lebar absolut ini
+                             setara dengan 31.4/31.0/7.8/9.1/11.7/9.1%
+                             dari lebar tabel material 435pt. --}}
+                        <col width="136.6pt" style="width:136.6pt"><col width="134.9pt" style="width:134.9pt"><col width="34.0pt" style="width:34.0pt">
+                        <col width="39.6pt" style="width:39.6pt"><col width="50.9pt" style="width:50.9pt"><col width="39.6pt" style="width:39.6pt">
                     </colgroup>
-                    <tr><td colspan="6" class="fr-hdr">PART MATERIAL SHOULD BE DELIVERY FOR REPAIR</td></tr>
+                    {{-- Baris pertama berisi enam sel agar DomPDF memakai
+                         lebar kolom ini sebelum menemukan colspan judul. --}}
+                    <tr class="fr-mat-width-row" aria-hidden="true">
+                        <td width="31.4%" style="width:31.4%;">&nbsp;</td>
+                        <td width="31.0%" style="width:31.0%;">&nbsp;</td>
+                        <td width="7.8%" style="width:7.8%;">&nbsp;</td>
+                        <td width="9.1%" style="width:9.1%;">&nbsp;</td>
+                        <td width="11.7%" style="width:11.7%;">&nbsp;</td>
+                        <td width="9.1%" style="width:9.1%;">&nbsp;</td>
+                    </tr>
+                    <tr><td colspan="6" class="fr-hdr fr-mat-title">PART MATERIAL SHOULD BE DELIVERY FOR REPAIR</td></tr>
                     <tr>
-                        <th>PN/Size/Dim/Mod/SN</th>
-                        <th>Description</th>
-                        <th>Brand</th>
-                        <th>Q'ty</th>
-                        <th>Unit price</th>
-                        <th>Amount Price</th>
+                        <th width="31.4%" style="width:31.4%;">PN/Size/Dim/Mod/SN</th>
+                        <th width="31.0%" style="width:31.0%;">Description</th>
+                        <th width="7.8%" style="width:7.8%;">Brand</th>
+                        <th width="9.1%" style="width:9.1%;">Q'ty</th>
+                        <th width="11.7%" style="width:11.7%;">Unit price</th>
+                        <th width="9.1%" style="width:9.1%;">Amount Price</th>
                     </tr>
                     {{-- Satu baris data. Sisanya ruang kosong: tanpa garis
                          mendatar, garis vertikal kolom tetap diteruskan. --}}
-                    <tr>
-                        <td>{{ $fr->part_number }}</td>
-                        <td>{{ $fr->part_name }}</td>
-                        <td>{{ $fr->brand }}</td>
-                        <td>{{ $fr->qty }}</td>
-                        <td class="fr-r">{{ $num($fr->unit_price) }}</td>
-                        <td class="fr-r">{{ $num($amount) }}</td>
+                    <tr class="fr-mat-data">
+                        <td width="31.4%" style="width:31.4%;">{{ $fr->part_number }}</td>
+                        <td width="31.0%" style="width:31.0%; white-space:nowrap; overflow:hidden; word-break:keep-all;">{{ $fr->part_name }}</td>
+                        <td width="7.8%" style="width:7.8%;">{{ $fr->brand }}</td>
+                        <td width="9.1%" style="width:9.1%;">{{ $fr->qty }}</td>
+                        <td width="11.7%" class="fr-r" style="width:11.7%;">{{ $num($fr->unit_price) }}</td>
+                        <td width="9.1%" class="fr-r" style="width:9.1%;">{{ $num($amount) }}</td>
                     </tr>
                     <tr class="fr-mat-fill">
-                        <td style="height:144pt;"></td><td></td><td></td><td></td><td></td><td></td>
+                        <td width="31.4%" style="width:31.4%; height:88pt;"></td>
+                        <td width="31.0%" style="width:31.0%;"></td>
+                        <td width="7.8%" style="width:7.8%;"></td>
+                        <td width="9.1%" style="width:9.1%;"></td>
+                        <td width="11.7%" style="width:11.7%;"></td>
+                        <td width="9.1%" style="width:9.1%;"></td>
                     </tr>
                 </table>
             </td>
@@ -236,15 +301,19 @@
             {{-- Kanan: gambar sebanyak yang diunggah (bisa lebih dari dua),
                  posisi & ukurannya mengikuti hasil geser/resize di form.
                  Posisi absolut dalam persen; tinggi ikut rasio asli gambar. --}}
-            <td style="padding:0; vertical-align:top; height:255pt;">
-                @if($images !== [])
-                <div style="position:relative; width:100%; height:253pt;">
+            <td width="46.47%" style="width:46.47%; padding:0; vertical-align:top; height:200pt;">
+                @if($images !== [] || $annotationSvg !== null)
+                <div style="position:relative; width:100%; height:198pt;">
                     @foreach($images as $img)
                     <img src="{{ $img['file'] }}"
                          style="position:absolute;
                                 left:{{ $img['x'] }}%; top:{{ $img['y'] }}%;
                                 width:{{ $img['w'] }}%;">
                     @endforeach
+                    @if($annotationSvg)
+                    <img src="{{ $annotationSvg }}"
+                         style="position:absolute; left:0; top:0; width:100%; height:100%;">
+                    @endif
                 </div>
                 @endif
             </td>
@@ -260,17 +329,17 @@
         {{-- Alignment mengikuti form asli: dua label kiri rata TENGAH,
              label Grand Total rata KIRI. --}}
         <tr class="fr-total">
-            <td class="fr-c">TOTAL PART / MATERIAL COST (JUMLAH BIAYA PART / MATERIAL)</td>
-            <td>Rp. {{ $num($amount) }}</td>
-            <td>GRAND TOTAL COST / BIAYA TOTAL (PART + LABOUR)</td>
-            <td>Rp. {!! $grand > 0 ? $num($grand) : '___________' !!}</td>
+            <td width="41.5%" class="fr-c" style="width:41.5%;">TOTAL PART / MATERIAL COST (JUMLAH BIAYA PART / MATERIAL)</td>
+            <td width="12%" style="width:12%;">Rp. {{ $num($amount) }}</td>
+            <td width="34.5%" style="width:34.5%;">GRAND TOTAL COST / BIAYA TOTAL (PART + LABOUR)</td>
+            <td width="12%" style="width:12%;">Rp. {!! $grand > 0 ? $num($grand) : '___________' !!}</td>
         </tr>
         <tr class="fr-total">
-            <td class="fr-c">TOTAL LABOUR / JUMLAH BIAYA TENAGA KERJA (PEKERJAAN)</td>
-            <td>Rp. {{ $num($labour) }}</td>
+            <td width="41.5%" class="fr-c" style="width:41.5%;">TOTAL LABOUR / JUMLAH BIAYA TENAGA KERJA (PEKERJAAN)</td>
+            <td width="12%" style="width:12%;">Rp. {{ $num($labour) }}</td>
             {{-- nowrap: deretan spasi panjang tidak boleh membungkus baris,
                  karena itu membuat blok total membengkak jauh dari aslinya --}}
-            <td colspan="2" style="white-space:nowrap; overflow:hidden;">SAID / TERBILANG : ({{ $fr->note ? ' ' . $fr->note . ' ' : str_repeat(' ', 46) }})</td>
+            <td width="46.5%" colspan="2" style="width:46.5%; white-space:nowrap; overflow:hidden;">SAID / TERBILANG : ({{ $fr->note ? ' ' . $fr->note . ' ' : str_repeat(' ', 46) }})</td>
         </tr>
     </table>
 
@@ -280,10 +349,10 @@
     <table class="fr-legend" style="border-top:none;">
         <colgroup><col style="width:30%"><col style="width:22%"><col style="width:25%"><col style="width:23%"></colgroup>
         <tr>
-            <td style="border-right:none;">White/Putih : Supplier / Bengkel Luar,</td>
-            <td style="border-left:none; border-right:none;">Pink/Merah : Security</td>
-            <td style="border-left:none; border-right:none;">Yellow/Kuning : Warehouse</td>
-            <td style="border-left:none;">Green/Hijau : Workshop</td>
+            <td width="30%" style="width:30%; border-right:none;">White/Putih : Supplier / Bengkel Luar,</td>
+            <td width="22%" style="width:22%; border-left:none; border-right:none;">Pink/Merah : Security</td>
+            <td width="25%" style="width:25%; border-left:none; border-right:none;">Yellow/Kuning : Warehouse</td>
+            <td width="23%" style="width:23%; border-left:none;">Green/Hijau : Workshop</td>
         </tr>
     </table>
 

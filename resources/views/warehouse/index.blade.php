@@ -47,7 +47,7 @@
                     <td style="color: var(--text-muted); font-size: 0.8rem;">{{ $pr->created_at->format('d M Y H:i') }}</td>
                     <td>
                         @if($pr->status == 'Pending')
-                            @role('SuperAdmin|Planner/Warehouse')
+                            @ocmsWarehouse
                             <div style="display: flex; gap: 6px;">
                                 <form action="{{ route('part-requests.update', $pr->req_id) }}" method="POST">
                                     @csrf @method('PATCH')
@@ -60,7 +60,7 @@
                                     <button type="submit" class="btn-danger btn-sm" style="font-size: 0.7rem;">❌ Kosong</button>
                                 </form>
                             </div>
-                            @endrole
+                            @endocmsWarehouse
                         @else
                             <span style="font-size: 0.75rem; color: var(--text-muted);">Diproses</span>
                         @endif

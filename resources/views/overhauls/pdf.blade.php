@@ -184,14 +184,14 @@
             <td>{{ $component->life_time ? number_format($component->life_time) : '-' }}</td>
         </tr>
         <tr>
-            <th>Manifest</th>
-            <td>{{ $component->manifest ?? '-' }}</td>
+            <th>Manifest / Way Bill</th>
+            <td>{{ $component->manifest ?? $component->way_bill ?? '-' }}</td>
             <th>Date Defitted</th>
             <td>{{ $component->date_defitted ? $component->date_defitted->format('d M Y') : '-' }}</td>
         </tr>
         <tr>
-            <th>Way Bill</th>
-            <td>{{ $component->way_bill ?? '-' }}</td>
+            <th>RO</th>
+            <td>{{ $component->ro_number ?? '-' }}</td>
             <th>Date Delivery</th>
             <td>{{ $component->date_delivery ? $component->date_delivery->format('d M Y') : '-' }}</td>
         </tr>

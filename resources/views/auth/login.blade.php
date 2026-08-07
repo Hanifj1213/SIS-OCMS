@@ -109,13 +109,16 @@
                 display: inline-flex;
                 align-items: center;
                 justify-content: center;
-                width: 56px; height: 56px;
-                background: linear-gradient(135deg, var(--accent-gold), var(--accent-gold-hover));
-                border-radius: 16px;
                 margin-bottom: 16px;
-                box-shadow: 0 8px 24px rgba(212, 175, 55, 0.2);
+                line-height: 0;
             }
-            .brand-logo svg { width: 28px; height: 28px; fill: #0B2B26; }
+            .brand-logo .alamtri-logo-full {
+                height: 56px;
+                width: auto;
+                object-fit: contain;
+                display: block;
+                mix-blend-mode: lighten;
+            }
             .brand-title {
                 font-size: 1.75rem;
                 font-weight: 800;
@@ -287,9 +290,7 @@
                 <!-- Brand -->
                 <div class="brand-section">
                     <div class="brand-logo">
-                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-                        </svg>
+                        <x-alamtri-logo :size="56" />
                     </div>
                     <h1 class="brand-title">SIS-OCMS</h1>
                     <p class="brand-subtitle">Overhaul Component Management System</p>

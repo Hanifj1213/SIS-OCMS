@@ -4,14 +4,15 @@
     <div class="section fade-up">
         <div class="ocms-page-header">
             <h1>Dashboard</h1>
-            <p>Selamat datang kembali, <strong style="color: var(--accent-gold);">{{ Auth::user()->name }}</strong>
-                <span class="badge badge-gold" style="margin-left: 8px;">{{ Auth::user()->roles->pluck('name')->implode(', ') }}</span>
-            </p>
+            <div class="ocms-welcome-role">
+                <p>Selamat datang kembali, <strong style="color: var(--accent-gold);">{{ Auth::user()->name }}</strong></p>
+                <span class="badge badge-gold ocms-role-badge">{{ Auth::user()->roles->pluck('name')->implode(', ') }}</span>
+            </div>
         </div>
     </div>
 
     {{-- Executive Analytics --}}
-    @role('SuperAdmin|Management|Supervisor|Planner/Warehouse')
+    @ocmsExecutive
     <div class="section">
         <div class="section-title fade-up">📊 Executive Analytics — Real-time Metrics</div>
         <div class="grid-4">
@@ -44,7 +45,7 @@
 
     {{-- Stage Distribution --}}
     <div class="section">
-        <div class="section-title fade-up">📈 Distribusi Komponen per Tahapan (On Progress)</div>
+        <div class="section-title fade-up">📈 Distribusi Komponen per Tahapan</div>
         <div class="glass-card fade-up" style="padding: 32px;">
             <div class="stage-dist-grid" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 12px;">
                 @php
@@ -67,7 +68,7 @@
             </div>
         </div>
     </div>
-    @endrole
+    @endocmsExecutive
 
     <style>
         .stage-dist-cell {
@@ -93,7 +94,7 @@
         }
     </style>
 
-    @role('SuperAdmin|Management|Supervisor|Planner/Warehouse')
+    @ocmsExecutive
     <script>
         // Realtime: perbarui metrik dashboard tiap 10 detik tanpa refresh
         ocmsPoll('{{ route('status.dashboard') }}', 10000, function(data) {
@@ -113,7 +114,7 @@
             });
         });
     </script>
-    @endrole
+    @endocmsExecutive
 
     {{-- Quick Access Modules --}}
     <div class="section">
@@ -140,14 +141,14 @@
                 <p>Gunakan kamera smartphone atau tablet untuk memindai dan mengakses data komponen secara instan.</p>
             </a>
 
-            @role('SuperAdmin')
+            @ocmsAdmin
             <a href="{{ route('admin.users.index') }}" class="glass-card module-card fade-up">
                 <span class="module-icon">👤</span>
                 <div class="module-arrow">→</div>
                 <h3>Manajemen User</h3>
                 <p>Tambah, lihat, dan hapus akun pengguna sistem. Khusus akses SuperAdmin / IT.</p>
             </a>
-            @endrole
+            @endocmsAdmin
         </div>
     </div>
 

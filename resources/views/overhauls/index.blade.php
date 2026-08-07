@@ -6,11 +6,11 @@
                 <h1>Daftar Komponen</h1>
                 <p><span id="componentCount">{{ $components->count() }}</span> komponen terdaftar dalam sistem</p>
             </div>
-            @role('SuperAdmin|Planner/Warehouse')
+            @ocmsRegister
             <a href="{{ route('components.create') }}" class="btn-primary">
                 + Daftarkan Komponen
             </a>
-            @endrole
+            @endocmsRegister
         </div>
     </div>
 
@@ -84,9 +84,20 @@
                             @endif
                         </td>
                         <td>
-                            <a href="{{ route('components.show', $comp->comp_id) }}" class="btn-secondary btn-sm">
-                                Lihat →
-                            </a>
+                            <div style="display: flex; gap: 6px; align-items: center;">
+                                <a href="{{ route('components.show', $comp->comp_id) }}" class="btn-secondary btn-sm">
+                                    Lihat →
+                                </a>
+                                @ocmsDeveloper
+                                <a href="{{ route('components.edit', $comp->comp_id) }}" class="btn-secondary btn-sm" style="font-size: 0.7rem;" title="Edit komponen (Developer/SuperAdmin)">✏️</a>
+                                <form action="{{ route('components.destroy', $comp->comp_id) }}" method="POST" style="margin: 0;"
+                                      onsubmit="return confirm('Hapus komponen {{ $comp->serial_number }}?\n\nSELURUH data terkait (riwayat, checksheet, FR, part request, dokumen) ikut terhapus dan TIDAK bisa dikembalikan.');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn-danger btn-sm" style="font-size: 0.7rem;" title="Hapus komponen (Developer/SuperAdmin)">🗑</button>
+                                </form>
+                                @endocmsDeveloper
+                            </div>
                         </td>
                     </tr>
                 @empty

@@ -11,7 +11,7 @@
       logo 13.45 | judul 61.01 | info form 25.54
       label 13.45 | nilai 15.08 | ttd: 13.99 14.81 12.77 12.77 17.12
       pembagi detail/gambar: x=419 → kiri 53.53 / kanan 46.47
-      tabel material (dari 394pt): 31.22 31.22 7.87 9.14 11.68 8.88
+      tabel material (dari 394pt): 31.4 31.0 7.8 9.1 11.7 9.1
 
     Tinggi (persen dari 510pt):
       header 9.41 | identitas+approval 33.33
@@ -110,8 +110,8 @@
        vertikal tetap diteruskan sampai blok total. */
     .fr-mat-fill td { border-top: none; border-bottom: none; }
     /* Tiga baris penutup pada form asli hanya ±9pt masing-masing. */
-    .fr-total td { height: 6pt; font-size: 7.5px; line-height: 1; padding: 0 3px; }
-    .fr-legend td { border: 0.5pt solid #000; font-size: 7.5px; height: 6pt; line-height: 1; padding: 0 3px; }
+    .fr-total td { height: 10pt; font-size: 7.5px; line-height: 1; padding: 0 3px; }
+    .fr-legend td { border: 0.5pt solid #000; font-size: 7.5px; height: 9pt; line-height: 1; padding: 0 3px; }
     .fr-legend-in td { border: none; font-size: 8px; padding: 0 3px; line-height: 1.05; }
 
     /* ---------- kolom isian pada versi web ----------
