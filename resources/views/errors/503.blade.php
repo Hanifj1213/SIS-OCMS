@@ -1,0 +1,1 @@
+@extends('errors.layout', ['statusCode' => 503, 'message' => 'Layanan sedang tidak tersedia.'])

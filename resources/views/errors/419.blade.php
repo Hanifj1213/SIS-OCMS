@@ -1,0 +1,1 @@
+@extends('errors.layout', ['statusCode' => 419, 'message' => 'Sesi habis. Muat ulang halaman lalu coba lagi.'])
