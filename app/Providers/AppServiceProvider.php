@@ -2,7 +2,9 @@
 
 namespace App\Providers;
 
+use App\Support\OcmsAccess;
 use Carbon\CarbonImmutable;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\ServiceProvider;
@@ -24,6 +26,18 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureDefaults();
+        $this->registerOcmsBladeDirectives();
+    }
+
+    protected function registerOcmsBladeDirectives(): void
+    {
+        Blade::if('ocmsOperate', fn () => auth()->user()?->canOperateOverhaul() ?? false);
+        Blade::if('ocmsApprove', fn () => auth()->user()?->canApproveStages() ?? false);
+        Blade::if('ocmsRegister', fn () => auth()->user()?->canRegisterComponents() ?? false);
+        Blade::if('ocmsWarehouse', fn () => auth()->user()?->canManageWarehouse() ?? false);
+        Blade::if('ocmsExecutive', fn () => auth()->user()?->canViewExecutiveDashboard() ?? false);
+        Blade::if('ocmsAdmin', fn () => auth()->user()?->canManageUsers() ?? false);
+        Blade::if('ocmsDeveloper', fn () => auth()->user()?->canManageTemplates() ?? false);
     }
 
     /**

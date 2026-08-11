@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Support\OcmsAccess;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Spatie\Permission\Models\Role;
 
 class UserManagementController extends Controller
@@ -22,8 +24,15 @@ class UserManagementController extends Controller
      */
     public function create()
     {
-        $roles = Role::all();
-        return view('admin.users.create', compact('roles'));
+        $roles = Role::query()
+            ->whereIn('name', OcmsAccess::ALL_ROLES)
+            ->get()
+            ->sortBy(fn ($role) => array_search($role->name, OcmsAccess::ALL_ROLES, true))
+            ->values();
+
+        $roleDescriptions = OcmsAccess::roleDescriptions();
+
+        return view('admin.users.create', compact('roles', 'roleDescriptions'));
     }
 
     /**
@@ -35,7 +44,7 @@ class UserManagementController extends Controller
             'name'     => 'required|string|max:255',
             'nik'      => 'required|string|max:50|unique:users,nik',
             'password' => 'required|string|min:6|confirmed',
-            'role'     => 'required|exists:roles,name',
+            'role'     => ['required', Rule::in(OcmsAccess::ALL_ROLES)],
         ]);
 
         $user = User::create([
@@ -49,6 +58,30 @@ class UserManagementController extends Controller
 
         return redirect()->route('admin.users.index')
             ->with('success', 'User "' . $user->name . '" (' . $user->nik . ') berhasil didaftarkan dengan role ' . $request->role);
+    }
+
+    /**
+     * Form ganti password user (SuperAdmin).
+     */
+    public function editPassword(User $user)
+    {
+        return view('admin.users.password', compact('user'));
+    }
+
+    /**
+     * Simpan password baru untuk user (SuperAdmin).
+     */
+    public function updatePassword(Request $request, User $user)
+    {
+        $request->validate([
+            'password' => 'required|string|min:6|confirmed',
+        ]);
+
+        // Cast 'hashed' pada model User otomatis melakukan hashing
+        $user->update(['password' => $request->password]);
+
+        return redirect()->route('admin.users.index')
+            ->with('success', 'Password user "' . $user->name . '" (' . $user->nik . ') berhasil diganti.');
     }
 
     /**

@@ -44,14 +44,17 @@
                     </td>
                     <td style="color: var(--text-muted); font-size: 0.8rem;">{{ $user->created_at->format('d M Y') }}</td>
                     <td>
-                        @if($user->id !== auth()->id())
-                        <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST" onsubmit="return confirm('Hapus user {{ $user->name }}?')">
-                            @csrf @method('DELETE')
-                            <button type="submit" class="btn-danger btn-sm" style="font-size: 0.7rem;">Hapus</button>
-                        </form>
-                        @else
-                            <span class="badge badge-cyan">Anda</span>
-                        @endif
+                        <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+                            <a href="{{ route('admin.users.password.edit', $user->id) }}" class="btn-secondary btn-sm" style="font-size: 0.7rem;" title="Ganti password user ini">🔑 Password</a>
+                            @if($user->id !== auth()->id())
+                            <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST" onsubmit="return confirm('Hapus user {{ $user->name }}?')" style="margin: 0;">
+                                @csrf @method('DELETE')
+                                <button type="submit" class="btn-danger btn-sm" style="font-size: 0.7rem;">Hapus</button>
+                            </form>
+                            @else
+                                <span class="badge badge-cyan">Anda</span>
+                            @endif
+                        </div>
                     </td>
                 </tr>
                 @endforeach

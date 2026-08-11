@@ -28,9 +28,16 @@
                 <select id="role" name="role" class="ocms-select" required>
                     <option value="">— Pilih Role —</option>
                     @foreach($roles as $role)
-                        <option value="{{ $role->name }}" {{ old('role') == $role->name ? 'selected' : '' }}>{{ $role->name }}</option>
+                        <option value="{{ $role->name }}" {{ old('role') == $role->name ? 'selected' : '' }}>
+                            {{ $role->name }}
+                        </option>
                     @endforeach
                 </select>
+                <p style="font-size: 0.72rem; color: var(--text-muted); margin-top: 8px; line-height: 1.5;">
+                    @foreach($roleDescriptions as $roleName => $desc)
+                        <strong>{{ $roleName }}:</strong> {{ $desc }}<br>
+                    @endforeach
+                </p>
                 @error('role') <p style="font-size: 0.75rem; color: var(--accent-red); margin-top: 6px;">{{ $message }}</p> @enderror
             </div>
 

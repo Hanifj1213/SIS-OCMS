@@ -45,9 +45,9 @@ return [
     |
     */
 
-    'username' => 'email',
+    'username' => 'nik',
 
-    'email' => 'email',
+    'email' => 'nik',
 
     /*
     |--------------------------------------------------------------------------
@@ -60,7 +60,7 @@ return [
     |
     */
 
-    'lowercase_usernames' => true,
+    'lowercase_usernames' => false,
 
     /*
     |--------------------------------------------------------------------------
@@ -164,8 +164,10 @@ return [
         // Registrasi publik DITUTUP: user baru hanya dibuat oleh SuperAdmin
         // lewat menu Admin → Users (temuan keamanan S-4, laporan test 05/08).
         // Features::registration(),
-        Features::resetPasswords(),
-        Features::emailVerification(),
+        // Reset password / verifikasi email dinonaktifkan — login memakai NIK,
+        // reset password oleh SuperAdmin (bukan email).
+        // Features::resetPasswords(),
+        // Features::emailVerification(),
         Features::twoFactorAuthentication([
             'confirm' => true,
             'confirmPassword' => true,

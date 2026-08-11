@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Concerns\HasTeams;
+use App\Support\OcmsAccess;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -78,5 +79,55 @@ class User extends Authenticatable implements PasskeyUser
         return Str::length($initials) > 1
             ? Str::substr($initials, 0, 1).Str::substr($initials, -1)
             : $initials;
+    }
+
+    public function canManageUsers(): bool
+    {
+        return OcmsAccess::canManageUsers($this);
+    }
+
+    public function hasFullOcmsAccess(): bool
+    {
+        return OcmsAccess::hasFullAccess($this);
+    }
+
+    public function canRegisterComponents(): bool
+    {
+        return OcmsAccess::canRegisterComponents($this);
+    }
+
+    public function canManageTemplates(): bool
+    {
+        return OcmsAccess::canManageTemplates($this);
+    }
+
+    public function canManageComponents(): bool
+    {
+        return OcmsAccess::canManageComponents($this);
+    }
+
+    public function canOperateOverhaul(): bool
+    {
+        return OcmsAccess::canOperateOverhaul($this);
+    }
+
+    public function canApproveStages(): bool
+    {
+        return OcmsAccess::canApproveStages($this);
+    }
+
+    public function canManageWarehouse(): bool
+    {
+        return OcmsAccess::canManageWarehouse($this);
+    }
+
+    public function canViewExecutiveDashboard(): bool
+    {
+        return OcmsAccess::canViewExecutiveDashboard($this);
+    }
+
+    public function isLogisticsReviewOnly(): bool
+    {
+        return OcmsAccess::isLogisticsReviewOnly($this);
     }
 }

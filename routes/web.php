@@ -1,15 +1,21 @@
 <?php
 
+use App\Http\Controllers\AssemblyDocumentController;
 use App\Http\Controllers\ChecksheetController;
 use App\Http\Controllers\ComponentController;
+use App\Http\Controllers\Dev\ChecksheetTemplateController as DevChecksheetTemplateController;
+use App\Http\Controllers\Dev\DevPanelController;
+use App\Http\Controllers\Dev\GsheetTemplateController as DevGsheetTemplateController;
 use App\Http\Controllers\FabricationRequestController;
 use App\Http\Controllers\LocalChecksheetController;
 use App\Http\Controllers\MolController;
+use App\Http\Controllers\PaintingPhotoController;
 use App\Http\Controllers\PartRequestController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StageTimeController;
 use App\Http\Controllers\StatusController;
 use App\Http\Controllers\UserManagementController;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -17,6 +23,23 @@ use Illuminate\Support\Facades\Route;
 | Web Routes
 |--------------------------------------------------------------------------
 */
+
+// Health check — deployment smoke test (no auth, no sensitive data)
+Route::get('/up', function () {
+    try {
+        DB::connection()->getPdo();
+
+        return response()->json([
+            'status' => 'ok',
+            'timestamp' => now()->toIso8601String(),
+        ]);
+    } catch (\Throwable) {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Database unreachable',
+        ], 503);
+    }
+})->name('health');
 
 // Landing Page (Pre-Login)
 Route::get('/', function () {
@@ -71,10 +94,15 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('components/{component}/crew/{log}', [StageTimeController::class, 'removeMechanic'])
         ->name('components.crew.remove');
     // Stage 5 (Test Performance & Painting): dokumentasi foto hasil pengecatan
-    Route::post('components/{component}/painting/photos', [ComponentController::class, 'uploadPaintingPhotos'])
+    Route::post('components/{component}/painting/photos', [PaintingPhotoController::class, 'upload'])
         ->name('components.painting.upload');
-    Route::delete('components/{component}/painting/photos', [ComponentController::class, 'deletePaintingPhoto'])
+    Route::delete('components/{component}/painting/photos', [PaintingPhotoController::class, 'destroy'])
         ->name('components.painting.delete');
+    // Stage 4 (Assembly): dokumen (PDF) / foto dokumentasi perakitan
+    Route::post('components/{component}/assembly/documents', [AssemblyDocumentController::class, 'upload'])
+        ->name('components.assembly.upload');
+    Route::delete('components/{component}/assembly/documents', [AssemblyDocumentController::class, 'destroy'])
+        ->name('components.assembly.delete');
 
     // Checksheet spreadsheet lokal (tampilan 1:1 Excel, data di database)
     Route::get('checksheet-layouts', [LocalChecksheetController::class, 'index'])
@@ -118,19 +146,52 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('components/{component}/mol/document', [MolController::class, 'deleteDocument'])
         ->name('components.mol.delete-document');
 
+    // Edit komponen — Developer & SuperAdmin (dicek juga di controller)
+    Route::get('components/{component}/edit', [ComponentController::class, 'edit'])
+        ->middleware('role:SuperAdmin|Developer')
+        ->name('components.edit');
+    Route::put('components/{component}', [ComponentController::class, 'update'])
+        ->middleware('role:SuperAdmin|Developer')
+        ->name('components.update');
+
     // Resource route komponen (hanya action yang tersedia di controller)
     Route::resource('components', ComponentController::class)
         ->only(['index', 'create', 'store', 'show']);
 
+    // Hapus komponen — Developer & SuperAdmin (dicek juga di controller)
+    Route::delete('components/{component}', [ComponentController::class, 'destroy'])
+        ->middleware('role:SuperAdmin|Developer')
+        ->name('components.destroy');
+
     // Part Requests (Modul Gudang)
     Route::get('/part-requests', [PartRequestController::class, 'index'])->name('part-requests.index');
     Route::patch('/part-requests/{partRequest}', [PartRequestController::class, 'updateStatus'])->name('part-requests.update');
+
+    // Panel Developer — kelola template GSheet & checksheet tanpa ubah kode
+    Route::middleware(['role:SuperAdmin|Developer'])->prefix('dev')->name('dev.')->group(function () {
+        Route::get('/', [DevPanelController::class, 'index'])->name('index');
+
+        Route::get('/gsheet-templates', [DevGsheetTemplateController::class, 'index'])->name('gsheet-templates.index');
+        Route::post('/gsheet-templates', [DevGsheetTemplateController::class, 'store'])->name('gsheet-templates.store');
+        Route::patch('/gsheet-templates/{gsheetTemplate}', [DevGsheetTemplateController::class, 'update'])->name('gsheet-templates.update');
+        Route::delete('/gsheet-templates/{gsheetTemplate}', [DevGsheetTemplateController::class, 'destroy'])->name('gsheet-templates.destroy');
+
+        Route::get('/checksheet-templates', [DevChecksheetTemplateController::class, 'index'])->name('checksheet-templates.index');
+        Route::post('/checksheet-templates', [DevChecksheetTemplateController::class, 'store'])->name('checksheet-templates.store');
+        Route::get('/checksheet-templates/{checksheetTemplate}/edit', [DevChecksheetTemplateController::class, 'edit'])->name('checksheet-templates.edit');
+        Route::put('/checksheet-templates/{checksheetTemplate}', [DevChecksheetTemplateController::class, 'update'])->name('checksheet-templates.update');
+        Route::delete('/checksheet-templates/{checksheetTemplate}', [DevChecksheetTemplateController::class, 'destroy'])->name('checksheet-templates.destroy');
+        Route::post('/checksheet-templates/{checksheetTemplate}/image', [DevChecksheetTemplateController::class, 'uploadImage'])->name('checksheet-templates.image.upload');
+        Route::delete('/checksheet-templates/{checksheetTemplate}/image', [DevChecksheetTemplateController::class, 'deleteImage'])->name('checksheet-templates.image.delete');
+    });
 
     // User Management (SuperAdmin only)
     Route::middleware(['role:SuperAdmin'])->prefix('admin')->name('admin.')->group(function () {
         Route::get('/users', [UserManagementController::class, 'index'])->name('users.index');
         Route::get('/users/create', [UserManagementController::class, 'create'])->name('users.create');
         Route::post('/users', [UserManagementController::class, 'store'])->name('users.store');
+        Route::get('/users/{user}/password', [UserManagementController::class, 'editPassword'])->name('users.password.edit');
+        Route::patch('/users/{user}/password', [UserManagementController::class, 'updatePassword'])->name('users.password.update');
         Route::delete('/users/{user}', [UserManagementController::class, 'destroy'])->name('users.destroy');
     });
 

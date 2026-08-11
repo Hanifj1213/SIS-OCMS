@@ -839,7 +839,6 @@ class ChecksheetTemplateSeeder extends Seeder
             ]
         );
 
-
         // =============================================
         // POWERTRAIN - Stage 1: Receiving Inspection
         // Setiap item di bawah ditranskripsi berurutan dari kolom ITEM
@@ -1187,7 +1186,7 @@ class ChecksheetTemplateSeeder extends Seeder
 
             // Control Valve D155/D375/... : item + group + callout number
             // dari sheet RECEIVING asli (mirip Engine view + nomor callout).
-            if (!empty($template['from_json'])) {
+            if (! empty($template['from_json'])) {
                 $jsonItems = $cvReceivingByEgi[$template['egi']] ?? [];
                 if ($jsonItems !== []) {
                     $items = array_map(static function (array $row) use ($template): array {
@@ -1199,6 +1198,7 @@ class ChecksheetTemplateSeeder extends Seeder
                         if (isset($row['number'])) {
                             $item['number'] = (int) $row['number'];
                         }
+
                         return $item;
                     }, $jsonItems);
                 }
@@ -1285,7 +1285,7 @@ class ChecksheetTemplateSeeder extends Seeder
             ['Cylinder Block', 'Check block cracks, lower liner-seal area, blind-plug corrosion, threads, cylinder-head mounting surface, oil/water-hole clogging; perform colour-check with QA Officer.', 'p.10'],
         ];
         foreach ($disassemblyRows as $index => [$label, $standard, $sourcePage]) {
-            $addStage2Item('DIS-' . str_pad((string) ($index + 1), 3, '0', STR_PAD_LEFT), $disassembly, $label, $standard, 'D375-6 EG MAINLINE.pdf ' . $sourcePage);
+            $addStage2Item('DIS-'.str_pad((string) ($index + 1), 3, '0', STR_PAD_LEFT), $disassembly, $label, $standard, 'D375-6 EG MAINLINE.pdf '.$sourcePage);
         }
 
         $timingGear = 'Disassembly Timing Gear and Reference Measurements';
@@ -1310,7 +1310,7 @@ class ChecksheetTemplateSeeder extends Seeder
             ['D170 cam height and journal reference', 'Intake cam height 62 +0.4144/-0.2144 mm (R.L. 61.37); exhaust 61 +0.3215/-0.5215 mm (R.L. 59.64); camshaft journal STD 72 -0.080/-0.110 mm.'],
         ];
         foreach ($timingGearRows as $index => [$label, $standard]) {
-            $addStage2Item('DGT-' . str_pad((string) ($index + 1), 3, '0', STR_PAD_LEFT), $timingGear, $label, $standard, 'D375-6 EG MAINLINE.pdf p.11-13');
+            $addStage2Item('DGT-'.str_pad((string) ($index + 1), 3, '0', STR_PAD_LEFT), $timingGear, $label, $standard, 'D375-6 EG MAINLINE.pdf p.11-13');
         }
 
         $pistonMeasurement = 'Piston, Piston Ring and Piston Pin Measurement';
@@ -1320,25 +1320,25 @@ class ChecksheetTemplateSeeder extends Seeder
         $addStage2Item('PST-004', $pistonMeasurement, 'Inside diameter of piston pin hole', 'Standard clearance 68 mm; clearance limit +0.044/+0.034 mm.', 'piston 170.pdf p.1 / PISTON CHECKSHEET2.pdf p.1');
         $addStage2Item('PST-005', $pistonMeasurement, 'Outside diameter of piston pin', 'Standard 68 mm; clearance limit 0/-0.006 mm.', 'piston 170.pdf p.1');
         foreach (range(1, 6) as $cylinder) {
-            $addStage2Item('PST-' . str_pad((string) (5 + (($cylinder - 1) * 2) + 1), 3, '0', STR_PAD_LEFT), $pistonMeasurement, 'Cylinder ' . $cylinder . ' piston outside diameter X-X\'', 'Record measurement and clearance actual.', 'PISTON CHECKSHEET2.pdf p.1');
-            $addStage2Item('PST-' . str_pad((string) (5 + (($cylinder - 1) * 2) + 2), 3, '0', STR_PAD_LEFT), $pistonMeasurement, 'Cylinder ' . $cylinder . ' piston outside diameter Y-Y\'', 'Record measurement and clearance actual.', 'PISTON CHECKSHEET2.pdf p.1');
+            $addStage2Item('PST-'.str_pad((string) (5 + (($cylinder - 1) * 2) + 1), 3, '0', STR_PAD_LEFT), $pistonMeasurement, 'Cylinder '.$cylinder.' piston outside diameter X-X\'', 'Record measurement and clearance actual.', 'PISTON CHECKSHEET2.pdf p.1');
+            $addStage2Item('PST-'.str_pad((string) (5 + (($cylinder - 1) * 2) + 2), 3, '0', STR_PAD_LEFT), $pistonMeasurement, 'Cylinder '.$cylinder.' piston outside diameter Y-Y\'', 'Record measurement and clearance actual.', 'PISTON CHECKSHEET2.pdf p.1');
         }
         foreach (range(1, 6) as $cylinder) {
             foreach (['Top ring', '2nd ring', 'Oil ring'] as $ringIndex => $ring) {
                 $id = 18 + (($cylinder - 1) * 3) + $ringIndex + 1;
-                $addStage2Item('PST-' . str_pad((string) $id, 3, '0', STR_PAD_LEFT), $pistonMeasurement, 'Cylinder ' . $cylinder . ' ' . $ring . ' measurement', 'Record ring measurement and clearance actual.', 'PISTON CHECKSHEET2.pdf p.2');
+                $addStage2Item('PST-'.str_pad((string) $id, 3, '0', STR_PAD_LEFT), $pistonMeasurement, 'Cylinder '.$cylinder.' '.$ring.' measurement', 'Record ring measurement and clearance actual.', 'PISTON CHECKSHEET2.pdf p.2');
             }
         }
         foreach (range(1, 6) as $cylinder) {
-            $addStage2Item('PST-' . str_pad((string) (37 + (($cylinder - 1) * 2) + 1), 3, '0', STR_PAD_LEFT), $pistonMeasurement, 'Cylinder ' . $cylinder . ' piston pin hole X-X\'', 'Record inside diameter and clearance actual.', 'PISTON CHECKSHEET2.pdf p.2');
-            $addStage2Item('PST-' . str_pad((string) (37 + (($cylinder - 1) * 2) + 2), 3, '0', STR_PAD_LEFT), $pistonMeasurement, 'Cylinder ' . $cylinder . ' piston pin hole Y-Y\'', 'Record inside diameter and clearance actual.', 'PISTON CHECKSHEET2.pdf p.2');
+            $addStage2Item('PST-'.str_pad((string) (37 + (($cylinder - 1) * 2) + 1), 3, '0', STR_PAD_LEFT), $pistonMeasurement, 'Cylinder '.$cylinder.' piston pin hole X-X\'', 'Record inside diameter and clearance actual.', 'PISTON CHECKSHEET2.pdf p.2');
+            $addStage2Item('PST-'.str_pad((string) (37 + (($cylinder - 1) * 2) + 2), 3, '0', STR_PAD_LEFT), $pistonMeasurement, 'Cylinder '.$cylinder.' piston pin hole Y-Y\'', 'Record inside diameter and clearance actual.', 'PISTON CHECKSHEET2.pdf p.2');
         }
 
         $pistonPin = 'Piston Pin Measuring and Polishing';
         $addStage2Item('PPM-001', $pistonPin, 'Piston pin standard and clearance limit', '6D170E-5 Ø68.000–67.994 mm; clearance limit 0.11 mm.', 'D375-6 EG MAINLINE.pdf p.15');
         foreach (range(1, 6) as $cylinder) {
-            $addStage2Item('PPM-' . str_pad((string) (2 + (($cylinder - 1) * 2)), 3, '0', STR_PAD_LEFT), $pistonPin, 'Cylinder ' . $cylinder . ' piston pin position X-X\'', 'Record measurement and clearance actual.', 'D375-6 EG MAINLINE.pdf p.15');
-            $addStage2Item('PPM-' . str_pad((string) (3 + (($cylinder - 1) * 2)), 3, '0', STR_PAD_LEFT), $pistonPin, 'Cylinder ' . $cylinder . ' piston pin position Y-Y\'', 'Record measurement and clearance actual.', 'D375-6 EG MAINLINE.pdf p.15');
+            $addStage2Item('PPM-'.str_pad((string) (2 + (($cylinder - 1) * 2)), 3, '0', STR_PAD_LEFT), $pistonPin, 'Cylinder '.$cylinder.' piston pin position X-X\'', 'Record measurement and clearance actual.', 'D375-6 EG MAINLINE.pdf p.15');
+            $addStage2Item('PPM-'.str_pad((string) (3 + (($cylinder - 1) * 2)), 3, '0', STR_PAD_LEFT), $pistonPin, 'Cylinder '.$cylinder.' piston pin position Y-Y\'', 'Record measurement and clearance actual.', 'D375-6 EG MAINLINE.pdf p.15');
         }
 
         $camshaft = 'Camshaft Process and Measurement';
@@ -1346,22 +1346,22 @@ class ChecksheetTemplateSeeder extends Seeder
         $addStage2Item('CAM-002', $camshaft, '6D170-5 exhaust cam lobe', 'Standard 77.074–77.355 mm; repair limit 77.00 mm.', 'D375-6 EG MAINLINE.pdf p.17');
         $addStage2Item('CAM-003', $camshaft, '6D170-5 cam journal', 'Standard 89.987–90.035 mm; repair limit 89.98 mm.', 'D375-6 EG MAINLINE.pdf p.17');
         foreach (range(1, 7) as $journal) {
-            $addStage2Item('CAM-' . str_pad((string) (3 + $journal), 3, '0', STR_PAD_LEFT), $camshaft, 'Camshaft journal No. ' . $journal . ' (X / Y)', 'Record journal, intake-lobe and exhaust-lobe measurements.', 'D375-6 EG MAINLINE.pdf p.17');
+            $addStage2Item('CAM-'.str_pad((string) (3 + $journal), 3, '0', STR_PAD_LEFT), $camshaft, 'Camshaft journal No. '.$journal.' (X / Y)', 'Record journal, intake-lobe and exhaust-lobe measurements.', 'D375-6 EG MAINLINE.pdf p.17');
         }
         $addStage2Item('CAM-011', $camshaft, 'Crack has been checked', 'Mark OK or Not OK after visual inspection.', 'D375-6 EG MAINLINE.pdf p.17');
 
         $crankMeasure = 'Crankshaft Disassembly and Measurement';
         foreach ([['001', 'Crankshaft', 'Physical data'], ['002', 'Gear', 'Physical data'], ['003', 'Key', 'Physical data'], ['004', 'Dowel Pin', 'Physical data']] as [$id, $label, $standard]) {
-            $addStage2Item('CKM-' . $id, $crankMeasure, $label, 'Record quantity and Good / No Good condition.', 'D375-6 EG MAINLINE.pdf p.19');
+            $addStage2Item('CKM-'.$id, $crankMeasure, $label, 'Record quantity and Good / No Good condition.', 'D375-6 EG MAINLINE.pdf p.19');
         }
         $addStage2Item('CKM-005', $crankMeasure, 'Main journal standard size', 'STD 140.000–139.975 mm; under size 0.25: 139.750–139.725; under size 0.50: 139.500–139.475; roundness 0–0.010; fillet radius 6.0–6.5 mm.', 'D375-6 EG MAINLINE.pdf p.19');
         $addStage2Item('CKM-006', $crankMeasure, 'Pin journal standard size', 'STD 108.000–107.978 mm; under size 0.25: 107.750–107.728; under size 0.50: 107.500–107.478; roundness 0–0.010; fillet radius 6.0–6.5 mm.', 'D375-6 EG MAINLINE.pdf p.19');
         $addStage2Item('CKM-007', $crankMeasure, 'Crack, scratch and wear visual check', 'Mark OK or Not OK.', 'D375-6 EG MAINLINE.pdf p.19');
         foreach (range(1, 7) as $journal) {
-            $addStage2Item('CKM-' . str_pad((string) (7 + $journal), 3, '0', STR_PAD_LEFT), $crankMeasure, 'Main journal critical inspection point ' . $journal, 'Record X-X\', Y-Y\' and roundness.', 'D375-6 EG MAINLINE.pdf p.19');
+            $addStage2Item('CKM-'.str_pad((string) (7 + $journal), 3, '0', STR_PAD_LEFT), $crankMeasure, 'Main journal critical inspection point '.$journal, 'Record X-X\', Y-Y\' and roundness.', 'D375-6 EG MAINLINE.pdf p.19');
         }
         foreach (range(1, 6) as $journal) {
-            $addStage2Item('CKM-' . str_pad((string) (14 + $journal), 3, '0', STR_PAD_LEFT), $crankMeasure, 'Pin journal critical inspection point ' . $journal, 'Record X-X\', Y-Y\' and roundness.', 'D375-6 EG MAINLINE.pdf p.19');
+            $addStage2Item('CKM-'.str_pad((string) (14 + $journal), 3, '0', STR_PAD_LEFT), $crankMeasure, 'Pin journal critical inspection point '.$journal, 'Record X-X\', Y-Y\' and roundness.', 'D375-6 EG MAINLINE.pdf p.19');
         }
         $addStage2Item('CKM-021', $crankMeasure, 'Critical fillet radius - main journal', 'Record actual measurement.', 'D375-6 EG MAINLINE.pdf p.19');
         $addStage2Item('CKM-022', $crankMeasure, 'Critical fillet radius - pin journal', 'Record actual measurement.', 'D375-6 EG MAINLINE.pdf p.19');
@@ -1370,7 +1370,7 @@ class ChecksheetTemplateSeeder extends Seeder
         foreach ([
             'Connecting rod', 'Connecting rod cap', 'Connecting rod bolt', 'Washer', 'Crank pin metal',
         ] as $index => $part) {
-            $addStage2Item('CON-' . str_pad((string) ($index + 1), 3, '0', STR_PAD_LEFT), $conRod, $part, 'Record physical data and New / Reuse condition.', 'D375-6 EG MAINLINE.pdf p.22');
+            $addStage2Item('CON-'.str_pad((string) ($index + 1), 3, '0', STR_PAD_LEFT), $conRod, $part, 'Record physical data and New / Reuse condition.', 'D375-6 EG MAINLINE.pdf p.22');
         }
         $addStage2Item('CON-006', $conRod, 'Connecting rod crack visual check', 'Mark OK or Not OK.', 'D375-6 EG MAINLINE.pdf p.22');
         $addStage2Item('CON-007', $conRod, 'Standard tightening bolt step', '6D170-5: 19.0–21.0 kgm + 90°–105°.', 'D375-6 EG MAINLINE.pdf p.22');
@@ -1380,9 +1380,9 @@ class ChecksheetTemplateSeeder extends Seeder
         $addStage2Item('CON-011', $conRod, 'Connecting rod twist limit', '6D170-5 twist R.L. 0.25 mm.', 'D375-6 EG MAINLINE.pdf p.22');
         $addStage2Item('CON-012', $conRod, 'Distance between holes', '6D170-5: 305 mm.', 'D375-6 EG MAINLINE.pdf p.22');
         foreach (range(1, 6) as $rod) {
-            $addStage2Item('CON-' . str_pad((string) (12 + $rod), 3, '0', STR_PAD_LEFT), $conRod, 'Small end connecting rod ' . $rod . ' (X-X\' / Y-Y\')', 'Record diameter after salvaging with new bearing.', 'D375-6 EG MAINLINE.pdf p.21');
-            $addStage2Item('CON-' . str_pad((string) (18 + $rod), 3, '0', STR_PAD_LEFT), $conRod, 'Big end connecting rod ' . $rod . ' (X-X\' / Y-Y\' / Z-Z\')', 'Record diameter after salvaging with new bearing.', 'D375-6 EG MAINLINE.pdf p.22');
-            $addStage2Item('CON-' . str_pad((string) (24 + $rod), 3, '0', STR_PAD_LEFT), $conRod, 'Connecting rod ' . $rod . ' bend and twist', 'Record indicator reading and actual bend/twist.', 'D375-6 EG MAINLINE.pdf p.21');
+            $addStage2Item('CON-'.str_pad((string) (12 + $rod), 3, '0', STR_PAD_LEFT), $conRod, 'Small end connecting rod '.$rod.' (X-X\' / Y-Y\')', 'Record diameter after salvaging with new bearing.', 'D375-6 EG MAINLINE.pdf p.21');
+            $addStage2Item('CON-'.str_pad((string) (18 + $rod), 3, '0', STR_PAD_LEFT), $conRod, 'Big end connecting rod '.$rod.' (X-X\' / Y-Y\' / Z-Z\')', 'Record diameter after salvaging with new bearing.', 'D375-6 EG MAINLINE.pdf p.22');
+            $addStage2Item('CON-'.str_pad((string) (24 + $rod), 3, '0', STR_PAD_LEFT), $conRod, 'Connecting rod '.$rod.' bend and twist', 'Record indicator reading and actual bend/twist.', 'D375-6 EG MAINLINE.pdf p.21');
         }
 
         $cylinderBlock = 'Cylinder Block Measuring and Inspection';
@@ -1401,13 +1401,13 @@ class ChecksheetTemplateSeeder extends Seeder
         $addStage2Item('CBM-008', $cylinderBlock, 'Main bearing cap tightening torque', '1st step 27.5–30.5 kgm; 2nd step 57.0–59.0 kgm; 3rd step 90°–120°.', 'D375-6 EG MAINLINE.pdf p.23');
         $addStage2Item('CBM-009', $cylinderBlock, 'Crack visual check', 'Mark Good Condition or Bad Condition.', 'D375-6 EG MAINLINE.pdf p.23');
         foreach (range(1, 7) as $bore) {
-            $addStage2Item('CBM-' . str_pad((string) (9 + $bore), 3, '0', STR_PAD_LEFT), $cylinderBlock, 'Main bore No. ' . $bore . ' measurement (X-X\' / Y-Y\')', 'Record inspection measurement.', 'D375-6 EG MAINLINE.pdf p.23');
+            $addStage2Item('CBM-'.str_pad((string) (9 + $bore), 3, '0', STR_PAD_LEFT), $cylinderBlock, 'Main bore No. '.$bore.' measurement (X-X\' / Y-Y\')', 'Record inspection measurement.', 'D375-6 EG MAINLINE.pdf p.23');
         }
         foreach (range(1, 6) as $cylinder) {
-            $addStage2Item('CBM-' . str_pad((string) (16 + $cylinder), 3, '0', STR_PAD_LEFT), $cylinderBlock, 'Cylinder ' . $cylinder . ' liner O-ring land visual check', 'Record mechanic and QA check.', 'D375-6 EG MAINLINE.pdf p.23');
-            $addStage2Item('CBM-' . str_pad((string) (22 + $cylinder), 3, '0', STR_PAD_LEFT), $cylinderBlock, 'Cylinder ' . $cylinder . ' liner flange seat (X-X\' / Y-Y\')', 'Record inspection measurement.', 'D375-6 EG MAINLINE.pdf p.24');
-            $addStage2Item('CBM-' . str_pad((string) (28 + $cylinder), 3, '0', STR_PAD_LEFT), $cylinderBlock, 'Cylinder ' . $cylinder . ' counter bore diameter (X-X\' / Y-Y\')', 'Record inspection measurement.', 'D375-6 EG MAINLINE.pdf p.24');
-            $addStage2Item('CBM-' . str_pad((string) (34 + $cylinder), 3, '0', STR_PAD_LEFT), $cylinderBlock, 'Cylinder ' . $cylinder . ' counter bore depth (X / X\' / Y / Y\')', 'Record after-repair inspection measurement.', 'D375-6 EG MAINLINE.pdf p.25');
+            $addStage2Item('CBM-'.str_pad((string) (16 + $cylinder), 3, '0', STR_PAD_LEFT), $cylinderBlock, 'Cylinder '.$cylinder.' liner O-ring land visual check', 'Record mechanic and QA check.', 'D375-6 EG MAINLINE.pdf p.23');
+            $addStage2Item('CBM-'.str_pad((string) (22 + $cylinder), 3, '0', STR_PAD_LEFT), $cylinderBlock, 'Cylinder '.$cylinder.' liner flange seat (X-X\' / Y-Y\')', 'Record inspection measurement.', 'D375-6 EG MAINLINE.pdf p.24');
+            $addStage2Item('CBM-'.str_pad((string) (28 + $cylinder), 3, '0', STR_PAD_LEFT), $cylinderBlock, 'Cylinder '.$cylinder.' counter bore diameter (X-X\' / Y-Y\')', 'Record inspection measurement.', 'D375-6 EG MAINLINE.pdf p.24');
+            $addStage2Item('CBM-'.str_pad((string) (34 + $cylinder), 3, '0', STR_PAD_LEFT), $cylinderBlock, 'Cylinder '.$cylinder.' counter bore depth (X / X\' / Y / Y\')', 'Record after-repair inspection measurement.', 'D375-6 EG MAINLINE.pdf p.25');
         }
         $addStage2Item('CBM-041', $cylinderBlock, 'Roughness surface of counter bore', 'Inspect scratches, rust and wear; record roughness measurement.', 'D375-6 EG MAINLINE.pdf p.25');
         $addStage2Item('CBM-042', $cylinderBlock, 'Flatness of top surface of cylinder block', 'Inspect head-gasket mounting surface for fretting, corrosion and scratches.', 'D375-6 EG MAINLINE.pdf p.25');
@@ -1424,7 +1424,7 @@ class ChecksheetTemplateSeeder extends Seeder
             'Water jacket area', 'Counter bore area',
         ];
         foreach ($blockInspectionRows as $index => $label) {
-            $addStage2Item('CBI-' . str_pad((string) ($index + 1), 3, '0', STR_PAD_LEFT), $blockInspection, $label, 'Mark Good Condition, Bad Condition or None and add remark.', 'D375-6 EG MAINLINE.pdf p.26');
+            $addStage2Item('CBI-'.str_pad((string) ($index + 1), 3, '0', STR_PAD_LEFT), $blockInspection, $label, 'Mark Good Condition, Bad Condition or None and add remark.', 'D375-6 EG MAINLINE.pdf p.26');
         }
 
         $damper = 'Front Damper Inspection';
@@ -1438,7 +1438,7 @@ class ChecksheetTemplateSeeder extends Seeder
             'Before release the damper, check no leakage on the contact cover.', 'Remove damper, clean developer and deliver damper to assembly line.',
         ];
         foreach ($damperRows as $index => $label) {
-            $addStage2Item('DMP-' . str_pad((string) ($index + 1), 3, '0', STR_PAD_LEFT), $damper, $label, null, 'D375-6 EG MAINLINE.pdf p.28');
+            $addStage2Item('DMP-'.str_pad((string) ($index + 1), 3, '0', STR_PAD_LEFT), $damper, $label, null, 'D375-6 EG MAINLINE.pdf p.28');
         }
 
         $crankInspection = 'Crankshaft Inspection';
@@ -1456,7 +1456,7 @@ class ChecksheetTemplateSeeder extends Seeder
             'Check condition all thread crankshaft front and rear; mark engine S/N on rear surface area',
         ];
         foreach ($crankInspectionRows as $index => $label) {
-            $addStage2Item('CKI-' . str_pad((string) ($index + 1), 3, '0', STR_PAD_LEFT), $crankInspection, $label, null, 'D375-6 EG MAINLINE.pdf p.29');
+            $addStage2Item('CKI-'.str_pad((string) ($index + 1), 3, '0', STR_PAD_LEFT), $crankInspection, $label, null, 'D375-6 EG MAINLINE.pdf p.29');
         }
 
         $cylinderHead = 'Cylinder Head Before Machining and Measurement';
@@ -1497,7 +1497,7 @@ class ChecksheetTemplateSeeder extends Seeder
                     return;
                 }
 
-                if ($checksheet->exists && !empty($checksheet->answers)) {
+                if ($checksheet->exists && ! empty($checksheet->answers)) {
                     $existingIds = collect($checksheet->items ?? [])->pluck('id')->all();
                     $missingItems = collect($stage2Items)
                         ->reject(fn (array $item): bool => in_array($item['id'], $existingIds, true))
@@ -1543,7 +1543,7 @@ class ChecksheetTemplateSeeder extends Seeder
                     ['id' => 'PTR-003', 'group' => 'Visual Inspection', 'label' => 'Housing assembly (no crack/damage)'],
                     ['id' => 'PTR-011', 'group' => 'Fluids & Plugs', 'label' => 'Oil level / condition'],
                     ['id' => 'PTR-014', 'group' => 'Fluids & Plugs', 'label' => 'Check for oil leakage'],
-                ]
+                ],
             ]
         );
 
@@ -1556,7 +1556,7 @@ class ChecksheetTemplateSeeder extends Seeder
                     ['id' => 'PFD-003', 'group' => 'Housing & Covers', 'label' => 'Main housing (no crack)'],
                     ['id' => 'PFD-005', 'group' => 'Housing & Covers', 'label' => 'Floating seal area / leak check'],
                     ['id' => 'PFD-008', 'group' => 'Fluids & Plugs', 'label' => 'Oil level / condition'],
-                ]
+                ],
             ]
         );
 
@@ -1568,7 +1568,7 @@ class ChecksheetTemplateSeeder extends Seeder
                     ['id' => 'PDF-001', 'group' => 'Visual Inspection', 'label' => 'Painting condition'],
                     ['id' => 'PDF-002', 'group' => 'Visual Inspection', 'label' => 'Housing assembly (no crack/damage)'],
                     ['id' => 'PDF-006', 'group' => 'Fluids & Plugs', 'label' => 'Drain plug'],
-                ]
+                ],
             ]
         );
 
@@ -1580,7 +1580,7 @@ class ChecksheetTemplateSeeder extends Seeder
                     ['id' => 'PTO-001', 'group' => 'Visual Inspection', 'label' => 'Painting & Nameplate'],
                     ['id' => 'PTO-002', 'group' => 'Visual Inspection', 'label' => 'PTO Case / Housing'],
                     ['id' => 'PTO-006', 'group' => 'Fluids & Plugs', 'label' => 'Oil drain plug / check metal particles'],
-                ]
+                ],
             ]
         );
 
@@ -1592,7 +1592,7 @@ class ChecksheetTemplateSeeder extends Seeder
                     ['id' => 'SWM-001', 'group' => 'Visual Inspection', 'label' => 'Painting & Nameplate'],
                     ['id' => 'SWM-002', 'group' => 'Visual Inspection', 'label' => 'Swing machinery housing'],
                     ['id' => 'SWM-006', 'group' => 'Fluids & Plugs', 'label' => 'Oil level gauge / dipstick'],
-                ]
+                ],
             ]
         );
 
@@ -1604,7 +1604,7 @@ class ChecksheetTemplateSeeder extends Seeder
                     ['id' => 'CVL-001', 'group' => 'Visual Inspection', 'label' => 'Painting & Nameplate'],
                     ['id' => 'CVL-002', 'group' => 'Visual Inspection', 'label' => 'Valve block / body (no crack/damage)'],
                     ['id' => 'CVL-003', 'group' => 'Components', 'label' => 'Spool caps & covers'],
-                ]
+                ],
             ]
         );
 
@@ -1627,7 +1627,7 @@ class ChecksheetTemplateSeeder extends Seeder
                     ->whereNull('egi_model')
                     ->first();
 
-                if (!$template) {
+                if (! $template) {
                     return;
                 }
 
@@ -1636,7 +1636,7 @@ class ChecksheetTemplateSeeder extends Seeder
                     'stage_number' => 1,
                 ]);
 
-                if ($checksheet->exists && ($checksheet->completed_at || !empty($checksheet->answers))) {
+                if ($checksheet->exists && ($checksheet->completed_at || ! empty($checksheet->answers))) {
                     return;
                 }
 
