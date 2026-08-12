@@ -74,6 +74,7 @@ class FabricationRequest extends Model
         'image_path_2',
         'image_layout',
         'images',
+        'annotations',
         'signature_layout',
         'note',
         'signatures',
@@ -94,6 +95,7 @@ class FabricationRequest extends Model
         'signatures' => 'array',
         'image_layout' => 'array',
         'images' => 'array',
+        'annotations' => 'array',
         'signature_layout' => 'array',
     ];
 
@@ -145,6 +147,67 @@ class FabricationRequest extends Model
         }
 
         return $list;
+    }
+
+    /**
+     * Daftar anotasi gambar (garis, panah, teks) jika ada.
+     *
+     * @return list<array>
+     */
+    public function annotationList(): array
+    {
+        $raw = $this->annotations ?? null;
+
+        if (is_array($raw)) {
+            return $this->normalizeAnnotationNumbers($raw);
+        }
+
+        if (is_string($raw) && $raw !== '') {
+            $decoded = json_decode($raw, true);
+            return is_array($decoded) ? $this->normalizeAnnotationNumbers($decoded) : [];
+        }
+
+        return [];
+    }
+
+    /**
+     * JSON tidak membedakan 3 dan 3.0 saat dibaca kembali dari SQLite.
+     * Normalisasi ini menjaga koordinat/properti anotasi tetap konsisten untuk
+     * renderer dan pemanggil API, sekaligus tidak mengubah format JSON mentah.
+     *
+     * @param  list<array<string, mixed>>  $annotations
+     * @return list<array<string, mixed>>
+     */
+    private function normalizeAnnotationNumbers(array $annotations): array
+    {
+        foreach ($annotations as &$annotation) {
+            if (!is_array($annotation)) {
+                continue;
+            }
+
+            foreach (['x', 'y', 'x1', 'y1', 'x2', 'y2', 'stroke', 'font_size', 'size'] as $key) {
+                if (array_key_exists($key, $annotation) && is_numeric($annotation[$key])) {
+                    $annotation[$key] = (float) $annotation[$key];
+                }
+            }
+
+            if (isset($annotation['points']) && is_array($annotation['points'])) {
+                foreach ($annotation['points'] as &$point) {
+                    if (!is_array($point)) {
+                        continue;
+                    }
+                    foreach (['x', 'y'] as $key) {
+                        if (array_key_exists($key, $point) && is_numeric($point[$key])) {
+                            $point[$key] = (float) $point[$key];
+                        }
+                    }
+                }
+                unset($point);
+            }
+        }
+        unset($annotation);
+
+        return $annotations;
     }
 
     /** Komposisi bawaan untuk gambar baru ke-$index (0-based). */

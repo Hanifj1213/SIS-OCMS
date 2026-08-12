@@ -61,4 +61,13 @@ class FrFormSpacingTest extends TestCase
         $response->assertDontSee('{{-- ============ IDENTITAS + APPROVAL ============ --}}
             <table style="border-top:none;">', false);
     }
+
+    public function test_kolom_material_mengikuti_rasio_form_asli_dan_description_tidak_wrap(): void
+    {
+        $response = $this->openForm();
+
+        $response->assertOk();
+        $response->assertSee('<col style="width:31.4%"><col style="width:31.0%"><col style="width:7.8%">', false);
+        $response->assertSee('<col style="width:9.1%"><col style="width:11.7%"><col style="width:9.1%">', false);
+    }
 }

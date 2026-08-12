@@ -5,7 +5,9 @@ namespace Tests\Feature;
 use App\Models\Component;
 use App\Models\FabricationRequest;
 use App\Models\User;
+use App\Services\FrAnnotationRenderer;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
@@ -23,7 +25,7 @@ class FrMolFormTest extends TestCase
 
         $user = User::create([
             'name' => 'Mekanik Form',
-            'nik' => 'FORM-' . random_int(1000, 9999),
+            'nik' => 'FORM-'.random_int(1000, 9999),
             'password' => 'password',
         ]);
         $user->assignRole('Mechanic');
@@ -34,7 +36,7 @@ class FrMolFormTest extends TestCase
     private function makeComponent(): Component
     {
         return Component::create([
-            'serial_number' => 'FORM-COMP-' . random_int(1000, 9999),
+            'serial_number' => 'FORM-COMP-'.random_int(1000, 9999),
             'egi' => 'D155-6',
             'model_type' => 'D155-6',
             'major_category' => 'Engine',
@@ -51,7 +53,7 @@ class FrMolFormTest extends TestCase
         $user = $this->mechanic();
         $component = $this->makeComponent();
 
-        $response = $this->actingAs($user)->get(route('components.fr.create', $component->comp_id) . '?' . http_build_query([
+        $response = $this->actingAs($user)->get(route('components.fr.create', $component->comp_id).'?'.http_build_query([
             'part_name' => 'SPACER',
             'part_number' => '17A-15-42710',
             'section' => 'DISASSY RH',
@@ -70,7 +72,7 @@ class FrMolFormTest extends TestCase
 
         // Garis titik di bawah kolom nama penanda tangan pernah hilang karena
         // selnya dibiarkan kosong — pastikan titiknya benar-benar dirender.
-        $response->assertSee('<span>' . str_repeat('.', 60) . '</span>', false);
+        $response->assertSee('<span>'.str_repeat('.', 60).'</span>', false);
     }
 
     public function test_store_single_membuat_fr_dengan_nomor_resmi_dan_field_plo(): void
@@ -155,6 +157,25 @@ class FrMolFormTest extends TestCase
             'status' => 'draft',
             'unit_price' => 100000,
             'labour_cost' => 25000,
+            'annotations' => [
+                [
+                    'type' => 'double_arrow',
+                    'x1' => 20,
+                    'y1' => 30,
+                    'x2' => 80,
+                    'y2' => 30,
+                    'color' => '#ef4444',
+                    'stroke' => 2,
+                ],
+                [
+                    'type' => 'text',
+                    'x' => 44,
+                    'y' => 20,
+                    'text' => '120mm',
+                    'color' => '#ffffff',
+                    'font_size' => 5,
+                ],
+            ],
         ]);
 
         $response = $this->actingAs($user)->get(route('components.fr.pdf', [$component->comp_id, $fr->fr_id]));
@@ -401,21 +422,22 @@ class FrMolFormTest extends TestCase
 
     public function test_gambar_bisa_banyak_dan_tidak_menimpa_yang_sudah_ada(): void
     {
+        Storage::fake('public');
         $user = $this->mechanic();
         $component = $this->makeComponent();
 
-        // Tiga gambar sekaligus, dua sudah tersimpan + satu unggahan baru
-        $png = 'data:image/png;base64,' . base64_encode(
-            base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8DwHwAFAAH/q842iQAAAABJRU5ErkJggg==')
-        );
+        $png = 'data:image/png;base64,'.base64_encode(base64_decode(
+            'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8DwHwAFAAH/q842iQAAAABJRU5ErkJggg==',
+            true,
+        ));
 
         $this->actingAs($user)->post(route('components.fr.storeSingle', $component->comp_id), [
             'part_name' => 'TRUNION',
             'qty' => 1,
             'work_types' => ['repair'],
             'images' => [
-                ['path' => 'storage/fr-sketches/a.jpg', 'x' => 2, 'y' => 3, 'w' => 46],
-                ['path' => 'storage/fr-sketches/b.jpg', 'x' => 50, 'y' => 3, 'w' => 46],
+                ['data' => $png, 'x' => 2, 'y' => 3, 'w' => 46],
+                ['data' => $png, 'x' => 50, 'y' => 3, 'w' => 46],
                 ['data' => $png, 'x' => 2, 'y' => 40, 'w' => 46],
             ],
         ])->assertRedirect();
@@ -424,18 +446,23 @@ class FrMolFormTest extends TestCase
         $list = $fr->imageList();
 
         $this->assertCount(3, $list);
-        $this->assertSame('storage/fr-sketches/a.jpg', $list[0]['path']);
-        $this->assertSame('storage/fr-sketches/b.jpg', $list[1]['path']);
-        // Unggahan baru tersimpan sebagai berkas, bukan data URL
+        $this->assertStringStartsWith('storage/fr-sketches/', $list[0]['path']);
+        $this->assertStringStartsWith('storage/fr-sketches/', $list[1]['path']);
         $this->assertStringStartsWith('storage/fr-sketches/', $list[2]['path']);
-        $this->assertStringNotContainsString('data:image', $list[2]['path']);
         $this->assertSame(40.0, $list[2]['y']);
 
-        // Lima gambar juga harus bisa
-        $five = [];
-        for ($i = 0; $i < 5; $i++) {
-            $five[] = ['path' => "storage/fr-sketches/img{$i}.jpg", 'x' => 2, 'y' => 3, 'w' => 40];
-        }
+        $owned = collect($list)->map(fn ($img) => [
+            'path' => $img['path'],
+            'x' => $img['x'],
+            'y' => $img['y'],
+            'w' => $img['w'],
+        ])->all();
+
+        $five = array_merge($owned, [
+            ['data' => $png, 'x' => 2, 'y' => 3, 'w' => 40],
+            ['data' => $png, 'x' => 50, 'y' => 3, 'w' => 40],
+        ]);
+
         $this->actingAs($user)->put(route('components.fr.update', [$component->comp_id, $fr->fr_id]), [
             'part_name' => 'TRUNION',
             'qty' => 1,
@@ -448,8 +475,16 @@ class FrMolFormTest extends TestCase
 
     public function test_gambar_yang_dihapus_tidak_lagi_tersimpan(): void
     {
+        Storage::fake('public');
         $user = $this->mechanic();
         $component = $this->makeComponent();
+
+        $pngBytes = base64_decode(
+            'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8DwHwAFAAH/q842iQAAAABJRU5ErkJggg==',
+            true,
+        );
+        Storage::disk('public')->put('fr-sketches/a.png', $pngBytes);
+        Storage::disk('public')->put('fr-sketches/b.png', $pngBytes);
 
         $fr = FabricationRequest::create([
             'comp_id' => $component->comp_id,
@@ -460,22 +495,163 @@ class FrMolFormTest extends TestCase
             'source' => 'manual',
             'status' => 'draft',
             'images' => [
-                ['path' => 'storage/fr-sketches/a.jpg', 'x' => 2, 'y' => 3, 'w' => 46],
-                ['path' => 'storage/fr-sketches/b.jpg', 'x' => 50, 'y' => 3, 'w' => 46],
+                ['path' => 'storage/fr-sketches/a.png', 'x' => 2, 'y' => 3, 'w' => 46],
+                ['path' => 'storage/fr-sketches/b.png', 'x' => 50, 'y' => 3, 'w' => 46],
             ],
         ]);
 
-        // Kirim hanya satu gambar = yang lain dihapus dari form
         $this->actingAs($user)->put(route('components.fr.update', [$component->comp_id, $fr->fr_id]), [
             'part_name' => 'SHAFT',
             'qty' => 1,
             'work_types' => ['repair'],
-            'images' => [['path' => 'storage/fr-sketches/b.jpg', 'x' => 10, 'y' => 5, 'w' => 50]],
+            'images' => [['path' => 'storage/fr-sketches/b.png', 'x' => 10, 'y' => 5, 'w' => 50]],
         ])->assertRedirect();
 
         $list = $fr->fresh()->imageList();
         $this->assertCount(1, $list);
-        $this->assertSame('storage/fr-sketches/b.jpg', $list[0]['path']);
+        $this->assertSame('storage/fr-sketches/b.png', $list[0]['path']);
+    }
+
+    public function test_anotasi_garis_panah_dan_teks_ukuran_tersimpan(): void
+    {
+        $user = $this->mechanic();
+        $component = $this->makeComponent();
+
+        $this->actingAs($user)->post(route('components.fr.storeSingle', $component->comp_id), [
+            'part_name' => 'TRUNION',
+            'qty' => 1,
+            'work_types' => ['repair'],
+            'annotations_present' => '1',
+            'annotations' => [
+                [
+                    'type' => 'double_arrow',
+                    'x1' => 25.5,
+                    'y1' => 45,
+                    'x2' => 78.25,
+                    'y2' => 45,
+                    'color' => '#ff0000',
+                    'stroke' => 3,
+                ],
+                [
+                    'type' => 'text',
+                    'x' => 48,
+                    'y' => 34.5,
+                    'text' => '120mm',
+                    'color' => '#ffffff',
+                    'font_size' => 6,
+                ],
+            ],
+        ])->assertRedirect();
+
+        $fr = FabricationRequest::where('comp_id', $component->comp_id)->firstOrFail();
+        $annotations = $fr->annotationList();
+
+        $this->assertCount(2, $annotations);
+        $this->assertSame('double_arrow', $annotations[0]['type']);
+        $this->assertSame(78.25, $annotations[0]['x2']);
+        $this->assertSame(3.0, $annotations[0]['stroke']);
+        $this->assertSame('120mm', $annotations[1]['text']);
+        $this->assertSame('#ffffff', $annotations[1]['color']);
+    }
+
+    public function test_form_edit_memuat_anotasi_tersimpan_sebagai_objek_interaktif(): void
+    {
+        $user = $this->mechanic();
+        $component = $this->makeComponent();
+        $fr = FabricationRequest::create([
+            'comp_id' => $component->comp_id,
+            'fr_number' => 'FR/SIS/RC/0083/VIII/2026/INT',
+            'part_name' => 'SHAFT',
+            'qty' => 1,
+            'work_type' => 'repair',
+            'source' => 'manual',
+            'status' => 'draft',
+            'annotations' => [
+                [
+                    'type' => 'line',
+                    'x1' => 12.5,
+                    'y1' => 24,
+                    'x2' => 70.25,
+                    'y2' => 68,
+                    'color' => '#123456',
+                    'stroke' => 4,
+                ],
+                [
+                    'type' => 'text',
+                    'x' => 33,
+                    'y' => 40,
+                    'text' => 'Bebas diedit',
+                    'color' => '#654321',
+                    'font_size' => 7,
+                ],
+            ],
+        ]);
+
+        $response = $this->actingAs($user)
+            ->get(route('components.fr.edit', [$component->comp_id, $fr->fr_id]));
+
+        $response->assertOk();
+        $response->assertSee('"type":"line"', false);
+        $response->assertSee('"text":"Bebas diedit"', false);
+        $response->assertSee('data-annotation-id', false);
+        $response->assertSee('syncControls', false);
+        $response->assertSee('fr-canvas-editor', false);
+        $response->assertSee('background: rgba(248, 250, 252, 0.52)', false);
+    }
+
+    public function test_semua_anotasi_bisa_dihapus_dari_form(): void
+    {
+        $user = $this->mechanic();
+        $component = $this->makeComponent();
+        $fr = FabricationRequest::create([
+            'comp_id' => $component->comp_id,
+            'fr_number' => 'FR/SIS/RC/0082/VIII/2026/INT',
+            'part_name' => 'SHAFT',
+            'qty' => 1,
+            'work_type' => 'repair',
+            'source' => 'manual',
+            'status' => 'draft',
+            'annotations' => [
+                ['type' => 'text', 'x' => 10, 'y' => 20, 'text' => '15mm', 'color' => '#ef4444', 'font_size' => 5],
+            ],
+        ]);
+
+        $this->actingAs($user)->put(route('components.fr.update', [$component->comp_id, $fr->fr_id]), [
+            'part_name' => 'SHAFT',
+            'qty' => 1,
+            'work_types' => ['repair'],
+            'annotations_present' => '1',
+        ])->assertRedirect();
+
+        $this->assertSame([], $fr->fresh()->annotationList());
+    }
+
+    public function test_anotasi_dirender_sebagai_lapisan_svg_untuk_pdf(): void
+    {
+        $svg = app(FrAnnotationRenderer::class)->svg([
+            [
+                'type' => 'arrow',
+                'x1' => 10,
+                'y1' => 20,
+                'x2' => 80,
+                'y2' => 20,
+                'color' => '#ef4444',
+                'stroke' => 2,
+            ],
+            [
+                'type' => 'text',
+                'x' => 40,
+                'y' => 10,
+                'text' => '15mm & Ø120',
+                'color' => '#ffffff',
+                'font_size' => 5,
+            ],
+        ]);
+
+        $this->assertNotNull($svg);
+        $this->assertStringContainsString('<line', $svg);
+        $this->assertStringContainsString('<polygon', $svg);
+        $this->assertStringContainsString('15mm &amp; Ø120', $svg);
     }
 
     public function test_posisi_tanda_tangan_tersimpan_dan_bisa_dihapus(): void
@@ -580,5 +756,4 @@ class FrMolFormTest extends TestCase
         $this->assertSame('F', $requests[1]->order_code);
         $this->assertSame(2, $requests[1]->qty);
     }
-
 }

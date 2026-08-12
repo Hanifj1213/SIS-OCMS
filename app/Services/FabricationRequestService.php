@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Component;
 use App\Models\FabricationRequest;
+use App\Models\FrNumberSequence;
 use App\Models\PartRequest;
 use Illuminate\Support\Facades\DB;
 
@@ -19,31 +20,83 @@ class FabricationRequestService
     ) {}
 
     /**
+     * Jumlah percobaan saat reserve nomor + insert FR tabrakan (deadlock/unique).
+     */
+    private const MAX_RETRIES = 3;
+
+    /**
      * Nomor FR resmi: FR/SIS/RC/{seq 4 digit}/{bulan Romawi}/{tahun}/INT
+     *
+     * Reserve nomor dan insert FR WAJIB dalam transaksi yang sama (createDraft).
+     * Pemanggil langsung hanya untuk preview/test.
      */
     public function nextNumber(?\DateTimeInterface $at = null): string
     {
         $at = $at ? \Carbon\Carbon::parse($at) : now();
+
+        return DB::transaction(
+            fn () => $this->allocateNextNumber($at),
+            self::MAX_RETRIES,
+        );
+    }
+
+    /**
+     * Reserve nomor berikutnya dari counter tahunan (dipanggil di dalam transaksi).
+     */
+    private function allocateNextNumber(\DateTimeInterface $at): string
+    {
         $year = (int) $at->format('Y');
         $month = (int) $at->format('n');
         $roman = self::ROMAN_MONTHS[$month] ?? 'I';
 
-        return DB::transaction(function () use ($year, $roman) {
-            $numbers = FabricationRequest::where('fr_number', 'like', "FR/SIS/RC/%/{$year}/INT")
+        FrNumberSequence::query()->insertOrIgnore([
+            'year' => $year,
+            'last_number' => 0,
+        ]);
+
+        /** @var FrNumberSequence $row */
+        $row = FrNumberSequence::query()
+            ->where('year', $year)
+            ->lockForUpdate()
+            ->firstOrFail();
+
+        $row->last_number++;
+        $row->save();
+
+        $seq = str_pad((string) $row->last_number, 4, '0', STR_PAD_LEFT);
+
+        return "FR/SIS/RC/{$seq}/{$roman}/{$year}/INT";
+    }
+
+    /**
+     * Naikkan counter tahunan bila nomor manual lebih tinggi — mencegah auto
+     * scan memberi nomor yang sudah dipakai manual.
+     */
+    public function syncSequenceFromManualNumber(string $frNumber): void
+    {
+        if (! preg_match('#^FR/SIS/RC/(\d+)/[^/]+/(\d{4})/INT$#', trim($frNumber), $matches)) {
+            return;
+        }
+
+        $seq = (int) $matches[1];
+        $year = (int) $matches[2];
+
+        DB::transaction(function () use ($year, $seq) {
+            FrNumberSequence::query()->insertOrIgnore([
+                'year' => $year,
+                'last_number' => 0,
+            ]);
+
+            /** @var FrNumberSequence $row */
+            $row = FrNumberSequence::query()
+                ->where('year', $year)
                 ->lockForUpdate()
-                ->pluck('fr_number');
+                ->firstOrFail();
 
-            $maxSeq = 0;
-            foreach ($numbers as $number) {
-                if (preg_match('#FR/SIS/RC/(\d+)/#', $number, $matches)) {
-                    $maxSeq = max($maxSeq, (int) $matches[1]);
-                }
+            if ($seq > $row->last_number) {
+                $row->update(['last_number' => $seq]);
             }
-
-            $seq = str_pad((string) ($maxSeq + 1), 4, '0', STR_PAD_LEFT);
-
-            return "FR/SIS/RC/{$seq}/{$roman}/{$year}/INT";
-        });
+        }, self::MAX_RETRIES);
     }
 
     /**
@@ -169,6 +222,7 @@ class FabricationRequestService
             'part_request_candidates' => $partRequestCandidates,
             'skipped' => $skipped,
             'gsheet_error' => $gsheet['error'] ?? null,
+            'gsheet_warning' => $gsheet['warning'] ?? null,
             'gsheet_sheet' => $gsheet['sheet'] ?? null,
             'scan_profile' => $profile,
             'scan_profile_label' => $profileLabel,
@@ -324,22 +378,34 @@ class FabricationRequestService
 
     /**
      * @param  array<string, mixed>  $data
+     * @param  string|null  $frNumber  Nomor manual; null = auto dari counter tahunan
      */
-    public function createDraft(Component $component, array $data, ?int $userId = null): FabricationRequest
-    {
-        return FabricationRequest::create([
-            'comp_id' => $component->comp_id,
-            'fr_number' => $this->nextNumber(),
-            'part_number' => $data['part_number'] ?? null,
-            'part_name' => $data['part_name'],
-            'section' => $data['section'] ?? null,
-            'qty' => $data['qty'] ?? 1,
-            'work_type' => $data['work_type'] ?? 'repair',
-            'instruction' => $data['instruction'] ?? null,
-            'source' => $data['source'] ?? 'manual',
-            'status' => 'draft',
-            'created_by' => $userId,
-        ]);
+    public function createDraft(
+        Component $component,
+        array $data,
+        ?int $userId = null,
+        ?string $frNumber = null,
+    ): FabricationRequest {
+        $manualNumber = is_string($frNumber) ? trim($frNumber) : null;
+        $manualNumber = ($manualNumber !== null && $manualNumber !== '') ? $manualNumber : null;
+
+        return DB::transaction(function () use ($component, $data, $userId, $manualNumber) {
+            $number = $manualNumber ?? $this->allocateNextNumber(now());
+
+            return FabricationRequest::create([
+                'comp_id' => $component->comp_id,
+                'fr_number' => $number,
+                'part_number' => $data['part_number'] ?? null,
+                'part_name' => $data['part_name'],
+                'section' => $data['section'] ?? null,
+                'qty' => $data['qty'] ?? 1,
+                'work_type' => $data['work_type'] ?? 'repair',
+                'instruction' => $data['instruction'] ?? null,
+                'source' => $data['source'] ?? 'manual',
+                'status' => 'draft',
+                'created_by' => $userId,
+            ]);
+        }, self::MAX_RETRIES);
     }
 
     private function normalizePartName(string $name): string

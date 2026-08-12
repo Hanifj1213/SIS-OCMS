@@ -5,10 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\Component;
 use App\Models\FabricationRequest;
 use App\Services\FabricationRequestService;
+use App\Services\FrAttachmentResolver;
+use App\Services\FrAttachmentService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
 class FabricationRequestController extends Controller
@@ -19,7 +20,7 @@ class FabricationRequestController extends Controller
 
     private function authorizeMechanic(): ?\Illuminate\Http\JsonResponse
     {
-        if (!auth()->user()->hasAnyRole(['Mechanic', 'Supervisor', 'SuperAdmin'])) {
+        if (! auth()->user()?->canOperateOverhaul()) {
             return response()->json(['ok' => false, 'message' => 'Unauthorized'], 403);
         }
 
@@ -62,9 +63,8 @@ class FabricationRequestController extends Controller
         }
 
         // Baca multi-tab GSheet + retry cold-start Apps Script sering > 30 detik.
-        // Batas hanya dinaikkan untuk request scan ini, bukan dihilangkan global.
-        set_time_limit(180);
-        ini_set('max_execution_time', '180');
+        set_time_limit(300);
+        ini_set('max_execution_time', '300');
 
         $result = $this->frService->scanCandidates($component);
 
@@ -108,6 +108,7 @@ class FabricationRequestController extends Controller
             ]),
             'skipped' => $result['skipped'],
             'gsheet_error' => $result['gsheet_error'],
+            'gsheet_warning' => $result['gsheet_warning'] ?? null,
             'gsheet_sheet' => $result['gsheet_sheet'],
             'scan_profile' => $result['scan_profile'],
             'scan_profile_label' => $result['scan_profile_label'],
@@ -232,6 +233,9 @@ class FabricationRequestController extends Controller
         $validated = $request->validate($this->formRules());
         $types = $this->workTypesFrom($validated);
 
+        $manualNumber = trim((string) ($validated['fr_number'] ?? ''));
+        $manualNumber = $manualNumber !== '' ? $manualNumber : null;
+
         $fr = $this->frService->createDraft(
             $component,
             [
@@ -243,15 +247,15 @@ class FabricationRequestController extends Controller
                 'instruction' => $validated['instruction'] ?? null,
                 'source' => $validated['source'] ?? 'manual',
             ],
-            auth()->id()
+            auth()->id(),
+            $manualNumber,
         );
 
-        $extra = $this->plofieldsFrom($request, $validated)
-            + ['work_types' => $types['work_types'], 'signatures' => $this->signaturesFrom($request, null)];
+        $extra = $this->plofieldsFrom($request, $validated, null)
+            + ['work_types' => $types['work_types'], 'signatures' => app(FrAttachmentService::class)->signaturesFrom($request, null)];
 
-        // Nomor FR boleh ditulis manual; kosong = nomor otomatis dari service.
-        if (trim((string) ($validated['fr_number'] ?? '')) !== '') {
-            $extra['fr_number'] = trim($validated['fr_number']);
+        if ($manualNumber !== null) {
+            $this->frService->syncSequenceFromManualNumber($manualNumber);
         }
 
         $fr->update($extra);
@@ -263,7 +267,7 @@ class FabricationRequestController extends Controller
     public function edit(Component $component, FabricationRequest $fr)
     {
         // RBAC: hanya pelaksana yang boleh mengubah dokumen FR.
-        if (!auth()->user()->hasAnyRole(['Mechanic', 'Supervisor', 'SuperAdmin'])) {
+        if (! auth()->user()?->canOperateOverhaul()) {
             abort(403, 'Hanya Mechanic/Supervisor/SuperAdmin yang boleh mengubah FR.');
         }
 
@@ -281,7 +285,7 @@ class FabricationRequestController extends Controller
     public function update(Request $request, Component $component, FabricationRequest $fr)
     {
         // RBAC: hanya pelaksana yang boleh mengubah dokumen FR.
-        if (!auth()->user()->hasAnyRole(['Mechanic', 'Supervisor', 'SuperAdmin'])) {
+        if (! auth()->user()?->canOperateOverhaul()) {
             abort(403, 'Hanya Mechanic/Supervisor/SuperAdmin yang boleh mengubah FR.');
         }
 
@@ -295,16 +299,20 @@ class FabricationRequestController extends Controller
         $data = [
             'work_type' => $types['work_type'],
             'work_types' => $types['work_types'],
-            'signatures' => $this->signaturesFrom($request, $fr),
+            'signatures' => app(FrAttachmentService::class)->signaturesFrom($request, $fr),
             'part_number' => $validated['part_number'] ?? null,
             'part_name' => $validated['part_name'],
             'qty' => $validated['qty'],
             'instruction' => $validated['instruction'] ?? null,
-        ] + $this->plofieldsFrom($request, $validated);
+        ] + $this->plofieldsFrom($request, $validated, $fr);
 
         // Nomor FR boleh disunting, tapi jangan sampai dikosongkan.
         if (trim((string) ($validated['fr_number'] ?? '')) !== '') {
-            $data['fr_number'] = trim($validated['fr_number']);
+            $newNumber = trim($validated['fr_number']);
+            if ($newNumber !== $fr->fr_number) {
+                $data['fr_number'] = $newNumber;
+                $this->frService->syncSequenceFromManualNumber($newNumber);
+            }
         }
 
         $fr->update($data);
@@ -356,6 +364,13 @@ class FabricationRequestController extends Controller
             'signature_layout.*.x' => 'nullable|numeric|between:-20,120',
             'signature_layout.*.y' => 'nullable|numeric|between:-20,120',
             'signature_layout.*.w' => 'nullable|numeric|between:5,100',
+            // Anotasi vektor kanvas "Gambar & Dimensi" (garis/kuas/konektor/teks)
+            // dikirim sebagai JSON dari toolbar; divalidasi saat decode.
+            'annotations_json' => 'nullable|string|max:65535',
+            // Format lama sebelum editor SVG disatukan. Tetap diterima agar
+            // request/test lama dan proses edit dokumen lama tidak rusak.
+            'annotations_present' => 'nullable|boolean',
+            'annotations' => 'nullable|array|max:200',
             'signatures.*.remove_image' => 'nullable|boolean',
             // Kolom lama (dua gambar tetap) — tetap diterima demi kompatibilitas
             'image_layout' => 'nullable|array',
@@ -394,7 +409,7 @@ class FabricationRequestController extends Controller
      * @param  array<string, mixed>  $validated
      * @return array<string, mixed>
      */
-    private function plofieldsFrom(Request $request, array $validated): array
+    private function plofieldsFrom(Request $request, array $validated, ?FabricationRequest $fr = null): array
     {
         $data = [];
 
@@ -410,141 +425,107 @@ class FabricationRequestController extends Controller
             }
         }
 
+        $attachments = app(FrAttachmentService::class);
+        $resolver = app(FrAttachmentResolver::class);
+
         if ($request->hasFile('image')) {
-            $data['image_path'] = 'storage/' . $request->file('image')->store('fr-sketches', 'public');
+            $stored = $request->file('image')->store('fr-sketches', 'public');
+            $candidate = 'storage/'.$stored;
+            $data['image_path'] = $resolver->normalizeClientPath($candidate) ?? null;
+            if ($data['image_path'] === null) {
+                Storage::disk('public')->delete($stored);
+            }
         }
 
         if ($request->hasFile('image_2')) {
-            $data['image_path_2'] = 'storage/' . $request->file('image_2')->store('fr-sketches', 'public');
+            $stored = $request->file('image_2')->store('fr-sketches', 'public');
+            $candidate = 'storage/'.$stored;
+            $data['image_path_2'] = $resolver->normalizeClientPath($candidate) ?? null;
+            if ($data['image_path_2'] === null) {
+                Storage::disk('public')->delete($stored);
+            }
         }
 
         if (isset($validated['image_layout'])) {
-            $data['image_layout'] = $this->imageLayoutFrom($validated['image_layout']);
+            $data['image_layout'] = $attachments->imageLayoutFrom($validated['image_layout']);
         }
 
         if (array_key_exists('images', $validated)) {
-            $data['images'] = $this->imagesFrom((array) $validated['images']);
+            $data['images'] = $attachments->imagesFrom((array) $validated['images'], $fr);
         }
 
         if (isset($validated['signature_layout'])) {
-            $data['signature_layout'] = $this->signatureLayoutFrom($validated['signature_layout']);
+            $data['signature_layout'] = $attachments->signatureLayoutFrom($validated['signature_layout']);
+        }
+
+        if (array_key_exists('annotations_json', $validated)) {
+            $data['annotations'] = $this->annotationsFrom($validated['annotations_json']);
+        } elseif (array_key_exists('annotations_present', $validated)) {
+            $data['annotations'] = $attachments->annotationsFrom((array) ($validated['annotations'] ?? []));
         }
 
         return $data;
     }
 
     /**
-     * Daftar gambar "Gambar & Dimensi". Entri boleh berupa gambar yang sudah
-     * tersimpan ('path') atau unggahan baru berupa data URL ('data'). Gambar
-     * yang tidak lagi dikirim berarti dihapus dari form.
+     * Decode & sanitasi daftar anotasi dari toolbar. Hanya tipe yang dikenal
+     * yang disimpan, koordinat dikunci 0..100 agar aman dirender ulang.
      *
-     * @param  array<int, mixed>  $rows
-     * @return list<array{path: string, x: float, y: float, w: float}>
+     * @return list<array<string, mixed>>
      */
-    private function imagesFrom(array $rows): array
+    private function annotationsFrom(?string $json): array
     {
-        $images = [];
+        $decoded = $json ? json_decode($json, true) : null;
+        if (!is_array($decoded)) {
+            return [];
+        }
 
-        foreach (array_values($rows) as $i => $row) {
-            $row = (array) $row;
-            $path = trim((string) ($row['path'] ?? ''));
-
-            if ($path === '' && ($row['data'] ?? '') !== '') {
-                $path = $this->storeDataUrl((string) $row['data']) ?? '';
-            }
-
-            if ($path === '') {
+        $out = [];
+        foreach ($decoded as $a) {
+            if (!is_array($a)) {
                 continue;
             }
+            // Versi awal memakai underscore (`double_arrow`); versi toolbar
+            // sekarang memakai hyphen. Normalisasi supaya data lama tidak
+            // hilang saat FR lama diedit lalu disimpan ulang.
+            $type = str_replace('_', '-', (string) ($a['type'] ?? ''));
+            $storedType = $type === 'double-arrow' ? 'double_arrow' : $type;
+            $color = is_string($a['color'] ?? null) && preg_match('/^#[0-9a-fA-F]{3,8}$/', $a['color'])
+                ? $a['color'] : '#dc2626';
+            $stroke = max(1, min(20, (float) ($a['stroke'] ?? 2)));
+            $base = ['id' => (int) ($a['id'] ?? 0), 'type' => $storedType, 'color' => $color, 'stroke' => $stroke];
+            $pt = fn ($v) => max(0, min(100, (float) $v));
 
-            $default = FabricationRequest::defaultImageBox(count($images));
-
-            $images[] = [
-                'path' => $path,
-                'x' => round((float) ($row['x'] ?? $default['x']), 2),
-                'y' => round((float) ($row['y'] ?? $default['y']), 2),
-                'w' => round((float) ($row['w'] ?? $default['w']), 2),
-            ];
-        }
-
-        return $images;
-    }
-
-    /**
-     * Simpan gambar yang dikirim sebagai data URL ke storage publik.
-     * Mengembalikan path relatif, atau null bila datanya tidak valid.
-     */
-    private function storeDataUrl(string $dataUrl): ?string
-    {
-        if (!preg_match('#^data:image/(jpeg|jpg|png|gif|webp);base64,#i', $dataUrl, $m)) {
-            return null;
-        }
-
-        $binary = base64_decode(substr($dataUrl, strlen($m[0])), true);
-
-        // Batas 5 MB, sama dengan aturan unggahan berkas biasa.
-        if ($binary === false || $binary === '' || strlen($binary) > 5 * 1024 * 1024) {
-            return null;
-        }
-
-        $ext = strtolower($m[1] === 'jpeg' ? 'jpg' : $m[1]);
-        $relative = 'fr-sketches/' . Str::random(40) . '.' . $ext;
-
-        Storage::disk('public')->put($relative, $binary);
-
-        return 'storage/' . $relative;
-    }
-
-    /**
-     * @param  array<string, mixed>  $input
-     * @return array<string, array{x: float, y: float, w: float}>
-     */
-    private function signatureLayoutFrom(array $input): array
-    {
-        $layout = [];
-
-        foreach (array_keys(FabricationRequest::SIGNATURE_ROLES) as $role) {
-            $box = (array) ($input[$role] ?? []);
-
-            if (!isset($box['x'], $box['y'], $box['w'])) {
-                continue;
+            if ($type === 'text') {
+                $text = trim((string) ($a['text'] ?? ''));
+                if ($text === '') {
+                    continue;
+                }
+                $out[] = $base + [
+                    'x' => $pt($a['x'] ?? 0),
+                    'y' => $pt($a['y'] ?? 0),
+                    'text' => mb_substr($text, 0, 200),
+                    'font_size' => max(2, min(15, (float) ($a['font_size'] ?? $a['size'] ?? 5))),
+                ];
+            } elseif ($type === 'brush' && is_array($a['points'] ?? null) && count($a['points']) >= 2) {
+                $points = [];
+                foreach (array_slice($a['points'], 0, 400) as $p) {
+                    if (is_array($p) && isset($p['x'], $p['y'])) {
+                        $points[] = ['x' => $pt($p['x']), 'y' => $pt($p['y'])];
+                    }
+                }
+                if (count($points) >= 2) {
+                    $out[] = $base + ['points' => $points];
+                }
+            } elseif (in_array($type, ['line', 'arrow', 'connector', 'double-arrow'], true)) {
+                $out[] = $base + [
+                    'x1' => $pt($a['x1'] ?? 0), 'y1' => $pt($a['y1'] ?? 0),
+                    'x2' => $pt($a['x2'] ?? 0), 'y2' => $pt($a['y2'] ?? 0),
+                ];
             }
-
-            $layout[$role] = [
-                'x' => round((float) $box['x'], 2),
-                'y' => round((float) $box['y'], 2),
-                'w' => round((float) $box['w'], 2),
-            ];
         }
 
-        return $layout;
-    }
-
-    /**
-     * Bersihkan posisi & ukuran gambar hasil geser/resize di form.
-     *
-     * @param  array<string, mixed>  $input
-     * @return array<string, array{x: float, y: float, w: float}>
-     */
-    private function imageLayoutFrom(array $input): array
-    {
-        $layout = [];
-
-        foreach (['image', 'image_2'] as $slot) {
-            $box = (array) ($input[$slot] ?? []);
-
-            if (!isset($box['x'], $box['y'], $box['w'])) {
-                continue;
-            }
-
-            $layout[$slot] = [
-                'x' => round((float) $box['x'], 2),
-                'y' => round((float) $box['y'], 2),
-                'w' => round((float) $box['w'], 2),
-            ];
-        }
-
-        return $layout;
+        return $out;
     }
 
     /**
@@ -572,47 +553,6 @@ class FabricationRequestController extends Controller
             'work_type' => $types[0],
             'work_types' => $types,
         ];
-    }
-
-    /**
-     * Gabungkan data tanda tangan lama dengan kiriman baru. Gambar yang tidak
-     * diunggah ulang tetap dipertahankan supaya tidak hilang saat mengedit
-     * kolom lain.
-     *
-     * @return array<string, array<string, mixed>>
-     */
-    private function signaturesFrom(Request $request, ?FabricationRequest $fr): array
-    {
-        $input = (array) $request->input('signatures', []);
-        $result = [];
-
-        foreach (array_keys(FabricationRequest::SIGNATURE_ROLES) as $role) {
-            $existing = $fr ? $fr->signature($role) : ['name' => '', 'date' => null, 'image' => null];
-            $row = (array) ($input[$role] ?? []);
-
-            $image = $existing['image'];
-            if ($file = $request->file("signatures.{$role}.image")) {
-                $image = 'storage/' . $file->store('fr-signatures', 'public');
-            } elseif (!empty($row['remove_image'])) {
-                // Dihapus lewat klik kanan pada gambar tanda tangan
-                $image = null;
-            } elseif (!empty($row['remove_image'])) {
-                $image = null;   // dihapus lewat klik kanan di form
-            }
-
-            $entry = [
-                'name' => trim((string) ($row['name'] ?? $existing['name'])),
-                'date' => ($row['date'] ?? $existing['date']) ?: null,
-                'image' => $image,
-            ];
-
-            // Simpan hanya kolom yang benar-benar terisi agar JSON tetap ringkas.
-            if ($entry['name'] !== '' || $entry['date'] || $entry['image']) {
-                $result[$role] = $entry;
-            }
-        }
-
-        return $result;
     }
 
     public function updateStatus(Request $request, Component $component, FabricationRequest $fr)
@@ -662,16 +602,24 @@ class FabricationRequestController extends Controller
         $component->load([]);
         $fr->load('creator');
 
-        if (auth()->check() && auth()->user()->hasAnyRole(['Mechanic', 'Supervisor', 'SuperAdmin'])) {
+        if (auth()->check() && auth()->user()->canOperateOverhaul()) {
             if ($fr->status === 'draft') {
                 $fr->update(['status' => 'printed']);
             }
+        }
+
+        $resolver = app(FrAttachmentResolver::class);
+        $signatureFiles = [];
+        foreach (array_keys(FabricationRequest::SIGNATURE_ROLES) as $role) {
+            $signatureFiles[$role] = $resolver->resolveSignatureImageForPdf($fr, $role);
         }
 
         // Form PLO/09/F-021 asli dicetak A4 landscape.
         $pdf = Pdf::loadView('fr.pdf', [
             'component' => $component,
             'fr' => $fr,
+            'pdfImages' => $resolver->resolveImagesForPdf($fr),
+            'signatureFiles' => $signatureFiles,
         ]);
         $pdf->setPaper('a4', 'landscape');
 
