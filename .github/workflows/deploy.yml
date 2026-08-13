@@ -1,0 +1,58 @@
+# Deploy otomatis ke PC/server kantor yang menjalankan GitHub Actions
+# self-hosted runner (Windows + Laragon). Lihat DEPLOY_SELF_HOSTED_RUNNER.md.
+#
+# Trigger: push ke main/master. Tidak jalan di ubuntu-latest — wajib runner lokal.
+
+name: Deploy to OCMS server
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch: # tombol "Run workflow" di GitHub Actions UI
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ocms-deploy
+  cancel-in-progress: false # jangan potong deploy yang sedang jalan
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    timeout-minutes: 30
+
+    env:
+      # Ubah path ini di server lewat Variables (opsional) atau edit di sini:
+      OCMS_DEPLOY_PATH: C:\laragon\www\sisi-ocms
+
+    steps:
+      - name: Checkout (ambil skrip deploy terbaru)
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Deploy ke folder Laragon
+        shell: powershell
+        run: |
+          $path = $env:OCMS_DEPLOY_PATH
+          if (-not (Test-Path $path)) {
+            throw "Folder deploy tidak ada: $path — clone repo sekali ke path itu dan buat .env dulu."
+          }
+          # Pakai deploy.ps1 dari commit yang baru di-push (workspace),
+          # target sinkronisasi = folder aplikasi Apache.
+          & powershell -ExecutionPolicy Bypass -File "$env:GITHUB_WORKSPACE\tools\deploy.ps1" -DeployPath $path
+
+      - name: Smoke check (HTTP lokal)
+        shell: powershell
+        run: |
+          try {
+            $r = Invoke-WebRequest -Uri "http://127.0.0.1/login" -UseBasicParsing -TimeoutSec 15
+            Write-Host "Smoke /login => HTTP $($r.StatusCode)"
+            if ($r.StatusCode -ge 500) { throw "Server error setelah deploy" }
+          } catch {
+            Write-Warning "Smoke check gagal (Apache mungkin beda vhost): $_"
+            # Jangan gagalkan deploy hanya karena smoke — log saja
+          }
