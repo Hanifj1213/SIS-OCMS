@@ -22,7 +22,7 @@ class StatusController extends Controller
         $readyForUse  = Component::where('status', 'Ready for Use')->count();
         $pendingParts = PartRequest::where('status', 'Pending')->count();
 
-        $stageCounts = Component::where('status', 'On Progress')
+        $stageCounts = Component::whereIn('status', ['On Progress', 'Ready for Use'])
             ->selectRaw('current_stage, COUNT(*) as total')
             ->groupBy('current_stage')
             ->pluck('total', 'current_stage');

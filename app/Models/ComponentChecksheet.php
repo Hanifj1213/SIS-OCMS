@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\ChecksheetIntegrityService;
 use Illuminate\Database\Eloquent\Model;
 
 class ComponentChecksheet extends Model
@@ -36,10 +37,16 @@ class ComponentChecksheet extends Model
      */
     public function getProgressAttribute(): int
     {
-        $totalItems = count($this->items ?? []);
-        $answeredItems = count($this->answers ?? []);
+        $integrity = app(ChecksheetIntegrityService::class);
+        $totalItems = count($integrity->validItemIds($this));
 
-        return $totalItems > 0 ? (int) round(($answeredItems / $totalItems) * 100) : 0;
+        if ($totalItems === 0) {
+            return 0;
+        }
+
+        $answeredItems = $integrity->answeredCount($this);
+
+        return (int) round(($answeredItems / $totalItems) * 100);
     }
 
     /**
@@ -47,6 +54,6 @@ class ComponentChecksheet extends Model
      */
     public function getIsCompleteAttribute(): bool
     {
-        return $this->progress === 100;
+        return app(ChecksheetIntegrityService::class)->isFullyAnswered($this);
     }
 }

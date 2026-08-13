@@ -4,10 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Models\Component;
 use App\Models\ComponentChecksheet;
+use App\Services\ChecksheetIntegrityService;
 use Illuminate\Http\Request;
 
 class ChecksheetController extends Controller
 {
+    public function __construct(
+        private readonly ChecksheetIntegrityService $integrity,
+    ) {}
+
     /**
      * Tampilkan UI checksheet interaktif (Typeform-style).
      */
@@ -32,9 +37,7 @@ class ChecksheetController extends Controller
      */
     public function saveAnswer(Request $request, Component $component, int $stage)
     {
-        // RBAC: hanya pelaksana yang boleh mengubah jawaban checksheet
-        // (Management / user tanpa role hanya boleh melihat).
-        if (!auth()->user()->hasAnyRole(['Mechanic', 'Supervisor', 'SuperAdmin'])) {
+        if (! auth()->user()?->canOperateOverhaul()) {
             return response()->json(['error' => 'Tidak memiliki izin.'], 403);
         }
 
@@ -47,22 +50,21 @@ class ChecksheetController extends Controller
         $answer = $request->answer;
         $userId = auth()->id();
 
-        // item_id harus benar-benar ada di checksheet; jawaban dengan id
-        // ngawur dulu ikut menaikkan progress (%).
         $target = $component->checksheets()
             ->where('stage_number', $stage)
             ->firstOrFail();
 
-        $validIds = collect($target->items ?? [])->pluck('id')->all();
-        if (!in_array($itemId, $validIds, true)) {
+        if ($denied = $this->integrity->mutationDeniedReason($component->fresh(), $target)) {
+            return response()->json(['error' => $denied], 403);
+        }
+
+        if (! $this->integrity->isValidItemId($target, $itemId)) {
             return response()->json([
                 'success' => false,
                 'message' => 'Item checksheet tidak dikenal.',
             ], 422);
         }
 
-        // Retry singkat untuk SQLite "database is locked" saat polling/status
-        // dan POST jawaban saling berkejaran di artisan serve.
         $checksheet = null;
         $lastError = null;
         for ($attempt = 0; $attempt < 4; $attempt++) {
@@ -73,17 +75,19 @@ class ChecksheetController extends Controller
                         ->lockForUpdate()
                         ->firstOrFail();
 
-                    $answers = $checksheet->answers ?? [];
+                    $componentLocked = $component->fresh();
+                    if ($denied = $this->integrity->mutationDeniedReason($componentLocked, $checksheet)) {
+                        abort(403, $denied);
+                    }
+
+                    $answers = $this->integrity->sanitizeAnswers($checksheet, $checksheet->answers ?? []);
                     $answers[$itemId] = $answer;
 
                     $updateData = [
                         'answers'   => $answers,
                         'filled_by' => $userId,
+                        'completed_at' => $this->integrity->resolveCompletedAt($checksheet, $answers),
                     ];
-
-                    if (count($answers) >= count($checksheet->items ?? [])) {
-                        $updateData['completed_at'] = now();
-                    }
 
                     $checksheet->update($updateData);
 
@@ -91,17 +95,22 @@ class ChecksheetController extends Controller
                 });
                 $lastError = null;
                 break;
+            } catch (\Symfony\Component\HttpKernel\Exception\HttpException $e) {
+                if ($e->getStatusCode() === 403) {
+                    return response()->json(['error' => $e->getMessage()], 403);
+                }
+                throw $e;
             } catch (\Throwable $e) {
                 $lastError = $e;
                 $msg = $e->getMessage();
-                if (!str_contains($msg, 'database is locked') && !str_contains($msg, 'HY000')) {
+                if (! str_contains($msg, 'database is locked') && ! str_contains($msg, 'HY000')) {
                     throw $e;
                 }
                 usleep(120000 * ($attempt + 1));
             }
         }
 
-        if ($lastError || !$checksheet) {
+        if ($lastError || ! $checksheet) {
             return response()->json([
                 'success' => false,
                 'message' => 'Database sibuk, coba lagi.',
@@ -119,7 +128,7 @@ class ChecksheetController extends Controller
      */
     public function addItem(Request $request, Component $component, int $stage)
     {
-        if (!auth()->user()->hasAnyRole(['Mechanic', 'Supervisor', 'SuperAdmin'])) {
+        if (! auth()->user()?->canOperateOverhaul()) {
             return response()->json(['error' => 'Tidak memiliki izin.'], 403);
         }
 
@@ -132,8 +141,12 @@ class ChecksheetController extends Controller
             ->where('stage_number', $stage)
             ->firstOrFail();
 
+        if ($denied = $this->integrity->mutationDeniedReason($component->fresh(), $checksheet)) {
+            return response()->json(['error' => $denied], 403);
+        }
+
         $items = $checksheet->items;
-        $customId = 'CUSTOM-' . strtoupper(substr(md5(uniqid()), 0, 6));
+        $customId = 'CUSTOM-'.strtoupper(substr(md5(uniqid('', true)), 0, 6));
 
         $items[] = [
             'id'     => $customId,
@@ -156,7 +169,7 @@ class ChecksheetController extends Controller
      */
     public function removeItem(Request $request, Component $component, int $stage)
     {
-        if (!auth()->user()->hasAnyRole(['Mechanic', 'Supervisor', 'SuperAdmin'])) {
+        if (! auth()->user()?->canOperateOverhaul()) {
             return response()->json(['error' => 'Tidak memiliki izin.'], 403);
         }
 
@@ -168,17 +181,26 @@ class ChecksheetController extends Controller
             ->where('stage_number', $stage)
             ->firstOrFail();
 
+        if ($denied = $this->integrity->removeItemDeniedReason($component->fresh(), $checksheet, $request->item_id)) {
+            $status = str_contains($denied, 'standar') || str_contains($denied, 'tidak dikenal') ? 422 : 403;
+
+            return response()->json(['message' => $denied], $status);
+        }
+
         $items = collect($checksheet->items)->filter(function ($item) use ($request) {
             return $item['id'] !== $request->item_id;
         })->values()->all();
 
-        // Also remove answer if exists
-        $answers = $checksheet->answers ?? [];
+        $answers = $this->integrity->sanitizeAnswers($checksheet, $checksheet->answers ?? []);
         unset($answers[$request->item_id]);
 
+        $updatedChecksheet = $checksheet->replicate();
+        $updatedChecksheet->items = $items;
+
         $checksheet->update([
-            'items'   => $items,
-            'answers' => $answers,
+            'items'        => $items,
+            'answers'      => $answers,
+            'completed_at' => $this->integrity->resolveCompletedAt($updatedChecksheet, $answers),
         ]);
 
         return response()->json([
@@ -192,7 +214,7 @@ class ChecksheetController extends Controller
      */
     public function saveSpreadsheet(Request $request, Component $component, int $stage)
     {
-        if (!auth()->user()->hasAnyRole(['Mechanic', 'Supervisor', 'SuperAdmin'])) {
+        if (! auth()->user()?->canOperateOverhaul()) {
             return response()->json(['error' => 'Tidak memiliki izin.'], 403);
         }
 
@@ -200,14 +222,34 @@ class ChecksheetController extends Controller
             ->where('stage_number', $stage)
             ->firstOrFail();
 
-        $answers = $request->input('answers', []);
-        
+        if ($denied = $this->integrity->mutationDeniedReason($component->fresh(), $checksheet)) {
+            return response()->json(['error' => $denied], 403);
+        }
+
+        $rawAnswers = $request->input('answers', []);
+        if (! is_array($rawAnswers)) {
+            return response()->json(['message' => 'Format answers tidak valid.'], 422);
+        }
+
+        $invalid = $this->integrity->invalidAnswerKeys($checksheet, $rawAnswers);
+        if ($invalid !== []) {
+            return response()->json([
+                'message' => 'Jawaban checksheet tidak valid.',
+                'invalid' => $invalid,
+            ], 422);
+        }
+
+        $answers = $this->integrity->sanitizeAnswers($checksheet, $rawAnswers);
+
         $checksheet->update([
-            'answers' => $answers,
+            'answers'      => $answers,
+            'filled_by'    => auth()->id(),
+            'completed_at' => $this->integrity->resolveCompletedAt($checksheet, $answers),
         ]);
 
         return response()->json([
-            'success' => true,
+            'success'  => true,
+            'progress' => $checksheet->fresh()->progress,
         ]);
     }
 }

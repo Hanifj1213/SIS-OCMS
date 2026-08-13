@@ -4,22 +4,16 @@ namespace App\Http\Controllers;
 
 use App\Models\Component;
 use App\Models\StageMechanicLog;
+use App\Services\StageCrewIntegrityService;
 use App\Services\StageTimeService;
 use Illuminate\Http\Request;
 
-/**
- * Pelacakan waktu 3 dimensi per tahap (Calendar / Work / Man Hour).
- *
- * Man Hour digerakkan daftar nama crew aktif: tambah nama = multiplier
- * naik sejak saat itu, hapus nama = berhenti. Tidak ada tombol start/stop —
- * jam kerja (07:30-16:30) dan jam istirahat dipotong otomatis dari config.
- * Setiap nama tercatat kapan masuk & keluar sehingga Man Hour tetap akurat.
- */
 class StageTimeController extends Controller
 {
-    /**
-     * Metrik live seluruh tahap — dipanggil polling JS di halaman detail.
-     */
+    public function __construct(
+        private readonly StageCrewIntegrityService $crewIntegrity,
+    ) {}
+
     public function metrics(Component $component, StageTimeService $service)
     {
         return response()->json([
@@ -30,13 +24,16 @@ class StageTimeController extends Controller
         ]);
     }
 
-    /**
-     * Tambah satu mekanik (nama bebas) ke crew tahap yang sedang berjalan.
-     */
     public function addMechanic(Request $request, Component $component)
     {
-        if (!auth()->user()->hasAnyRole(['Mechanic', 'Supervisor', 'SuperAdmin'])) {
+        if (! auth()->user()?->canOperateOverhaul()) {
             return back()->withErrors(['crew' => 'Anda tidak memiliki izin mengubah crew.']);
+        }
+
+        $component = $component->fresh();
+
+        if ($denied = $this->crewIntegrity->mutationDeniedReason($component)) {
+            return back()->withErrors(['crew' => $denied]);
         }
 
         $validated = $request->validate([
@@ -53,7 +50,7 @@ class StageTimeController extends Controller
             ->contains(fn ($log) => mb_strtolower(trim((string) $log->crew_names)) === mb_strtolower($name));
 
         if ($duplicate) {
-            return back()->withErrors(['crew' => '"' . $name . '" sudah ada di crew tahap ini.']);
+            return back()->withErrors(['crew' => '"'.$name.'" sudah ada di crew tahap ini.']);
         }
 
         $component->mechanicLogs()->create([
@@ -64,16 +61,12 @@ class StageTimeController extends Controller
             'clock_in' => now(),
         ]);
 
-        return back()->with('success', $name . ' ditambahkan ke crew — Man Hour ikut menghitung mulai sekarang.');
+        return back()->with('success', $name.' ditambahkan ke crew — Man Hour ikut menghitung mulai sekarang.');
     }
 
-    /**
-     * Hapus mekanik dari crew: jam hadirnya ditutup (bukan dihapus dari
-     * riwayat) supaya Man Hour yang sudah berjalan tetap tercatat.
-     */
     public function removeMechanic(Component $component, StageMechanicLog $log)
     {
-        if (!auth()->user()->hasAnyRole(['Mechanic', 'Supervisor', 'SuperAdmin'])) {
+        if (! auth()->user()?->canOperateOverhaul()) {
             return back()->withErrors(['crew' => 'Anda tidak memiliki izin mengubah crew.']);
         }
 
@@ -81,12 +74,12 @@ class StageTimeController extends Controller
             abort(404);
         }
 
-        if ($log->clock_out) {
-            return back()->withErrors(['crew' => 'Mekanik ini sudah tidak aktif.']);
+        if ($denied = $this->crewIntegrity->mutationDeniedReason($component->fresh(), $log)) {
+            return back()->withErrors(['crew' => $denied]);
         }
 
         $log->update(['clock_out' => now()]);
 
-        return back()->with('success', ($log->crew_names ?: 'Mekanik') . ' dikeluarkan dari crew.');
+        return back()->with('success', ($log->crew_names ?: 'Mekanik').' dikeluarkan dari crew.');
     }
 }

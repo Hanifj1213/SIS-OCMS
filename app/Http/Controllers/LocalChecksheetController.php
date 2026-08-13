@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Component;
 use App\Models\ComponentSpreadsheetAnswer;
 use App\Models\SpreadsheetLayout;
+use App\Services\LocalChecksheetIntegrityService;
 use Illuminate\Http\Request;
 
 /**
@@ -13,6 +14,10 @@ use Illuminate\Http\Request;
  */
 class LocalChecksheetController extends Controller
 {
+    public function __construct(
+        private readonly LocalChecksheetIntegrityService $integrity,
+    ) {}
+
     /** Jenis checksheet yang boleh dibuka. */
     private const KINDS = [
         'disassembly' => 'Disassembly',
@@ -47,7 +52,7 @@ class LocalChecksheetController extends Controller
             'answers' => [],
             'editable' => false,
             'component' => null,
-            'title' => $layout->major_category . ' ' . ($layout->egi_model ?: '') . ' — ' . self::KINDS[$layout->kind] ?? $layout->kind,
+            'title' => $layout->major_category.' '.($layout->egi_model ?: '').' — '.self::KINDS[$layout->kind] ?? $layout->kind,
         ]);
     }
 
@@ -57,7 +62,7 @@ class LocalChecksheetController extends Controller
         abort_unless(isset(self::KINDS[$kind]), 404);
 
         $layout = SpreadsheetLayout::forComponent($component, $kind);
-        abort_if(!$layout, 404, "Layout {$kind} untuk {$component->major_category} {$component->egi} belum diimpor.");
+        abort_if(! $layout, 404, "Layout {$kind} untuk {$component->major_category} {$component->egi} belum diimpor.");
 
         $sheets = $layout->sheets();
         $active = $this->activeSheet($request, $sheets);
@@ -74,9 +79,9 @@ class LocalChecksheetController extends Controller
             'sheets' => $sheets,
             'active' => $active,
             'answers' => $answers,
-            'editable' => $this->canEdit(),
+            'editable' => $this->canEdit($component, $kind),
             'component' => $component,
-            'title' => $component->serial_number . ' — ' . (self::KINDS[$kind] ?? $kind),
+            'title' => $component->serial_number.' — '.(self::KINDS[$kind] ?? $kind),
         ]);
     }
 
@@ -85,8 +90,12 @@ class LocalChecksheetController extends Controller
     {
         abort_unless(isset(self::KINDS[$kind]), 404);
 
-        if (!$this->canEdit()) {
+        if (! auth()->user()?->canOperateOverhaul()) {
             return response()->json(['ok' => false, 'message' => 'Tidak memiliki izin.'], 403);
+        }
+
+        if ($denied = $this->integrity->mutationDeniedReason($component->fresh(), $kind)) {
+            return response()->json(['ok' => false, 'message' => $denied], 403);
         }
 
         $data = $request->validate([
@@ -96,12 +105,23 @@ class LocalChecksheetController extends Controller
         ]);
 
         $layout = SpreadsheetLayout::forComponent($component, $kind);
-        abort_if(!$layout, 404);
+        abort_if(! $layout, 404);
 
-        // Hanya sel yang memang terdaftar sebagai kolom keputusan yang boleh
-        // ditulis — mencegah sembarang sel diubah lewat request.
-        if (!$this->isDecisionCell($layout, $data['sheet'], $data['cell_ref'])) {
+        if (! $this->integrity->layoutMatchesComponent($component, $layout, $kind)) {
+            return response()->json(['ok' => false, 'message' => 'Layout tidak sesuai komponen.'], 422);
+        }
+
+        if (! $this->integrity->sheetExists($layout, $data['sheet'])) {
+            return response()->json(['ok' => false, 'message' => 'Sheet tidak dikenal.'], 422);
+        }
+
+        if (! $this->integrity->isDecisionCell($layout, $data['sheet'], $data['cell_ref'])) {
             return response()->json(['ok' => false, 'message' => 'Sel ini tidak bisa diisi.'], 422);
+        }
+
+        $value = $this->integrity->normalizeValue($data['value'] ?? null);
+        if ($value === null && trim((string) ($data['value'] ?? '')) !== '') {
+            return response()->json(['ok' => false, 'message' => 'Nilai keputusan tidak valid.'], 422);
         }
 
         ComponentSpreadsheetAnswer::updateOrCreate(
@@ -112,7 +132,7 @@ class LocalChecksheetController extends Controller
                 'cell_ref' => $data['cell_ref'],
             ],
             [
-                'value' => $data['value'] ?: null,
+                'value' => $value,
                 'filled_by' => auth()->id(),
             ]
         );
@@ -120,20 +140,13 @@ class LocalChecksheetController extends Controller
         return response()->json(['ok' => true]);
     }
 
-    private function isDecisionCell(SpreadsheetLayout $layout, string $sheet, string $ref): bool
+    private function canEdit(Component $component, string $kind): bool
     {
-        foreach ($layout->decision_map[$sheet]['parts'] ?? [] as $part) {
-            if (in_array($ref, $part['cells'] ?? [], true)) {
-                return true;
-            }
+        if (! auth()->user()?->canOperateOverhaul()) {
+            return false;
         }
 
-        return false;
-    }
-
-    private function canEdit(): bool
-    {
-        return (bool) auth()->user()?->hasAnyRole(['Mechanic', 'Supervisor', 'SuperAdmin']);
+        return $this->integrity->mutationDeniedReason($component, $kind) === null;
     }
 
     /**

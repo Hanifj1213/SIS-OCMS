@@ -18,6 +18,15 @@ class OverhaulLog extends Model
         'start_time',
         'end_time',
         'notes',
+        'approval_requested_by',
+        'approval_requested_at',
+        'approved_by',
+        'approved_at',
+    ];
+
+    protected $casts = [
+        'approval_requested_at' => 'datetime',
+        'approved_at' => 'datetime',
     ];
 
     public function component()
@@ -28,5 +37,15 @@ class OverhaulLog extends Model
     public function mechanic()
     {
         return $this->belongsTo(User::class, 'mechanic_id', 'id');
+    }
+
+    public function approvalRequester()
+    {
+        return $this->belongsTo(User::class, 'approval_requested_by', 'id');
+    }
+
+    public function approver()
+    {
+        return $this->belongsTo(User::class, 'approved_by', 'id');
     }
 }

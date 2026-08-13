@@ -19,7 +19,7 @@ class MolController extends Controller
 {
     private function authorizeMechanic(): void
     {
-        if (!auth()->user()->hasAnyRole(['Mechanic', 'Supervisor', 'SuperAdmin'])) {
+        if (! auth()->user()?->canOperateOverhaul()) {
             abort(403, 'Hanya Mechanic/Supervisor/SuperAdmin yang boleh menerbitkan MOL.');
         }
     }
