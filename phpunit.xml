@@ -26,6 +26,10 @@
         <env name="DB_CONNECTION" value="sqlite"/>
         <env name="DB_DATABASE" value=":memory:"/>
         <env name="DB_URL" value=""/>
+        <!-- Jangan pernah memanggil Apps Script sungguhan dari test suite;
+             test yang membutuhkannya mengeset config + Http::fake sendiri. -->
+        <env name="GSHEET_COPY_WEBAPP_URL" value=""/>
+        <env name="GSHEET_COPY_SECRET" value=""/>
         <env name="MAIL_MAILER" value="array"/>
         <env name="QUEUE_CONNECTION" value="sync"/>
         <env name="SESSION_DRIVER" value="array"/>
