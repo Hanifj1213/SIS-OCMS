@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Models\Component;
 use App\Services\ChecksheetGsheetService;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Log;
@@ -16,8 +17,13 @@ use Illuminate\Support\Facades\Log;
  * measurement) dan tiap panggilan Apps Script bisa memakan 10–20 detik, jadi
  * totalnya melewati batas 30 detik PHP dan pendaftaran komponen gagal dengan
  * "Maximum execution time exceeded" — padahal komponennya sudah tersimpan.
+ *
+ * ShouldBeUnique: halaman detail men-dispatch ulang setiap kali dibuka selama
+ * masih ada URL kosong. Tanpa uniqueness, antrean bisa berisi banyak job untuk
+ * komponen yang sama — dan bila ada lebih dari satu worker, dua job bisa
+ * menyalin template yang sama bersamaan (file ganda di Google Drive).
  */
-class DuplicateChecksheetGsheets implements ShouldQueue
+class DuplicateChecksheetGsheets implements ShouldQueue, ShouldBeUnique
 {
     use Queueable;
 
@@ -26,7 +32,15 @@ class DuplicateChecksheetGsheets implements ShouldQueue
 
     public int $tries = 3;
 
+    /** Lock unik dilepas otomatis setelah 10 menit jika job macet. */
+    public int $uniqueFor = 600;
+
     public function __construct(public int $compId) {}
+
+    public function uniqueId(): string
+    {
+        return (string) $this->compId;
+    }
 
     public function handle(ChecksheetGsheetService $gsheetService): void
     {

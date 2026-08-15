@@ -79,9 +79,16 @@ class ChecksheetGsheetService
         ],
     ];
 
+    /** Daftar kind template yang dikenal (untuk UI Developer). */
+    public static function kinds(): array
+    {
+        return array_keys(self::KINDS);
+    }
+
     /**
      * ID template jenis tertentu untuk komponen ini, atau null.
-     * Lookup: config.{kind}.{major_category}.{EGI} atau fallback default.
+     * Lookup: tabel gsheet_templates DULU (dikelola Developer dari UI),
+     * lalu fallback config.{kind}.{major_category}.{EGI} / default.
      */
     public function templateIdFor(Component $component, string $kind = 'disassembly'): ?string
     {
@@ -93,19 +100,46 @@ class ChecksheetGsheetService
         $egi = strtoupper(trim((string) $component->egi));
         $configKey = self::KINDS[$kind]['config'];
 
-        $id = config("checksheet_gsheets.{$configKey}.{$category}.{$egi}");
+        $id = $this->dbTemplateId($kind, $category, $egi)
+            ?? config("checksheet_gsheets.{$configKey}.{$category}.{$egi}");
 
         // Alias GD825A ↔ GD825A-2
         if (!$id && str_starts_with($egi, 'GD825A')) {
             $alt = $egi === 'GD825A' ? 'GD825A-2' : 'GD825A';
-            $id = config("checksheet_gsheets.{$configKey}.{$category}.{$alt}");
+            $id = $this->dbTemplateId($kind, $category, $alt)
+                ?? config("checksheet_gsheets.{$configKey}.{$category}.{$alt}");
         }
 
         if (!$id) {
-            $id = config("checksheet_gsheets.{$configKey}.default");
+            $id = $this->dbTemplateId($kind, null, null)
+                ?? config("checksheet_gsheets.{$configKey}.default");
         }
 
         return $id ?: null;
+    }
+
+    /**
+     * Cari ID template di tabel gsheet_templates. Aman dipanggil sebelum
+     * tabelnya ada (mis. migrasi belum jalan) — cukup fallback ke config.
+     */
+    private function dbTemplateId(string $kind, ?string $category, ?string $egi): ?string
+    {
+        try {
+            $query = \App\Models\GsheetTemplate::query()->where('kind', $kind);
+
+            if ($category === null && $egi === null) {
+                $query->whereNull('major_category')->whereNull('egi');
+            } else {
+                $query->where('major_category', $category)
+                    ->whereRaw('UPPER(egi) = ?', [strtoupper((string) $egi)]);
+            }
+
+            $id = $query->value('spreadsheet_id');
+
+            return ($id !== null && $id !== '') ? $id : null;
+        } catch (\Throwable) {
+            return null;
+        }
     }
 
     /**
@@ -146,52 +180,33 @@ class ChecksheetGsheetService
         );
 
         try {
-            $payload = [
+            // Lewat postWebapp() agar secret, allow-list action, timeout, dan
+            // logging aman berlaku seragam untuk seluruh panggilan Apps Script.
+            $data = $this->postWebapp([
+                'action' => 'copy',
                 'template_id' => $templateId,
                 'name' => $name,
-                'secret' => config('checksheet_gsheets.secret', ''),
-            ];
-            $json = json_encode($payload);
+            ]);
 
-            $response = Http::timeout(20)
-                ->withHeaders(['Accept' => 'application/json', 'Content-Type' => 'application/json'])
-                ->withBody($json, 'application/json')
-                ->withOptions(['allow_redirects' => false])
-                ->post($webappUrl);
-
-            if (in_array($response->status(), [301, 302, 303, 307, 308], true)) {
-                $location = $response->header('Location');
-                if ($location && !str_starts_with($location, 'http')) {
-                    $parts = parse_url($webappUrl);
-                    $location = ($parts['scheme'] ?? 'https') . '://' . ($parts['host'] ?? '') . $location;
-                }
-                if ($location) {
-                    // GAS: hasil doPost diambil lewat GET ke URL redirect
-                    $response = Http::timeout(20)
-                        ->withHeaders(['Accept' => 'application/json'])
-                        ->withOptions(['allow_redirects' => false])
-                        ->get($location);
-                }
-            }
-
-            $data = $response->json();
-
-            if ($response->successful() && ($data['ok'] ?? false) && !empty($data['url'])) {
+            if (is_array($data) && ($data['ok'] ?? false) && !empty($data['url'])) {
                 $component->update([$column => $data['url']]);
+
                 return true;
             }
 
+            // Catat metadata saja — tanpa secret dan tanpa isi response.
             Log::warning('Duplikasi GSheet gagal', [
                 'comp_id' => $component->comp_id,
                 'kind' => $kind,
                 'category' => $component->major_category,
-                'status' => $response->status(),
-                'body' => $data,
+                'error' => is_array($data) ? ($data['error'] ?? 'unknown') : 'response tidak valid',
+                'correlation_id' => is_array($data) ? ($data['correlation_id'] ?? null) : null,
             ]);
         } catch (\Throwable $e) {
-            Log::warning('Duplikasi GSheet error: ' . $e->getMessage(), [
+            Log::warning('Duplikasi GSheet error', [
                 'comp_id' => $component->comp_id,
                 'kind' => $kind,
+                'error' => $e->getMessage(),
             ]);
         }
 
@@ -318,17 +333,22 @@ class ChecksheetGsheetService
 
         if ($allRows === [] && $errors !== []) {
             return [
-                'error' => implode('; ', $errors),
+                'error' => implode('; ', array_unique($errors)),
                 'profile' => 'disassembly',
                 'rows' => [],
             ];
         }
 
-        return [
+        $result = [
             'sheet' => $sheetNames === [] ? null : implode(', ', array_unique($sheetNames)),
             'profile' => 'disassembly',
             'rows' => $allRows,
         ];
+        if ($errors !== []) {
+            $result['warning'] = implode('; ', array_unique($errors));
+        }
+
+        return $result;
     }
 
     /**
@@ -405,10 +425,15 @@ class ChecksheetGsheetService
             return ['ok' => false, 'error' => 'URL spreadsheet tidak valid.'];
         }
 
+        // Hanya spreadsheet milik OCMS (salinan komponen atau template
+        // terdaftar) yang boleh dibaca atas nama aplikasi.
+        if (!$this->isManagedSpreadsheetId($spreadsheetId)) {
+            return ['ok' => false, 'error' => 'Spreadsheet tidak terdaftar pada OCMS.'];
+        }
+
         $body = [
             'action' => 'read',
             'spreadsheet_id' => $spreadsheetId,
-            'secret' => config('checksheet_gsheets.secret', ''),
         ];
 
         if ($sheetKeywords !== null) {
@@ -454,6 +479,16 @@ class ChecksheetGsheetService
     }
 
     /**
+     * Aksi runtime yang boleh dipanggil aplikasi. Aksi administratif
+     * (restore/format/list revision) sengaja TIDAK ada di sini — aksi itu
+     * hanya boleh dijalankan lewat tools CLI pada deployment terpisah yang
+     * mengaktifkan OCMS_ADMIN_ACTIONS di Apps Script.
+     *
+     * @var list<string>
+     */
+    private const ALLOWED_ACTIONS = ['copy', 'upload', 'read', 'ping'];
+
+    /**
      * @param  array<string, mixed>  $body
      * @return array<string, mixed>|null
      */
@@ -464,50 +499,63 @@ class ChecksheetGsheetService
             return ['ok' => false, 'error' => 'GSHEET_COPY_WEBAPP_URL belum dikonfigurasi.'];
         }
 
-        // Apps Script sering timeout pada percobaan pertama (cold start).
-        // Dua percobaan dengan jeda singkat jauh mengurangi cURL error 28.
-        // Action "read" (multi-tab) butuh lebih lama dari copy/upload singkat.
-        $httpTimeout = (($body['action'] ?? '') === 'read') ? 90 : 30;
+        // Fail-closed: tanpa secret, jangan pernah memanggil webapp. Apps
+        // Script juga menolak, tapi permintaan tidak perlu dikirim sama sekali.
+        $secret = (string) config('checksheet_gsheets.secret', '');
+        if ($secret === '') {
+            return [
+                'ok' => false,
+                'error' => 'GSHEET_COPY_SECRET belum dikonfigurasi. Integrasi Google Sheets dinonaktifkan sampai secret diisi.',
+            ];
+        }
+
+        $action = (string) ($body['action'] ?? 'copy');
+        if (!in_array($action, self::ALLOWED_ACTIONS, true)) {
+            return ['ok' => false, 'error' => 'Action tidak diizinkan: '.$action];
+        }
+
+        $body['secret'] = $secret;
+
+        // Correlation ID untuk menelusuri satu permintaan lintas log tanpa
+        // pernah mencatat secret atau isi spreadsheet.
+        $correlationId = (string) \Illuminate\Support\Str::uuid();
+
+        require_once base_path('tools/apps_script_http.php');
+
+        // Action read (multi-tab) butuh lebih lama; cold start GAS sering > 30 detik di Windows.
+        $httpTimeout = $action === 'read' ? 120 : 45;
         $lastError = null;
 
-        for ($attempt = 1; $attempt <= 2; $attempt++) {
+        for ($attempt = 1; $attempt <= 3; $attempt++) {
             try {
-                $json = json_encode($body);
+                $response = postToAppsScript($webappUrl, $body, $httpTimeout);
+                $payload = $response->json();
 
-                $response = Http::timeout($httpTimeout)
-                    ->connectTimeout(15)
-                    ->withHeaders(['Accept' => 'application/json', 'Content-Type' => 'application/json'])
-                    ->withBody($json, 'application/json')
-                    ->withOptions(['allow_redirects' => false])
-                    ->post($webappUrl);
-
-                if (in_array($response->status(), [301, 302, 303, 307, 308], true)) {
-                    $location = $response->header('Location');
-                    if ($location && !str_starts_with($location, 'http')) {
-                        $parts = parse_url($webappUrl);
-                        $location = ($parts['scheme'] ?? 'https') . '://' . ($parts['host'] ?? '') . $location;
-                    }
-                    if ($location) {
-                        $response = Http::timeout($httpTimeout)
-                            ->connectTimeout(15)
-                            ->withHeaders(['Accept' => 'application/json'])
-                            ->withOptions(['allow_redirects' => false])
-                            ->get($location);
-                    }
+                if (is_array($payload) && ($payload['ok'] ?? false)) {
+                    return $payload;
                 }
 
-                return $response->json();
+                $lastError = is_array($payload)
+                    ? ($payload['error'] ?? 'Gagal membaca spreadsheet (pastikan webapp sudah di-deploy dengan action read).')
+                    : 'Respons webapp tidak valid (HTTP '.$response->status().')';
             } catch (\Throwable $e) {
-                $lastError = $e;
-                Log::warning("GSheet webapp attempt {$attempt} error: " . $e->getMessage());
+                $lastError = $e->getMessage();
 
-                if ($attempt < 2) {
-                    usleep(1500000);   // jeda 1,5 detik sebelum percobaan kedua
+                // Log hanya metadata — tanpa secret, tanpa body, tanpa URL.
+                Log::warning('GSheet webapp gagal', [
+                    'correlation_id' => $correlationId,
+                    'action' => $action,
+                    'attempt' => $attempt,
+                    'error' => $lastError,
+                ]);
+
+                if ($attempt < 3) {
+                    usleep(2000000);
                 }
             }
         }
 
-        return ['ok' => false, 'error' => $lastError?->getMessage() ?? 'Unknown error'];
+        return ['ok' => false, 'error' => $lastError ?? 'Unknown error', 'correlation_id' => $correlationId];
     }
 
     public function extractSpreadsheetId(string $url): ?string
@@ -521,6 +569,70 @@ class ChecksheetGsheetService
         }
 
         return null;
+    }
+
+    /**
+     * Apakah ID spreadsheet ini dikelola OCMS?
+     *
+     * Sumber sah: URL yang sudah tersimpan pada kolom gsheet_* komponen, atau
+     * template yang terdaftar (tabel gsheet_templates / config). ID di luar
+     * itu tidak boleh dikirim ke Apps Script atas nama aplikasi.
+     */
+    public function isManagedSpreadsheetId(string $spreadsheetId): bool
+    {
+        if ($spreadsheetId === '') {
+            return false;
+        }
+
+        foreach (self::KINDS as $meta) {
+            $exists = Component::query()
+                ->whereNotNull($meta['column'])
+                ->where($meta['column'], 'like', '%'.$spreadsheetId.'%')
+                ->exists();
+
+            if ($exists) {
+                return true;
+            }
+        }
+
+        try {
+            if (\App\Models\GsheetTemplate::query()->where('spreadsheet_id', $spreadsheetId)->exists()) {
+                return true;
+            }
+        } catch (\Throwable) {
+            // Tabel template belum ada — lanjut cek config.
+        }
+
+        foreach (self::KINDS as $meta) {
+            $templates = (array) config('checksheet_gsheets.'.$meta['config'], []);
+            if ($this->configContainsId($templates, $spreadsheetId)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param  array<mixed>  $templates
+     */
+    private function configContainsId(array $templates, string $spreadsheetId): bool
+    {
+        foreach ($templates as $value) {
+            if (is_array($value)) {
+                if ($this->configContainsId($value, $spreadsheetId)) {
+                    return true;
+                }
+
+                continue;
+            }
+
+            if (is_string($value) && $value === $spreadsheetId) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

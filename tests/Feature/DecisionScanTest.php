@@ -20,7 +20,12 @@ class DecisionScanTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        config(['checksheet_gsheets.webapp_url' => 'https://script.google.com/macros/s/TEST/exec']);
+        // Integrasi GSheet fail-closed: tanpa secret seluruh panggilan ditolak
+        // sebelum HTTP dikirim. Test memakai secret dummy + Http::fake().
+        config([
+            'checksheet_gsheets.webapp_url' => 'https://script.google.com/macros/s/TEST/exec',
+            'checksheet_gsheets.secret' => 'test-secret',
+        ]);
     }
 
     /** @return array<string, mixed> */

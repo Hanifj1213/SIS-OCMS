@@ -46,7 +46,94 @@
  *     "data": "<base64>", "dry_run": true, "secret": "..." }
  */
 
-var SECRET = '';
+/**
+ * KEAMANAN (WAJIB DIBACA SEBELUM DEPLOY):
+ *
+ * 1. Secret TIDAK disimpan di file ini. Simpan lewat Script Properties:
+ *    Project Settings → Script Properties → Add:
+ *      OCMS_SECRET = <nilai yang sama dengan GSHEET_COPY_SECRET di .env>
+ *    Nilai secret tidak boleh ikut ter-commit ke repository.
+ *
+ * 2. Autentikasi FAIL-CLOSED: bila OCMS_SECRET belum diisi, SELURUH aksi
+ *    ditolak. Deployment tanpa secret tidak dapat dipakai siapa pun.
+ *
+ * 3. Aksi administratif/destruktif (list_revisions, restore_revision,
+ *    restore_from_xlsx, apply_checkboxes, apply_decision_merges,
+ *    apply_decision_boxes) HANYA aktif bila Script Property
+ *      OCMS_ADMIN_ACTIONS = enabled
+ *    Deployment runtime produksi harus membiarkannya kosong sehingga hanya
+ *    aksi runtime (copy, upload, read, ping) yang dapat dipanggil.
+ *
+ * 4. Rotasi secret: ganti nilai OCMS_SECRET di Script Properties dan
+ *    GSHEET_COPY_SECRET di .env pada waktu yang sama, lalu Deploy →
+ *    New version. URL /exec lama tetap berlaku; bila URL bocor, buat
+ *    deployment baru dan perbarui .env.
+ */
+
+/** Ambil secret dari Script Properties — tidak pernah dari source. */
+function getSecret_() {
+  try {
+    var value = PropertiesService.getScriptProperties().getProperty('OCMS_SECRET');
+    return value == null ? '' : String(value);
+  } catch (err) {
+    return '';
+  }
+}
+
+/** Aksi administratif hanya aktif bila di-opt-in lewat Script Properties. */
+function adminActionsEnabled_() {
+  try {
+    var value = PropertiesService.getScriptProperties().getProperty('OCMS_ADMIN_ACTIONS');
+    return String(value == null ? '' : value).toLowerCase() === 'enabled';
+  } catch (err) {
+    return false;
+  }
+}
+
+/** Aksi runtime yang boleh dipanggil aplikasi OCMS. */
+var RUNTIME_ACTIONS = ['copy', 'upload', 'read', 'ping'];
+
+/** Aksi administratif/destruktif — default nonaktif pada deployment runtime. */
+var ADMIN_ACTIONS = [
+  'apply_checkboxes',
+  'apply_decision_merges',
+  'apply_decision_boxes',
+  'list_revisions',
+  'restore_revision',
+  'restore_from_xlsx'
+];
+
+function inList_(list, value) {
+  for (var i = 0; i < list.length; i++) {
+    if (list[i] === value) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * Perbandingan secret dengan waktu konstan terhadap panjang string —
+ * menghindari kebocoran informasi lewat waktu respons.
+ */
+function secretMatches_(provided) {
+  var expected = getSecret_();
+  if (!expected) {
+    return false; // fail-closed: secret belum dikonfigurasi
+  }
+
+  var given = provided == null ? '' : String(provided);
+  if (given.length !== expected.length) {
+    return false;
+  }
+
+  var diff = 0;
+  for (var i = 0; i < expected.length; i++) {
+    diff |= expected.charCodeAt(i) ^ given.charCodeAt(i);
+  }
+  return diff === 0;
+}
+
 var TARGET_FOLDER_NAME = 'OCMS Checksheet Copies';
 
 /**
@@ -73,17 +160,33 @@ function doPost(e) {
   try {
     var body = JSON.parse(e.postData.contents);
 
-    if (SECRET && body.secret !== SECRET) {
+    // Tanpa action = permintaan copy template (kompatibilitas versi lama).
+    var action = body.action ? String(body.action) : 'copy';
+
+    // FAIL-CLOSED: secret kosong atau salah → seluruh aksi ditolak.
+    // Tidak ada informasi konfigurasi yang dikembalikan ke pemanggil.
+    if (!secretMatches_(body.secret)) {
       return jsonOut({ ok: false, error: 'unauthorized' });
     }
 
-    if (body.action === 'upload') {
+    var isRuntime = inList_(RUNTIME_ACTIONS, action);
+    var isAdmin = inList_(ADMIN_ACTIONS, action);
+
+    if (!isRuntime && !isAdmin) {
+      return jsonOut({ ok: false, error: 'action tidak dikenal' });
+    }
+
+    if (isAdmin && !adminActionsEnabled_()) {
+      return jsonOut({ ok: false, error: 'action administratif dinonaktifkan pada deployment ini' });
+    }
+
+    if (action === 'upload') {
       return handleUpload(body);
     }
-    if (body.action === 'read') {
+    if (action === 'read') {
       return handleRead(body);
     }
-    if (body.action === 'ping') {
+    if (action === 'ping') {
       return jsonOut({
         ok: true,
         ping: true,
@@ -92,28 +195,30 @@ function doPost(e) {
         driveInsert: !!(Drive && Drive.Files && Drive.Files.insert)
       });
     }
-    if (body.action === 'apply_checkboxes') {
+    if (action === 'apply_checkboxes') {
       return handleApplyCheckboxes(body);
     }
-    if (body.action === 'apply_decision_merges') {
+    if (action === 'apply_decision_merges') {
       return handleApplyDecisionMerges(body);
     }
-    if (body.action === 'apply_decision_boxes') {
+    if (action === 'apply_decision_boxes') {
       return handleApplyDecisionBoxes(body);
     }
-    if (body.action === 'list_revisions') {
+    if (action === 'list_revisions') {
       return handleListRevisions(body);
     }
-    if (body.action === 'restore_revision') {
+    if (action === 'restore_revision') {
       return handleRestoreRevision(body);
     }
-    if (body.action === 'restore_from_xlsx') {
+    if (action === 'restore_from_xlsx') {
       return handleRestoreFromXlsx(body);
     }
 
     return handleCopy(body);
   } catch (err) {
-    return jsonOut({ ok: false, error: String(err) });
+    // Jangan mengembalikan payload/stack mentah ke pemanggil.
+    Logger.log('doPost error: ' + err);
+    return jsonOut({ ok: false, error: 'internal error' });
   }
 }
 

@@ -13,7 +13,7 @@ use Tests\TestCase;
 /**
  * E2E: jalankan satu komponen SA12V140E-1 dari Stage 1 (Receiving) sampai
  * Stage 7 (RFU) lewat endpoint yang sama dengan yang dipakai UI:
- * updateStage (Mechanic) + approveStage (Management).
+ * updateStage (Mechanic) + approveStage (Group Leader).
  * Stage 5 = Test Performance & Painting, Stage 6 = Delivery (checksheet
  * internal seperti Receiving), Stage 7 = RFU (halaman penutup).
  */
@@ -22,7 +22,7 @@ class FullStageWalkthroughTest extends TestCase
     use RefreshDatabase;
 
     private User $mechanic;
-    private User $management;
+    private User $groupLeader;
 
     protected function setUp(): void
     {
@@ -30,7 +30,7 @@ class FullStageWalkthroughTest extends TestCase
         Queue::fake();
 
         Role::findOrCreate('Mechanic', 'web');
-        Role::findOrCreate('Management', 'web');
+        Role::findOrCreate('Group Leader', 'web');
 
         $this->mechanic = User::create([
             'name' => 'Mekanik E2E',
@@ -39,12 +39,12 @@ class FullStageWalkthroughTest extends TestCase
         ]);
         $this->mechanic->assignRole('Mechanic');
 
-        $this->management = User::create([
-            'name' => 'Manajemen E2E',
-            'nik' => 'E2E-MGT-' . random_int(1000, 9999),
+        $this->groupLeader = User::create([
+            'name' => 'Group Leader E2E',
+            'nik' => 'E2E-GL-' . random_int(1000, 9999),
             'password' => 'password',
         ]);
-        $this->management->assignRole('Management');
+        $this->groupLeader->assignRole('Group Leader');
     }
 
     public function test_komponen_berjalan_dari_stage_1_sampai_rfu(): void
@@ -87,7 +87,7 @@ class FullStageWalkthroughTest extends TestCase
         $this->assertSame(2, $component->current_stage);
         $this->assertTrue($component->is_waiting_approval);
 
-        $this->actingAs($this->management)
+        $this->actingAs($this->groupLeader)
             ->post(route('components.approveStage', $component->comp_id))
             ->assertSessionHasNoErrors();
         $component->refresh();
@@ -97,7 +97,7 @@ class FullStageWalkthroughTest extends TestCase
         $this->actingAs($this->mechanic)
             ->post(route('components.updateStage', $component->comp_id))
             ->assertSessionHasNoErrors();
-        $this->actingAs($this->management)
+        $this->actingAs($this->groupLeader)
             ->post(route('components.approveStage', $component->comp_id))
             ->assertSessionHasNoErrors();
         $component->refresh();
@@ -107,7 +107,7 @@ class FullStageWalkthroughTest extends TestCase
         $this->actingAs($this->mechanic)
             ->post(route('components.updateStage', $component->comp_id))
             ->assertSessionHasNoErrors();
-        $this->actingAs($this->management)
+        $this->actingAs($this->groupLeader)
             ->post(route('components.approveStage', $component->comp_id))
             ->assertSessionHasNoErrors();
         $component->refresh();
@@ -117,7 +117,7 @@ class FullStageWalkthroughTest extends TestCase
         $this->actingAs($this->mechanic)
             ->post(route('components.updateStage', $component->comp_id))
             ->assertSessionHasNoErrors();
-        $this->actingAs($this->management)
+        $this->actingAs($this->groupLeader)
             ->post(route('components.approveStage', $component->comp_id))
             ->assertSessionHasNoErrors();
         $component->refresh();
@@ -166,8 +166,17 @@ class FullStageWalkthroughTest extends TestCase
             ->assertSessionHasErrors('stage');
     }
 
-    public function test_management_tidak_bisa_memproses_tahap_dan_mekanik_tidak_bisa_approve(): void
+    public function test_logistik_tidak_bisa_memproses_tahap_dan_mekanik_tidak_bisa_approve(): void
     {
+        Role::findOrCreate('Logistik', 'web');
+
+        $logistik = User::create([
+            'name' => 'Logistik E2E',
+            'nik' => 'E2E-LO-' . random_int(1000, 9999),
+            'password' => 'password',
+        ]);
+        $logistik->assignRole('Logistik');
+
         $component = Component::create([
             'serial_number' => 'E2E-RBAC-' . random_int(10000, 99999),
             'egi' => 'SA12V140E-1',
@@ -179,8 +188,8 @@ class FullStageWalkthroughTest extends TestCase
             'gsheet_measurement_url' => 'https://docs.google.com/spreadsheets/d/MEA/edit',
         ]);
 
-        // Management tidak boleh memproses tahap
-        $this->actingAs($this->management)
+        // Logistik tidak boleh memproses tahap
+        $this->actingAs($logistik)
             ->post(route('components.updateStage', $component->comp_id))
             ->assertSessionHasErrors('stage');
 

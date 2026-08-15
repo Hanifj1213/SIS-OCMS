@@ -28,6 +28,7 @@ class Component extends Model
         'date_defitted',
         'manifest',
         'way_bill',
+        'ro_number',
         'date_delivery',
         'current_stage',
         'is_waiting_approval',
@@ -40,6 +41,7 @@ class Component extends Model
         'gsheet_assembly_url',
         'gsheet_testbench_url',
         'painting_images',
+        'assembly_documents',
         'mol_wo_number',
         'mol_order_type',
         'mol_order_date',
@@ -53,6 +55,7 @@ class Component extends Model
     protected $casts = [
         'is_waiting_approval' => 'boolean',
         'painting_images' => 'array',
+        'assembly_documents' => 'array',
         'date_defitted' => 'date',
         'date_delivery' => 'date',
         'smr' => 'integer',
