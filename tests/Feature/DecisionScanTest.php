@@ -373,4 +373,220 @@ class DecisionScanTest extends TestCase
         $this->assertSame('INSPEKSI NO2', $result['candidates'][0]['section']);
         $this->assertCount(1, $result['skipped']);
     }
+
+    public function test_rescan_uncheck_removes_draft_fr_from_gsheet(): void
+    {
+        $this->fakeWebapp([
+            'ok' => true,
+            'matched' => true,
+            'sheets' => [[
+                'name' => 'INSPEKSI',
+                'values' => [
+                    ['NO', 'PARTS NAME', '', 'DECISION', '', ''],
+                    ['', '', '', 'U/A', 'U/R', 'R/N'],
+                    [1, 'SPOOL VALVE', '', false, false, false],
+                ],
+            ]],
+        ]);
+
+        $component = $this->makeComponent([
+            'gsheet_measurement_url' => 'https://docs.google.com/spreadsheets/d/FAKE_ID/edit',
+        ]);
+
+        $component->fabricationRequests()->create([
+            'fr_number' => 'FR/SIS/RC/0001/VII/2026/INT',
+            'part_name' => 'SPOOL VALVE',
+            'section' => 'INSPEKSI',
+            'qty' => 1,
+            'work_type' => 'repair',
+            'source' => 'gsheet',
+            'status' => 'draft',
+        ]);
+
+        $result = app(FabricationRequestService::class)->scanCandidates($component);
+
+        $this->assertSame([], $result['candidates']);
+        $this->assertCount(1, $result['sync']['removed_fr']);
+        $this->assertSame('Centang dicabut di spreadsheet', $result['sync']['removed_fr'][0]['reason']);
+        $this->assertDatabaseMissing('fabrication_requests', [
+            'comp_id' => $component->comp_id,
+            'part_name' => 'SPOOL VALVE',
+        ]);
+    }
+
+    public function test_rescan_salvage_to_replace_converts_fr_to_mol(): void
+    {
+        $this->fakeWebapp([
+            'ok' => true,
+            'matched' => true,
+            'sheets' => [[
+                'name' => 'INSPEKSI',
+                'values' => [
+                    ['NO', 'PARTS NAME', '', 'DECISION', '', ''],
+                    ['', '', '', 'U/A', 'U/R', 'R/N'],
+                    [1, 'BUSHING', '', false, false, true],
+                ],
+            ]],
+        ]);
+
+        $component = $this->makeComponent([
+            'gsheet_measurement_url' => 'https://docs.google.com/spreadsheets/d/FAKE_ID/edit',
+        ]);
+
+        $component->fabricationRequests()->create([
+            'fr_number' => 'FR/SIS/RC/0002/VII/2026/INT',
+            'part_name' => 'BUSHING',
+            'section' => 'INSPEKSI',
+            'qty' => 1,
+            'work_type' => 'repair',
+            'source' => 'gsheet',
+            'status' => 'draft',
+        ]);
+
+        $result = app(FabricationRequestService::class)->scanCandidates($component);
+
+        $this->assertCount(1, $result['part_request_candidates']);
+        $this->assertSame('BUSHING', $result['part_request_candidates'][0]['part_name']);
+        $this->assertCount(1, $result['sync']['removed_fr']);
+        $this->assertSame('Keputusan berubah ke REPLACE/MOL', $result['sync']['removed_fr'][0]['reason']);
+        $this->assertDatabaseMissing('fabrication_requests', [
+            'comp_id' => $component->comp_id,
+            'part_name' => 'BUSHING',
+        ]);
+
+        $created = app(FabricationRequestService::class)->createPartRequestsFromCandidates(
+            $component,
+            $result['part_request_candidates']
+        );
+
+        $this->assertCount(1, $created);
+        $this->assertDatabaseHas('part_requests', [
+            'comp_id' => $component->comp_id,
+            'part_name' => 'BUSHING',
+            'section' => 'INSPEKSI',
+            'status' => 'Pending',
+        ]);
+    }
+
+    public function test_rescan_replace_to_salvage_converts_mol_to_fr(): void
+    {
+        $this->fakeWebapp([
+            'ok' => true,
+            'matched' => true,
+            'sheets' => [[
+                'name' => 'INSPEKSI',
+                'values' => [
+                    ['NO', 'PARTS NAME', '', 'DECISION', '', ''],
+                    ['', '', '', 'U/A', 'U/R', 'R/N'],
+                    [1, 'O-RING', '', false, true, false],
+                ],
+            ]],
+        ]);
+
+        $component = $this->makeComponent([
+            'gsheet_measurement_url' => 'https://docs.google.com/spreadsheets/d/FAKE_ID/edit',
+        ]);
+
+        $component->partRequests()->create([
+            'part_name' => 'O-RING',
+            'section' => 'INSPEKSI',
+            'qty' => 1,
+            'status' => 'Pending',
+        ]);
+
+        $result = app(FabricationRequestService::class)->scanCandidates($component);
+
+        $this->assertCount(1, $result['candidates']);
+        $this->assertSame('O-RING', $result['candidates'][0]['part_name']);
+        $this->assertCount(1, $result['sync']['removed_pr']);
+        $this->assertSame('Keputusan berubah ke SALVAGE/U/R', $result['sync']['removed_pr'][0]['reason']);
+        $this->assertDatabaseMissing('part_requests', [
+            'comp_id' => $component->comp_id,
+            'part_name' => 'O-RING',
+        ]);
+    }
+
+    public function test_rescan_does_not_remove_printed_fr_or_processed_mol(): void
+    {
+        $this->fakeWebapp([
+            'ok' => true,
+            'matched' => true,
+            'sheets' => [[
+                'name' => 'INSPEKSI',
+                'values' => [
+                    ['NO', 'PARTS NAME', '', 'DECISION', '', ''],
+                    ['', '', '', 'U/A', 'U/R', 'R/N'],
+                    [1, 'SHAFT', '', false, false, false],
+                    [2, 'GEAR', '', false, true, false],
+                ],
+            ]],
+        ]);
+
+        $component = $this->makeComponent([
+            'gsheet_measurement_url' => 'https://docs.google.com/spreadsheets/d/FAKE_ID/edit',
+        ]);
+
+        $component->fabricationRequests()->create([
+            'fr_number' => 'FR/SIS/RC/0003/VII/2026/INT',
+            'part_name' => 'SHAFT',
+            'section' => 'INSPEKSI',
+            'qty' => 1,
+            'work_type' => 'repair',
+            'source' => 'gsheet',
+            'status' => 'printed',
+        ]);
+
+        $component->partRequests()->create([
+            'part_name' => 'GEAR',
+            'section' => 'INSPEKSI',
+            'qty' => 1,
+            'status' => 'Available',
+        ]);
+
+        $result = app(FabricationRequestService::class)->scanCandidates($component);
+
+        $this->assertSame([], $result['sync']['removed_fr']);
+        $this->assertSame([], $result['sync']['removed_pr']);
+        $this->assertCount(2, $result['sync']['blocked']);
+        $this->assertDatabaseHas('fabrication_requests', ['part_name' => 'SHAFT', 'status' => 'printed']);
+        $this->assertDatabaseHas('part_requests', ['part_name' => 'GEAR', 'status' => 'Available']);
+    }
+
+    public function test_rescan_does_not_remove_manual_fr(): void
+    {
+        $this->fakeWebapp([
+            'ok' => true,
+            'matched' => true,
+            'sheets' => [[
+                'name' => 'INSPEKSI',
+                'values' => [
+                    ['NO', 'PARTS NAME', '', 'DECISION', '', ''],
+                    ['', '', '', 'U/A', 'U/R', 'R/N'],
+                    [1, 'MANUAL PART', '', false, false, false],
+                ],
+            ]],
+        ]);
+
+        $component = $this->makeComponent([
+            'gsheet_measurement_url' => 'https://docs.google.com/spreadsheets/d/FAKE_ID/edit',
+        ]);
+
+        $component->fabricationRequests()->create([
+            'fr_number' => 'FR/SIS/RC/0099/VII/2026/INT',
+            'part_name' => 'MANUAL PART',
+            'section' => 'INSPEKSI',
+            'qty' => 1,
+            'work_type' => 'fabrikasi',
+            'source' => 'manual',
+            'status' => 'draft',
+        ]);
+
+        $result = app(FabricationRequestService::class)->scanCandidates($component);
+
+        $this->assertSame([], $result['sync']['removed_fr']);
+        $this->assertDatabaseHas('fabrication_requests', [
+            'part_name' => 'MANUAL PART',
+            'source' => 'manual',
+        ]);
+    }
 }

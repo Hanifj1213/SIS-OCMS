@@ -79,17 +79,32 @@ class FabricationRequestController extends Controller
             ? $this->frService->createPartRequestsFromCandidates($component, $prCandidates)
             : [];
 
+        $sync = $result['sync'] ?? ['removed_fr' => [], 'removed_pr' => [], 'blocked' => []];
+        $removedFrCount = count($sync['removed_fr'] ?? []);
+        $removedPrCount = count($sync['removed_pr'] ?? []);
+        $blockedCount = count($sync['blocked'] ?? []);
+
         $messages = [];
+        if ($removedFrCount > 0) {
+            $messages[] = $removedFrCount . ' FR dihapus/diganti';
+        }
+        if ($removedPrCount > 0) {
+            $messages[] = $removedPrCount . ' MOL dihapus/diganti';
+        }
         if ($createdFr !== []) {
-            $messages[] = count($createdFr) . ' FR';
+            $messages[] = count($createdFr) . ' FR baru';
         }
         if ($createdPr !== []) {
-            $messages[] = count($createdPr) . ' Part Request (MOL)';
+            $messages[] = count($createdPr) . ' MOL baru';
         }
 
         $msg = $messages !== []
-            ? implode(' + ', $messages) . ' berhasil dibuat.'
-            : 'Tidak ada FR atau MOL baru yang dibuat.';
+            ? 'Scan selesai: ' . implode(', ', $messages) . '.'
+            : 'Tidak ada perubahan FR atau MOL.';
+
+        if ($blockedCount > 0) {
+            $msg .= " {$blockedCount} item tidak disentuh (sudah dicetak/diproses gudang).";
+        }
 
         return response()->json([
             'ok' => true,
@@ -107,6 +122,7 @@ class FabricationRequestController extends Controller
                 'qty' => $pr->qty,
             ]),
             'skipped' => $result['skipped'],
+            'sync' => $sync,
             'gsheet_error' => $result['gsheet_error'],
             'gsheet_warning' => $result['gsheet_warning'] ?? null,
             'gsheet_sheet' => $result['gsheet_sheet'],

@@ -71,12 +71,23 @@
                     if ((data.skipped || []).length) {
                         msg += `, ${data.skipped.length} dilewati (sudah ada)`;
                     }
+                    if ((data.sync?.removed_fr || []).length) {
+                        msg += `, ${data.sync.removed_fr.length} FR disesuaikan`;
+                    }
+                    if ((data.sync?.removed_pr || []).length) {
+                        msg += `, ${data.sync.removed_pr.length} MOL disesuaikan`;
+                    }
+                    if ((data.sync?.blocked || []).length) {
+                        msg += `, ${data.sync.blocked.length} tidak disentuh (sudah dicetak/diproses)`;
+                    }
                     scanStatus.textContent = msg;
 
-                    // Reload jika ada FR/PR baru yang berhasil dibuat
+                    // Reload jika ada perubahan FR/PR
                     const createdFrCount = (data.created_fr || []).length;
                     const createdPrCount = (data.created_pr || []).length;
-                    if (createdFrCount > 0 || createdPrCount > 0) {
+                    const removedFrCount = (data.sync?.removed_fr || []).length;
+                    const removedPrCount = (data.sync?.removed_pr || []).length;
+                    if (createdFrCount > 0 || createdPrCount > 0 || removedFrCount > 0 || removedPrCount > 0) {
                         setTimeout(() => location.reload(), 1500);
                     }
                 } catch (e) {

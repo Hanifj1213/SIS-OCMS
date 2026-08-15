@@ -7,6 +7,7 @@ use App\Models\FabricationRequest;
 use App\Models\FrNumberSequence;
 use App\Models\PartRequest;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class FabricationRequestService
 {
@@ -136,9 +137,63 @@ class FabricationRequestService
 
     /**
      * Gabungkan kandidat FR/PR dari form internal + Google Sheets.
+     * Scan ulang juga menyesuaikan FR/MOL draft dengan centang terbaru di sheet.
      */
     public function scanCandidates(Component $component): array
     {
+        $gsheet = $this->gsheetService->readPartDecisionRows($component);
+        $profile = $gsheet['profile'] ?? 'inspection';
+        $profileLabel = match ($profile) {
+            'disassembly' => 'Disassembly (SALVAGE → FR, REPLACE → PR)',
+            'inspection+disassembly' => 'Inspection & Disassembly (U/R / SALVAGE → FR, R/N / REPLACE → PR)',
+            default => 'Inspection (U/R → FR, R/N → PR)',
+        };
+
+        $formDesiredFrKeys = [];
+        $formDesiredPrKeys = [];
+        $formManagedKeys = [];
+
+        foreach ($component->inspectionDetails()->where('decision', 'Repair')->get() as $detail) {
+            $key = $this->partKey($detail->part_name, null);
+            $formManagedKeys[$key] = true;
+            $formDesiredFrKeys[$key] = true;
+        }
+
+        foreach ($component->inspectionDetails()->where('decision', 'Replace')->get() as $detail) {
+            $key = $this->partKey($detail->part_name, null);
+            $formManagedKeys[$key] = true;
+            $formDesiredPrKeys[$key] = true;
+        }
+
+        $gsheetDesiredFrKeys = [];
+        $gsheetDesiredPrKeys = [];
+        $gsheetManagedKeys = [];
+
+        if (empty($gsheet['error'])) {
+            foreach ($gsheet['rows'] ?? [] as $row) {
+                $section = trim((string) ($row['sheet'] ?? ''));
+                $key = $this->partKey($row['part_name'] ?? '', $section);
+                $gsheetManagedKeys[$key] = true;
+
+                if (! empty($row['needs_repair'])) {
+                    $gsheetDesiredFrKeys[$key] = true;
+                }
+                if (! empty($row['needs_replace'])) {
+                    $gsheetDesiredPrKeys[$key] = true;
+                }
+            }
+        }
+
+        $sync = $this->syncWithScanDecisions(
+            $component,
+            $gsheetDesiredFrKeys,
+            $gsheetDesiredPrKeys,
+            $gsheetManagedKeys,
+            $formDesiredFrKeys,
+            $formDesiredPrKeys,
+            $formManagedKeys,
+        );
+
         $existingFrNames = $component->fabricationRequests()
             ->get(['part_name', 'section'])
             ->map(fn ($fr) => $this->partKey($fr->part_name, $fr->section))
@@ -175,14 +230,6 @@ class FabricationRequestService
             ];
             $this->pushPrCandidate($partRequestCandidates, $skipped, $entry, $existingPrNames);
         }
-
-        $gsheet = $this->gsheetService->readPartDecisionRows($component);
-        $profile = $gsheet['profile'] ?? 'inspection';
-        $profileLabel = match ($profile) {
-            'disassembly' => 'Disassembly (SALVAGE → FR, REPLACE → PR)',
-            'inspection+disassembly' => 'Inspection & Disassembly (U/R / SALVAGE → FR, R/N / REPLACE → PR)',
-            default => 'Inspection (U/R → FR, R/N → PR)',
-        };
 
         foreach ($gsheet['rows'] ?? [] as $row) {
             $section = trim((string) ($row['sheet'] ?? ''));
@@ -221,11 +268,142 @@ class FabricationRequestService
             'candidates' => $candidates,
             'part_request_candidates' => $partRequestCandidates,
             'skipped' => $skipped,
+            'sync' => $sync,
             'gsheet_error' => $gsheet['error'] ?? null,
             'gsheet_warning' => $gsheet['warning'] ?? null,
             'gsheet_sheet' => $gsheet['sheet'] ?? null,
             'scan_profile' => $profile,
             'scan_profile_label' => $profileLabel,
+        ];
+    }
+
+    /**
+     * Sesuaikan FR/MOL hasil scan sebelumnya dengan centang terbaru.
+     * Hanya menyentuh FR draft (source gsheet/form) dan MOL Pending tanpa data form MOL.
+     *
+     * @param  array<string, true>  $gsheetDesiredFrKeys
+     * @param  array<string, true>  $gsheetDesiredPrKeys
+     * @param  array<string, true>  $gsheetManagedKeys
+     * @param  array<string, true>  $formDesiredFrKeys
+     * @param  array<string, true>  $formDesiredPrKeys
+     * @param  array<string, true>  $formManagedKeys
+     * @return array{
+     *   removed_fr: list<array{fr_id:int, fr_number:string, part_name:string, section:?string, reason:string}>,
+     *   removed_pr: list<array{req_id:int, part_name:string, section:?string, reason:string}>,
+     *   blocked: list<array{type:string, part_name:string, section:?string, reason:string}>
+     * }
+     */
+    public function syncWithScanDecisions(
+        Component $component,
+        array $gsheetDesiredFrKeys,
+        array $gsheetDesiredPrKeys,
+        array $gsheetManagedKeys,
+        array $formDesiredFrKeys,
+        array $formDesiredPrKeys,
+        array $formManagedKeys,
+    ): array {
+        $removedFr = [];
+        $removedPr = [];
+        $blocked = [];
+
+        foreach ($component->fabricationRequests()->get() as $fr) {
+            if (! in_array($fr->source, ['gsheet', 'form'], true)) {
+                continue;
+            }
+
+            if ($fr->source === 'gsheet') {
+                $lookupKey = $this->partKey($fr->part_name, $fr->section);
+                if (! isset($gsheetManagedKeys[$lookupKey])) {
+                    continue;
+                }
+                $wantsFr = isset($gsheetDesiredFrKeys[$lookupKey]);
+                $wantsPr = isset($gsheetDesiredPrKeys[$lookupKey]);
+            } else {
+                $lookupKey = $this->partKey($fr->part_name, null);
+                if (! isset($formManagedKeys[$lookupKey])) {
+                    continue;
+                }
+                $wantsFr = isset($formDesiredFrKeys[$lookupKey]);
+                $wantsPr = isset($formDesiredPrKeys[$lookupKey]);
+            }
+
+            if ($wantsFr) {
+                continue;
+            }
+
+            if ($fr->status !== 'draft') {
+                $blocked[] = [
+                    'type' => 'fr',
+                    'part_name' => $fr->part_name,
+                    'section' => $fr->section,
+                    'reason' => $wantsPr
+                        ? 'FR sudah dicetak/selesai — tidak bisa diganti ke MOL otomatis'
+                        : 'FR sudah dicetak/selesai — tidak dihapus otomatis',
+                ];
+                continue;
+            }
+
+            $reason = $wantsPr ? 'Keputusan berubah ke REPLACE/MOL' : 'Centang dicabut di spreadsheet';
+
+            $this->deleteFabricationRequest($fr);
+            $removedFr[] = [
+                'fr_id' => $fr->fr_id,
+                'fr_number' => $fr->fr_number,
+                'part_name' => $fr->part_name,
+                'section' => $fr->section,
+                'reason' => $reason,
+            ];
+        }
+
+        foreach ($component->partRequests()->get() as $pr) {
+            if (! $this->isScanManagedPartRequest($pr)) {
+                continue;
+            }
+
+            $lookupKey = $this->partKey($pr->part_name, $pr->section);
+            $formKey = $this->partKey($pr->part_name, null);
+
+            if (isset($gsheetManagedKeys[$lookupKey])) {
+                $wantsFr = isset($gsheetDesiredFrKeys[$lookupKey]);
+                $wantsPr = isset($gsheetDesiredPrKeys[$lookupKey]);
+            } elseif (isset($formManagedKeys[$formKey])) {
+                $wantsFr = isset($formDesiredFrKeys[$formKey]);
+                $wantsPr = isset($formDesiredPrKeys[$formKey]);
+            } else {
+                continue;
+            }
+
+            if ($wantsPr) {
+                continue;
+            }
+
+            if ($pr->status !== 'Pending') {
+                $blocked[] = [
+                    'type' => 'pr',
+                    'part_name' => $pr->part_name,
+                    'section' => $pr->section,
+                    'reason' => $wantsFr
+                        ? 'MOL sudah diproses gudang — tidak bisa diganti ke FR otomatis'
+                        : 'MOL sudah diproses gudang — tidak dihapus otomatis',
+                ];
+                continue;
+            }
+
+            $reason = $wantsFr ? 'Keputusan berubah ke SALVAGE/U/R' : 'Centang dicabut di spreadsheet';
+
+            $pr->delete();
+            $removedPr[] = [
+                'req_id' => $pr->req_id,
+                'part_name' => $pr->part_name,
+                'section' => $pr->section,
+                'reason' => $reason,
+            ];
+        }
+
+        return [
+            'removed_fr' => $removedFr,
+            'removed_pr' => $removedPr,
+            'blocked' => $blocked,
         ];
     }
 
@@ -424,5 +602,47 @@ class FabricationRequestService
         $sectionKey = $this->normalizePartName((string) $section);
 
         return $sectionKey === '' ? $key : $key . '@' . $sectionKey;
+    }
+
+    /** MOL dari scan otomatis — bukan baris form MOL manual (punya WO/figure/index/remark/part number). */
+    private function isScanManagedPartRequest(PartRequest $pr): bool
+    {
+        foreach (['wo_number', 'figure', 'index_no', 'part_number', 'remarks'] as $field) {
+            $value = trim((string) ($pr->{$field} ?? ''));
+            if ($value !== '') {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private function deleteFabricationRequest(FabricationRequest $fr): void
+    {
+        foreach ($fr->imageList() as $image) {
+            $this->deletePublicStoragePath($image['path'] ?? null);
+        }
+
+        foreach (array_keys(FabricationRequest::SIGNATURE_ROLES) as $role) {
+            $this->deletePublicStoragePath($fr->signature($role)['image'] ?? null);
+        }
+
+        $fr->delete();
+    }
+
+    private function deletePublicStoragePath(?string $path): void
+    {
+        $path = trim((string) $path);
+        if ($path === '') {
+            return;
+        }
+
+        $relative = str_starts_with($path, 'storage/')
+            ? substr($path, strlen('storage/'))
+            : ltrim($path, '/');
+
+        if ($relative !== '') {
+            Storage::disk('public')->delete($relative);
+        }
     }
 }
