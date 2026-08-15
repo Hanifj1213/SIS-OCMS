@@ -40,37 +40,127 @@ Dibangun dengan Laravel sebagai proyek Kerja Praktik.
 
 ## Teknologi
 
-- **Backend:** PHP 8.3+, Laravel, SQLite (dev) / MySQL (produksi), queue database
+- **Backend:** PHP 8.3+, Laravel 13, MySQL, queue database
 - **Integrasi:** Google Sheets via Apps Script Web App (duplikasi + pembacaan multi-tab)
 - **Frontend:** Blade, CSS custom (glassmorphism), vanilla JS (polling, live timer)
 - **PDF:** barryvdh/laravel-dompdf
 - **Testing:** PHPUnit — feature test untuk alur tahap, parser keputusan, FR/MOL, dan time tracking
 
-## Menjalankan Secara Lokal
+## Prasyarat
+
+- [Laragon](https://laragon.org/) (versi Full disarankan — sudah termasuk Apache, MySQL, PHP, Node.js)
+- PHP 8.3+
+- MySQL 8+ (bawaan Laragon)
+- Composer (bawaan Laragon)
+- Node.js & npm (bawaan Laragon)
+- Git (bawaan Laragon)
+
+## Cara Deploy di Laragon
+
+### 1. Clone Repository
+
+Buka **Terminal** Laragon (klik kanan tray icon → Terminal), lalu jalankan:
 
 ```bash
-git clone https://github.com/MuhammadRezqyRobiansyah/SISI-OCMS.git
-cd SISI-OCMS
+cd C:\laragon\www
+git clone https://github.com/Hanifj1213/SIS-OCMS.git sisi-ocms
+cd sisi-ocms
+```
 
+> Folder harus berada di `C:\laragon\www\sisi-ocms` agar Laragon otomatis
+> membuat virtual host `sisi-ocms.test`.
+
+### 2. Install Dependencies
+
+```bash
 composer install
 npm install && npm run build
+```
 
+### 3. Buat Database MySQL
+
+Buka **HeidiSQL** dari Laragon (klik kanan tray icon → MySQL → HeidiSQL),
+lalu jalankan query berikut:
+
+```sql
+CREATE DATABASE sisi_ocms CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+```
+
+Atau bisa juga lewat terminal:
+
+```bash
+mysql -u root -e "CREATE DATABASE sisi_ocms CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+```
+
+### 4. Konfigurasi Environment
+
+```bash
 cp .env.example .env
 php artisan key:generate
+```
 
-# .env: isi GSHEET_COPY_WEBAPP_URL & GSHEET_COPY_SECRET (integrasi Google Sheets)
+Edit file `.env`, ubah bagian database menjadi:
 
+```dotenv
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=sisi_ocms
+DB_USERNAME=root
+DB_PASSWORD=
+```
+
+> **Catatan:** Laragon default menggunakan user `root` tanpa password.
+> Untuk produksi, buat user MySQL khusus dengan password yang kuat.
+
+Isi juga konfigurasi Google Sheets jika diperlukan:
+
+```dotenv
+GSHEET_COPY_WEBAPP_URL=<URL Apps Script Web App>
+GSHEET_COPY_SECRET=<secret yang sama dengan Script Property OCMS_SECRET>
+```
+
+### 5. Migrasi & Seeder
+
+```bash
 php artisan migrate
 php artisan db:seed --class=ChecksheetTemplateSeeder
 php artisan db:seed --class=DeliveryChecksheetTemplateSeeder
-
-php artisan serve
-php artisan queue:work   # wajib: memproses duplikasi checksheet GSheet
 ```
+
+### 6. Buat Storage Symlink
+
+```bash
+php artisan storage:link
+```
+
+### 7. Jalankan Queue Worker
+
+Queue worker **wajib berjalan** untuk memproses duplikasi checksheet Google Sheets.
+Buka tab terminal baru di Laragon dan jalankan:
+
+```bash
+php artisan queue:work --tries=3
+```
+
+> Worker ini harus tetap berjalan selama aplikasi digunakan. Jika terminal
+> ditutup, worker ikut berhenti dan job duplikasi GSheet tidak terproses.
+
+### 8. Akses Aplikasi
+
+Pastikan Laragon sudah **Start All** (Apache + MySQL harus hijau).
+Buka browser dan akses:
+
+```
+http://sisi-ocms.test
+```
+
+> Jika virtual host belum aktif, klik kanan tray icon Laragon → **Apache** →
+> **Reload**. Atau restart Laragon.
 
 Registrasi publik dinonaktifkan — user dibuat oleh SuperAdmin melalui menu Users.
 
-### Menjalankan test
+## Menjalankan Test
 
 ```bash
 php artisan test
@@ -78,11 +168,16 @@ php artisan test
 php vendor/bin/phpunit --filter FullStageWalkthroughTest
 ```
 
-## Deploy
+## Troubleshooting
 
-Panduan produksi Windows (Laragon / IIS) ada di [`DEPLOY_LARAGON_IIS.md`](DEPLOY_LARAGON_IIS.md),
-checklist umum di [`DEPLOYMENT.md`](DEPLOYMENT.md). Poin penting: worker antrian
-(`php artisan queue:work`) harus berjalan sebagai service.
+| Masalah | Solusi |
+|---|---|
+| `sisi-ocms.test` tidak bisa diakses | Restart Laragon, pastikan Apache & MySQL hijau |
+| `SQLSTATE[HY000] [1049] Unknown database` | Buat database `sisi_ocms` dulu (lihat langkah 3) |
+| `Class not found` setelah clone | Jalankan `composer install` ulang |
+| Style/CSS tidak muncul | Jalankan `npm install && npm run build` |
+| Job GSheet tidak jalan | Pastikan `php artisan queue:work` berjalan di terminal |
+| `419 Page Expired` | Jalankan `php artisan config:clear && php artisan cache:clear` |
 
 ## Struktur Direktori Penting
 

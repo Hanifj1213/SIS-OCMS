@@ -49,10 +49,20 @@ FABRIKASI/
 # Catatan kerja internal & berkas scratch pengembangan (lokal saja)
 /CLAUDE.md
 /handoff.md
+/handoff_fr.md
 /KESIMPULAN_SESI_*.md
 /LAPORAN_TEST_PROYEK.txt
 /PLAN_MULTI_EGI_CHECKSHEET.md
 /PROJECT_CONTEXT.md
+/SUPERPROMPT_PRODUCTION_READY.md
+/REFACTOR_CHECKLIST.md
+/MATERI_PROJEK.md
+/MATERI_PROJEK.docx
+/iyah.py
+/WhatsApp Image *
+/fr-preview*
+/docs/puppeteer-config.json
+/docs/img.zip
 /build_final_data.py
 /extract_excel.py
 /extract_images.py
@@ -65,12 +75,23 @@ FABRIKASI/
 /scratch_*.json
 /scratch_*.txt
 /20250325160734-AlamTri-gede.png
+/20250325160734-AlamTri-gede (1).png
+/public/qrcodes/[0-9]*.png
+/public/storage_old_backup/
 /storage/left side.png
 /storage/rear1.png
 /storage/rear2.png
 /storage/rightsideview.png
 /tools/_gitlog_*.txt
 /tools/fill_logbook_kp.py
+/tools/kiro_minimax_proxy.cjs
+/tools/minimax_proxy.py
+/tools/minimax_proxy_debug.log
+/tools/zz_test_req.json
+/tools/check_kiro_db.py
+/tools/list_sqlite_tables.php
+/tools/audit_components_gsheet.php
+/tools/_*.php
 storage/framework/sessions/
 storage/framework/views/
 storage/logs/

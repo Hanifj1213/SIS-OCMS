@@ -66,6 +66,16 @@ if (!$webappUrl) {
 }
 
 $secret = config('checksheet_gsheets.secret', '');
+if ($secret === '') {
+    fwrite(STDERR, "GSHEET_COPY_SECRET belum di-set di .env — integrasi Apps Script fail-closed.\n");
+    fwrite(STDERR, "Lihat TUTORIAL_GSHEET_SECRET.md (Langkah 1-5).\n");
+    exit(1);
+}
+
+// Tool ini memakai aksi administratif DESTRUKTIF (restore_from_xlsx menimpa
+// seluruh isi master) yang default-nya DIMATIKAN. Aktifkan sementara lewat
+// Script Property OCMS_ADMIN_ACTIONS=enabled, lalu HAPUS setelah selesai.
+// Lihat TUTORIAL_GSHEET_SECRET.md bagian "Operasi maintenance template".
 
 if ($listOnly || $fromRevision) {
     runRevisionMode(

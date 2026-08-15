@@ -53,6 +53,16 @@ if (!$webappUrl) {
 }
 
 $secret = config('checksheet_gsheets.secret', '');
+if ($secret === '') {
+    fwrite(STDERR, "GSHEET_COPY_SECRET belum di-set di .env — integrasi Apps Script fail-closed.\n");
+    fwrite(STDERR, "Lihat TUTORIAL_GSHEET_SECRET.md (Langkah 1-5).\n");
+    exit(1);
+}
+
+// Tool ini memakai aksi administratif (apply_checkboxes) yang secara default
+// DIMATIKAN pada deployment Apps Script. Aktifkan sementara lewat Script
+// Property OCMS_ADMIN_ACTIONS=enabled, lalu HAPUS setelah selesai.
+// Lihat TUTORIAL_GSHEET_SECRET.md bagian "Operasi maintenance template".
 
 /** @var array<string, array{ids: list<string>, sheets: array<string, array<string, true>>, labels: list<string>, cell_count: int}> */
 $targets = [];

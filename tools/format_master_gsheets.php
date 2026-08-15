@@ -49,6 +49,16 @@ if (!$webappUrl) {
 }
 
 $secret = config('checksheet_gsheets.secret', '');
+if ($secret === '') {
+    fwrite(STDERR, "GSHEET_COPY_SECRET belum di-set di .env — integrasi Apps Script fail-closed.\n");
+    fwrite(STDERR, "Lihat TUTORIAL_GSHEET_SECRET.md (Langkah 1-5).\n");
+    exit(1);
+}
+
+// Tool ini memakai aksi administratif (apply_decision_boxes) yang secara
+// default DIMATIKAN pada deployment Apps Script. Aktifkan sementara lewat
+// Script Property OCMS_ADMIN_ACTIONS=enabled, lalu HAPUS setelah selesai.
+// Lihat TUTORIAL_GSHEET_SECRET.md bagian "Operasi maintenance template".
 
 // Hanya layout dengan kolom keputusan FR — measurement Engine tidak disentuh.
 $formatKinds = ['disassembly', 'subassy_disassembly', 'inspection'];
